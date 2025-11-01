@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>TOEIC Study Tracker – 6-Month Flashcard Memory Plan</title>
+<style>
+body {
+  font-family: "Noto Sans TC", Arial, sans-serif;
+  background-color: #f7fdf8;
+  margin: 0;
+  padding: 0;
+  color: #333;
+}
+header {
+  background: linear-gradient(135deg, #b6e3b1, #d7f7c4);
+  padding: 2rem 1rem;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+header h1 {
+  margin: 0;
+  font-size: 1.8rem;
+  color: #1b5e20;
+}
+header h2 {
+  margin: 0.5rem 0 0;
+  font-size: 1.1rem;
+  color: #388e3c;
+}
+section {
+  max-width: 700px;
+  margin: 1rem auto;
+  padding: 0 1rem;
+}
+.task-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+.task-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+  color: #2e7d32;
+}
+.task-body { margin-top: 0.5rem; line-height: 1.4; }
+.week-summary {
+  background: #e8f5e9;
+  border-left: 6px solid #66bb6a;
+  border-radius: 8px;
+  padding: 0.8rem;
+  margin: 1rem 0;
+  font-weight: bold;
+  color: #2e7d32;
+}
+.progress { background: #c8e6c9; border-radius: 20px; height: 20px; width: 100%; margin-top: 6px;}
+.progress-bar { background: #388e3c; height: 20px; border-radius: 20px; width: 0%; transition: width 0.3s;}
+input[type="checkbox"] { width: 20px; height: 20px; }
+footer { text-align: center; color: #777; font-size: 0.9rem; margin: 2rem 0;}
+</style>
+</head>
+<body>
+<header>
+  <h1>TOEIC Study Tracker</h1>
+  <h2>6-Month Flashcard Memory Plan</h2>
+  <p>每日10字 × 記憶曲線 × 手寫複習追蹤</p>
+</header>
+
+<section id="task-list"></section>
+
+<section style="max-width:700px;margin:auto;padding:1rem;">
+  <h3>📊 全期進度統計</h3>
+  <div class="progress"><div class="progress-bar" id="progress-bar"></div></div>
+  <p id="progress-text" style="text-align:center;margin-top:8px;">完成率：0%</p>
+</section>
+
+<footer>
+  <p>© 2025 TOEIC Study Tracker | Handwritten Flashcard Memory Plan</p>
+</footer>
+
+<script>
+const taskList = document.getElementById("task-list");
+const progressBar = document.getElementById("progress-bar");
+const progressText = document.getElementById("progress-text");
+const start = new Date("2025-11-03");
+const totalDays = 144; // 24週×6天
+const daysPerWeek = 6;
+const totalWeeks = totalDays / daysPerWeek;
+let total = 0;
+
+function makeWeekSummary(weekIndex) {
+  const div = document.createElement("div");
+  div.className = "week-summary";
+  div.innerHTML = `
+    🟩 第 ${weekIndex + 1} 週進度<br>
+    <div class="progress"><div class="progress-bar" id="weekbar${weekIndex}"></div></div>
+    <p style="margin:6px 0;" id="weektext${weekIndex}">完成率：0%</p>
+  `;
+  taskList.appendChild(div);
+}
+
+// 建立每日任務
+for (let i = 0; i < totalDays; i++) {
+  const weekIndex = Math.floor(i / daysPerWeek);
+
+  const date = new Date(start);
+  date.setDate(start.getDate() + i);
+  const dayStr = date.toLocaleDateString('zh-TW', { month: '2-digit', day: '2-digit', weekday: 'short' });
+  const dLabel = `D${i + 1}`;
+  const review = [];
+  if (i >= 1) review.push(`D${i}`);
+  if (i >= 3) review.push(`D${i - 2}`);
+  if (i >= 7) review.push(`D${i - 6}`);
+
+  const card = document.createElement("div");
+  card.className = "task-card";
+  card.innerHTML = `
+    <div class="task-header">
+      <span>${dayStr}｜${dLabel}</span>
+      <input type="checkbox" id="chk${i}">
+    </div>
+    <div class="task-body">
+      🆕 今日新字：10 個<br>
+      🔁 今日複習：${review.length ? review.join("、") : "—"}<br>
+      ✍️ 備註：<input type="text" id="note${i}" style="width:60%;border:none;border-bottom:1px solid #ccc;">
+    </div>`;
+
+  taskList.appendChild(card);
+  total++;
+
+  // 在每週結尾插入統計卡
+  if ((i + 1) % daysPerWeek === 0) {
+    makeWeekSummary(weekIndex);
+  }
+}
+
+function updateProgress() {
+  let done = 0;
+  for (let i = 0; i < total; i++) {
+    if (localStorage.getItem("chk" + i) === "true") done++;
+  }
+  const percent = Math.round((done / total) * 100);
+  progressBar.style.width = percent + "%";
+  progressText.textContent = "完成率：" + percent + "%";
+
+  // 每週統計
+  for (let w = 0; w < totalWeeks; w++) {
+    const startI = w * daysPerWeek;
+    const endI = startI + daysPerWeek;
+    let weekDone = 0;
+    for (let i = startI; i < endI; i++) {
+      if (localStorage.getItem("chk" + i) === "true") weekDone++;
+    }
+    const weekPercent = Math.round((weekDone / daysPerWeek) * 100);
+    const bar = document.getElementById("weekbar" + w);
+    const txt = document.getElementById("weektext" + w);
+    if (bar && txt) {
+      bar.style.width = weekPercent + "%";
+      txt.textContent = "完成率：" + weekPercent + "%（" + weekDone + "/6）";
+    }
+  }
+}
+
+for (let i = 0; i < total; i++) {
+  const chk = document.getElementById("chk" + i);
+  const saved = localStorage.getItem("chk" + i) === "true";
+  chk.checked = saved;
+  chk.addEventListener("change", () => {
+    localStorage.setItem("chk" + i, chk.checked);
+    updateProgress();
+  });
+}
+
+updateProgress();
+</script>
+</body>
+</html>
