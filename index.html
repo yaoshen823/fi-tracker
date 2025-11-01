@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>TOEIC Study Tracker v10.6.4</title>
+<title>TOEIC Study Tracker v10.6.5</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -11,12 +11,18 @@
   --pri:#2e7d32;--pri2:#43a047;--sun:#fdf6ea;--sunText:#6a512a;
   --bar:#43a047;--barBg:#dcedc8;--btn:#43a047;--btnText:#fff;
 }
-body{margin:0;background:var(--bg);color:var(--text);
-  font-family:"Noto Sans TC",sans-serif;line-height:1.6;}
-header{background:linear-gradient(135deg,#c8f3c8,#e7fbe7);
-  padding:22px;text-align:center;position:sticky;top:0;z-index:10;}
+body{
+  margin:0;background:var(--bg);color:var(--text);
+  font-family:"Noto Sans TC",sans-serif;
+  font-size:15.5px;line-height:1.6;
+}
+header{
+  background:linear-gradient(135deg,#c8f3c8,#e7fbe7);
+  padding:22px;text-align:center;position:sticky;top:0;z-index:10;
+}
 h1{margin:0;font-size:26px;color:var(--pri)}
 h2{margin:6px 0 0;font-size:15px;color:var(--pri2)}
+h3{font-size:18px;font-weight:700;color:var(--pri);margin-bottom:8px;}
 main{max-width:960px;margin:18px auto;padding:0 14px 100px}
 .card{background:#fff;border-radius:14px;
   box-shadow:0 2px 6px rgba(0,0,0,.08);padding:18px;margin:12px 0;}
@@ -26,7 +32,7 @@ button{background:var(--btn);color:var(--btnText);border:none;
   padding:8px 14px;border-radius:8px;cursor:pointer;font-weight:600;}
 button:hover{filter:brightness(0.95);}
 
-/* ========== 週卡容器（壓縮版） ========== */
+/* ========== 週卡容器 ========== */
 #weekSlider{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;
   -webkit-overflow-scrolling:touch;padding:8px 0;scroll-behavior:smooth;}
 #weekSlider::-webkit-scrollbar{display:none;}
@@ -45,14 +51,14 @@ button:hover{filter:brightness(0.95);}
 .dayRow:last-child{border:none;}
 .dayRow.sun{background:var(--sun);border-left:4px solid #e0b65f;border-radius:6px;padding:6px 8px;}
 .dayName{width:56px;font-weight:700;color:var(--pri);}
-.taskInfo{flex:1;min-width:0;font-size:13px;color:#333;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.taskInfo{flex:1;min-width:0;font-size:14.5px;color:#333;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .dayRow input[type=checkbox]{width:18px;height:18px;cursor:pointer;}
 .dayRow.done .taskInfo{color:#999;text-decoration:line-through;}
 .revToggle{font-size:12px;color:#2e7d32;border:1px solid #c8e6c9;border-radius:6px;padding:2px 6px;cursor:pointer;user-select:none;white-space:nowrap;}
 .revToggle:hover{background:#e8f5e9;}
-.revDetail{margin:6px 0 0 56px;background:#f7faf7;border:1px solid #e0f2e9;border-radius:8px;padding:6px 8px;font-size:13px;color:#2b3d2b;
-  display:none;overflow:hidden;max-height:0;transition:max-height .25s ease;}
-.revDetail.show{display:block;max-height:220px;}
+.revDetail{margin:6px 0 0 56px;background:#f4fbf4;border:1px solid #dcefdc;border-radius:8px;padding:6px 8px;font-size:14px;color:#2b3d2b;
+  display:none;overflow:hidden;max-height:0;transition:max-height .25s ease,padding .2s ease;}
+.revDetail.show{display:block;max-height:220px;padding:8px 10px;}
 
 /* 週進度條 */
 .weekFooter{margin-top:8px;}
@@ -60,37 +66,81 @@ button:hover{filter:brightness(0.95);}
 .weekFooter .progress .bar{background:var(--bar);height:10px;width:0%;transition:.5s;}
 
 /* 浮動進度條 */
-#floatingBar{position:fixed;bottom:0;left:0;right:0;
-  backdrop-filter:blur(10px);background:rgba(240,248,242,0.9);
-  border-top:2px solid #c8e6c9;padding:8px 14px;
-  display:flex;justify-content:space-between;align-items:center;
-  z-index:50;}
-#floatingBar .barWrap{flex-grow:1;margin:0 10px;}
-#floatingBar .barWrap .progress{height:10px;}
-#floatingBar span{font-size:13px;color:#2e5933;white-space:nowrap;}
-@media(max-width:600px){
-  header h1{font-size:22px;}
-  .weekCard{flex:0 0 95%;}
-  #floatingBar{flex-direction:column;gap:4px;}
-  #floatingBar .barWrap{width:100%;margin:4px 0;}
-  .dayName{width:48px;}
-  .taskInfo{font-size:12px;}
+#floatingBar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  backdrop-filter: blur(10px);
+  background: rgba(240,248,242,0.9);
+  border-top: 2px solid #c8e6c9;
+  padding: 8px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 50;
+  flex-wrap: nowrap; /* 不允許換行 */
+  gap: 12px;         /* 各元素間保留間距 */
+  white-space: nowrap;
 }
 
-/* 每月進度卡 */
-#monthGrid{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;}
-.monthCard{flex:1 1 calc(33% - 10px);min-width:120px;
-  background:linear-gradient(135deg,#e8f5e9,#f1f8e9);
-  border-radius:12px;padding:10px;text-align:center;
-  box-shadow:0 1px 4px rgba(0,0,0,.05);}
-.monthCard.high{background:linear-gradient(135deg,#c8e6c9,#dcedc8);}
-.monthCard.med{background:linear-gradient(135deg,#fff8e1,#fffde7);}
-.monthCard.low{background:linear-gradient(135deg,#eeeeee,#f5f5f5);}
-.monthCard .monthName{font-weight:600;color:var(--pri);}
-.monthCard .monthRate{font-size:14px;margin:4px 0;}
-.monthCard .monthBadge{font-size:20px;}
-@media(max-width:600px){
-  .monthCard{flex:1 1 calc(50% - 10px);}
+#floatingBar .barWrap {
+  flex-grow: 1;
+  margin: 0 10px;
+}
+
+#floatingBar .barWrap .progress {
+  height: 10px;
+}
+
+#floatingBar span {
+  font-size: 14px;
+  color: #2e5933;
+}
+
+/* 手機版也維持單行，不再自動換行 */
+@media (max-width: 600px) {
+  #floatingBar {
+    flex-direction: row;
+    gap: 8px;
+    padding: 10px;
+  }
+}
+/* ========== 每月進度卡（新版網格） ========== */
+#monthGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 14px;
+  margin-top: 10px;
+}
+.monthCard {
+  border-radius: 14px;
+  padding: 14px 10px;
+  background: linear-gradient(135deg, #e8f5e9, #f1f8e9);
+  box-shadow: 0 2px 6px rgba(0,0,0,.08);
+  text-align: center;
+  transition: transform .25s;
+}
+.monthCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0,0,0,.12);
+}
+.monthCard.high { background: linear-gradient(135deg,#c8e6c9,#dcedc8); }
+.monthCard.med { background: linear-gradient(135deg,#fff8e1,#fffde7); }
+.monthCard.low { background: linear-gradient(135deg,#eeeeee,#f5f5f5); }
+.monthName { font-weight: 700; color: var(--pri); font-size: 15px; }
+.monthRate { font-size: 14px; margin: 6px 0; color: #333; }
+.monthBadge {
+  width: 48px; height: 48px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.8);
+  font-size: 22px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+@media (max-width: 600px) {
+  #monthGrid {
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  }
+  .monthBadge { width: 42px; height: 42px; font-size: 20px; }
 }
 
 /* 輕量動畫 */
@@ -104,7 +154,7 @@ button:hover{filter:brightness(0.95);}
 
 <header>
   <h1>TOEIC Study Tracker</h1>
-  <h2>v10.6.4｜明確複習提示 × 壓縮週卡 × 智慧記憶曲線</h2>
+  <h2>v10.6.5｜字體＋月卡優化 × 明確複習提示 × 壓縮週卡</h2>
 </header>
 
 <main>
@@ -139,7 +189,7 @@ button:hover{filter:brightness(0.95);}
 
 <section id="monthly" class="card">
   <h3>🏅 每月進度總覽</h3>
-  <div class="tip-box">檢視各月份平均完成率，達標月份將自動獲得徽章。</div>
+  <div class="tip-box">顯示各月份平均完成率，徽章代表成效等級（🏅 高／🌿 中／🕓 需努力）。</div>
   <div id="monthGrid"></div>
 </section>
 
@@ -175,11 +225,9 @@ button:hover{filter:brightness(0.95);}
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script>
 (()=>{
-const NS="toeic-v10.6.4";
+const NS="toeic-v10.6.5";
 const TOTAL_DAYS=180;
 const $=q=>document.querySelector(q);
-const $$=q=>document.querySelectorAll(q);
-
 let config={startDate:null,dailyCount:10};
 let studyLog={};
 let _chart=null;
@@ -195,7 +243,7 @@ const todayIdx=()=>{if(!config.startDate)return null;
   return Math.floor((t-s)/86400000);
 };
 
-/* ===== 建立記錄（記憶曲線） ===== */
+/* ===== 初始記錄 ===== */
 function buildInitialLog(){
   studyLog={};
   for(let i=0;i<TOTAL_DAYS;i++){
@@ -209,7 +257,7 @@ function buildInitialLog(){
   }
 }
 
-/* ===== 延遲補複邏輯 ===== */
+/* ===== 延遲補複 ===== */
 function adaptiveDefer(){
   const t=todayIdx(); if(t==null)return;
   const sun=(new Date()).getDay()===0;
@@ -266,7 +314,7 @@ function markDayDone(i,done){
   }));
 }
 
-/* ===== 週卡生成（含🔍明細） ===== */
+/* ===== 週卡生成 ===== */
 function createWeekCard(W){
   const ws=idxDate(W*7),we=idxDate(Math.min(W*7+6,TOTAL_DAYS-1));
   const card=document.createElement("div");
@@ -371,14 +419,24 @@ function updateMSI(){
 
 /* ===== 折線圖 ===== */
 function drawChart(rates){
-  const ctx=$("#weekChart");if(!ctx)return;
+  const ctx=document.getElementById("weekChart");
+  if(!ctx)return;
   if(_chart)_chart.destroy();
-  _chart=new Chart(ctx,{type:"line",data:{labels:rates.map((_,i)=>"W"+(i+1)),datasets:[{label:"每週完成率",data:rates,borderColor:"#43a047",backgroundColor:"#a5d6a770",fill:true,tension:.25}]},options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,max:100,ticks:{stepSize:20}}}}});
+  _chart=new Chart(ctx,{type:"line",data:{
+    labels:rates.map((_,i)=>"W"+(i+1)),
+    datasets:[{label:"每週完成率",data:rates,borderColor:"#43a047",
+    backgroundColor:"#a5d6a770",fill:true,tension:.25}]},
+    options:{plugins:{legend:{display:false}},
+    scales:{y:{beginAtZero:true,max:100,ticks:{stepSize:20}}}}});
 }
 
 /* ===== 月卡 ===== */
 function updateMonthlyCards(weekRates){
-  const mR=[];for(let i=0;i<24;i+=4){const s=weekRates.slice(i,i+4);mR.push(Math.round(s.reduce((a,b)=>a+b,0)/(s.length||1)));}
+  const mR=[];
+  for(let i=0;i<24;i+=4){
+    const s=weekRates.slice(i,i+4);
+    mR.push(Math.round(s.reduce((a,b)=>a+b,0)/(s.length||1)));
+  }
   const g=$("#monthGrid");g.innerHTML="";
   mR.forEach((r,i)=>{
     const c=document.createElement("div");
@@ -443,12 +501,12 @@ function updateProgress(){
   }
   const total=TOTAL_DAYS*config.dailyCount;
   const pct=Math.round(done/(total||1)*100);
-  $("#kAccum").textContent=done;
-  $("#kExpect").textContent=total;
-  $("#overallBar").style.width=pct+"%";
-  $("#overallPct").textContent=pct+"%";
-  $("#floatBar").style.width=pct+"%";
-  $("#floatPct").textContent=pct+"%";
+  document.getElementById("kAccum").textContent=done;
+  document.getElementById("kExpect").textContent=total;
+  document.getElementById("overallBar").style.width=pct+"%";
+  document.getElementById("overallPct").textContent=pct+"%";
+  document.getElementById("floatBar").style.width=pct+"%";
+  document.getElementById("floatPct").textContent=pct+"%";
   drawChart(weekRates);
   updateMonthlyCards(weekRates);
   updateMSI();
@@ -456,43 +514,44 @@ function updateProgress(){
 
 /* ===== 初始化 ===== */
 window.addEventListener("DOMContentLoaded",()=>{
-  $("#genBtn").addEventListener("click",()=>generatePlan());
-  $("#prevWeek").addEventListener("click",()=>goToWeek(currentWeek-1));
-  $("#nextWeek").addEventListener("click",()=>goToWeek(currentWeek+1));
-  $("#exportBtn")?.addEventListener("click",exportProgress);
-  $("#importBtn")?.addEventListener("click",()=>$("#importFile").click());
-  $("#importFile")?.addEventListener("change",e=>{
+  document.getElementById("genBtn").addEventListener("click",()=>generatePlan());
+  document.getElementById("prevWeek").addEventListener("click",()=>goToWeek(currentWeek-1));
+  document.getElementById("nextWeek").addEventListener("click",()=>goToWeek(currentWeek+1));
+  document.getElementById("exportBtn")?.addEventListener("click",exportProgress);
+  document.getElementById("importBtn")?.addEventListener("click",()=>document.getElementById("importFile").click());
+  document.getElementById("importFile")?.addEventListener("change",e=>{
     const f=e.target.files&&e.target.files[0];if(f)importProgress(f);
   });
   const c=localStorage.getItem(NS+":config");
   if(c){
     const conf=JSON.parse(c);config=conf;
-    if(conf.startDate)$("#startDate").value=new Date(conf.startDate).toISOString().slice(0,10);
-    if(conf.dailyCount)$("#dailyWords").value=conf.dailyCount;
+    if(conf.startDate)document.getElementById("startDate").value=new Date(conf.startDate).toISOString().slice(0,10);
+    if(conf.dailyCount)document.getElementById("dailyWords").value=conf.dailyCount;
     const sl=localStorage.getItem(NS+":studyLog");if(sl)studyLog=JSON.parse(sl);
     generatePlan();
   }
 });
-})(); 
+})();
 </script>
   <style>
-/* 🔧 補強：🔍 明細展開更順暢（高度過渡） */
-.revDetail {
-  transition: max-height .25s ease, padding .2s ease;
-}
-.revDetail.show {
-  padding: 8px 10px;
-}
+/* 🔧 補強：🔍 明細展開更順暢（高度與內距過渡） */
+.revDetail { transition: max-height .25s ease, padding .2s ease; }
+.revDetail.show { padding: 8px 10px; }
 
-/* 📱 額外手機優化：縮短行高避免卡片過長 */
+/* 📱 額外手機優化：縮短行高避免卡片過長、提高易讀性 */
 @media (max-width: 480px) {
   .dayRow { padding: 4px 0; }
-  .revDetail { font-size: 12px; }
+  .revDetail { font-size: 13.5px; }
+}
+
+/* 🖥️ 桌機視覺微調：週卡略放大可讀性 */
+@media (min-width: 1024px) {
+  .weekCard { flex: 0 0 80%; }
 }
 </style>
 
 <script>
-// 🛡️ 安全提示（避免第三方阻擋 Chart.js 時無感）
+// 🛡️ 安全提示（若 Chart.js 被阻擋，不影響其他功能）
 window.addEventListener("error", (e) => {
   if ((e?.filename||"").includes("chart.umd.min.js")) {
     console.warn("⚠️ Chart.js 載入失敗，統計圖表將不顯示。其他功能不受影響。");
@@ -500,7 +559,7 @@ window.addEventListener("error", (e) => {
 });
 
 // ℹ️ Console 標記
-console.info("%cTOEIC Study Tracker v10.6.4 loaded","color:#2e7d32;font-weight:bold;");
+console.info("%cTOEIC Study Tracker v10.6.5 loaded","color:#2e7d32;font-weight:bold;");
 </script>
 
 </body>
