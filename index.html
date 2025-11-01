@@ -1,67 +1,259 @@
-<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>TOEIC Study Tracker v2</title><style>
-:root{--bg:#f7fdf8;--card:#fff;--text:#233;--muted:#6b6b6b;--pri:#2e7d32;--pri2:#43a047;--accent:#a5d6a7;--chip:#e8f5e9;--bar:#2e7d32;--barBg:#c8e6c9;--head:linear-gradient(135deg,#b6e3b1,#d7f7c4);--sun:#fdf9f3;--sunText:#5a4a2c}
-:root.theme-calm{--bg:#f6fbff;--text:#203040;--pri:#1b5e83;--pri2:#1976d2;--accent:#b3d4f5;--chip:#e7f2ff;--bar:#1976d2;--barBg:#cfe8ff;--head:linear-gradient(135deg,#bcdfff,#d6ecff);--sun:#f2f7ff;--sunText:#284a6a}
-:root.theme-chill{--bg:#fffdf9;--text:#2b2b2b;--pri:#7a5d2f;--pri2:#b98938;--accent:#e8d9b9;--chip:#fbf3e5;--bar:#b98938;--barBg:#f0e3c9;--head:linear-gradient(135deg,#ffefcf,#fff6e6);--sun:#fdf6ea;--sunText:#6a512a}
-@media(prefers-color-scheme:dark){:root.theme-auto{--bg:#0f1411;--card:#121814;--text:#eaeaea;--muted:#9aa;--pri:#9ad29f;--pri2:#6ecf78;--accent:#365a3a;--chip:#18251c;--bar:#7dd089;--barBg:#203425;--head:linear-gradient(135deg,#143e1d,#0d2b14);--sun:#1c1a16;--sunText:#e8dcc7}}
-html,body{margin:0;background:var(--bg);color:var(--text);font-family:"Noto Sans TC",system-ui,-apple-system,Arial,"Segoe UI","PingFang TC","Heiti TC",sans-serif}
-header{background:var(--head);padding:22px 14px;text-align:center;position:sticky;top:0;z-index:9;box-shadow:0 2px 6px rgba(0,0,0,.08)}
-h1{margin:0;color:#1b5e20;font-size:24px}h2{margin:6px 0 0;color:#2b7a2e;font-size:14px}header p{margin:8px 0 0;color:#2b7a2e;font-size:13px}
-main{max-width:980px;margin:14px auto;padding:0 14px 40px}
-.card{background:var(--card);border-radius:14px;box-shadow:0 2px 6px rgba(0,0,0,.08);padding:14px;margin:12px 0}
-ol{margin:6px 0 10px;padding-left:22px}
-li{margin-bottom:4px}
-.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-input[type=date],button,select{border:1px solid var(--accent);border-radius:10px;padding:8px 10px;font-size:14px;background:#fff;color:var(--text)}
-button{background:var(--pri2);color:#fff;border:none;cursor:pointer}button.secondary{background:#fff;color:var(--pri);border:1px solid var(--pri2)}
-.tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
-.muted{color:var(--muted);font-size:12px}
-.grid{display:grid;gap:10px}
-.task{background:#fff;border-radius:12px;box-shadow:0 2px 6px rgba(0,0,0,.06);padding:10px}
-.task.sun{background:var(--sun);color:var(--sunText);border:1px dashed #e3d9c9}
-.task-head{display:flex;justify-content:space-between;align-items:center;font-weight:700;color:var(--pri)}
-.task.sun .task-head{color:var(--sunText)}
-.task-body{margin-top:6px;line-height:1.5}
-.task-body input[type=text]{border:none;border-bottom:1px solid #ddd;width:70%;background:transparent;color:inherit}
-.week{background:var(--chip);border-left:6px solid var(--pri2);border-radius:10px;padding:10px;margin:8px 0 4px;font-weight:700;color:var(--pri)}
-.progress{background:var(--barBg);height:16px;border-radius:30px;overflow:hidden}
-.bar{background:var(--bar);height:16px;width:0%}
-details.month{background:#fff;border-radius:14px;box-shadow:0 2px 6px rgba(0,0,0,.08);padding:8px}
-details>summary{list-style:none;cursor:pointer;padding:6px 4px;border-radius:10px;display:flex;justify-content:space-between;align-items:center}
-details>summary::-webkit-details-marker{display:none}
-.m-left{display:flex;gap:10px;align-items:center}
-.chip{background:var(--chip);color:var(--pri);border-radius:999px;padding:2px 8px;font-size:12px}
-.month-body{padding:4px 2px}
-.kpi{display:flex;gap:8px;align-items:center;color:var(--pri)}
-.totals{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:8px 0}.totals .progress{flex:1}
-footer{color:#777;text-align:center;margin:28px 0 10px}
-</style></head>
-<body class="theme-auto">
-<header><h1>TOEIC Study Tracker</h1><h2>6‑Month Flashcard Memory Plan</h2><p>☕ 每週日為 <b>Chill Review Day</b>：不學新字，輕鬆複習前期單字，讓記憶更穩定。</p></header>
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TOEIC Study Tracker — 記憶曲線精修版</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#f7fdf8;--card:#fff;--text:#233;--muted:#6b6b6b;
+  --pri:#2e7d32;--pri2:#43a047;--accent:#a5d6a7;--chip:#e8f5e9;
+  --bar:#2e7d32;--barBg:#c8e6c9;--today:#c8e6c9;
+  --soft:#f8f8f8;--sun:#fdf6ea;--sunText:#6a512a;
+  --btn:#43a047;--btnText:#fff;
+}
+html,body{
+  margin:0;background:var(--bg);color:var(--text);
+  font-family:"Noto Sans TC",sans-serif;
+}
+header{background:linear-gradient(135deg,#b6e3b1,#d7f7c4);padding:26px 14px;text-align:center;}
+h1{margin:0;font-size:26px;color:var(--pri);}
+h2{margin:4px 0 0;font-size:15px;color:var(--pri2);}
+main{max-width:960px;margin:16px auto;padding:0 14px 50px;}
+.card{background:var(--card);border-radius:14px;box-shadow:0 2px 6px rgba(0,0,0,.08);padding:18px;margin:12px 0;}
+details.month{background:var(--chip);border-radius:12px;margin:8px 0;padding:6px;}
+details>summary{list-style:none;cursor:pointer;padding:8px 10px;font-weight:700;color:var(--pri2);
+display:flex;justify-content:space-between;align-items:center;}
+.mBadge{margin-left:8px;padding:2px 8px;font-size:12px;font-weight:700;border-radius:999px;}
+.week{background:var(--soft);border-radius:8px;padding:10px;margin:6px 0;position:relative;}
+.week .weekTitle{font-weight:700;color:var(--pri);}
+.week .weekPct{position:absolute;top:8px;right:10px;font-size:13px;color:var(--pri2);}
+.task{background:var(--card);border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.06);
+padding:8px;margin:6px 0;}
+.task.today{border:2px solid var(--today);}
+.task.sun{background:var(--sun);color:var(--sunText);border-left:4px solid #e0b65f;font-weight:600;}
+.progress{background:var(--barBg);height:16px;border-radius:30px;overflow:hidden;}
+.bar{background:var(--bar);height:16px;width:0%;}
+input,button{
+  font-family:"Noto Sans TC",sans-serif;
+  border-radius:6px;
+  border:1px solid #c8e6c9;
+  padding:6px 10px;
+}
+button{
+  background:var(--btn);
+  color:var(--btnText);
+  border:none;
+  padding:8px 18px;
+  cursor:pointer;
+  font-weight:600;
+  transition:0.2s;
+}
+button:hover{background:#2e7d32;}
+.inputRow{
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+  align-items:center;
+  justify-content:flex-start;
+  margin-top:8px;
+}
+.noteBox{
+  background:var(--chip);
+  border-left:4px solid var(--pri2);
+  padding:12px;
+  border-radius:10px;
+  font-size:15px;
+  line-height:1.6;
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>TOEIC Study Tracker</h1>
+  <h2>記憶曲線精修版 — 6 個月長期計畫</h2>
+</header>
+
 <main>
-<section id="guide" class="card">
-<h3>📘 使用說明</h3>
-<ol>
-<li>選擇你的學習開始日期（建議週一）。</li>
-<li>系統將自動建立 <b>6 個月 × 每日任務</b>。</li>
-<li>週一至週六學習 10 個新字，週日為 ☕ <b>Chill Review Day</b>。</li>
-<li>每日卡片會顯示記憶曲線複習批次（D+1 / D+3 / D+7 / D+14）。</li>
-<li>✔ 勾選與備註會自動保存，可於任何時候繼續。</li>
-<li>📤 <b>匯出進度</b> 會下載 CSV，可備份或轉移裝置使用。</li>
-<li>📥 <b>匯入進度</b> 可還原之前的勾選與備註。</li>
-<li>🎨 可透過右上角下拉選單切換主題（Fresh / Calm / Chill / Auto）。</li>
-</ol></section>
-<section id="setup" class="card">
-<div class="row" style="justify-content:space-between;align-items:center">
-<div class="row"><label>📅 開始日期 <input type="date" id="startDate"></label><button id="genBtn">開始生成</button><button id="resetBtn" class="secondary">🔄 重新設定</button></div>
-<div class="row"><label>🎨 主題 <select id="themeSel"><option value="auto">Auto</option><option value="fresh">Fresh</option><option value="calm">Calm</option><option value="chill">Chill</option></select></label></div></div>
-<div class="muted">生成後會自動保存起始日與進度（localStorage）。匯出/匯入可跨裝置延續。</div>
+<section class="card">
+  <h3>📘 使用說明</h3>
+  <div class="noteBox">
+    <p>這是一個根據「記憶曲線理論」設計的多益單字長期追蹤系統，目標是在半年內穩定提升你的記憶效率與多益單字量。</p>
+    <p><strong>運作原理：</strong><br>
+    每次學習的新單字會在 <b>D+1、D+3、D+7、D+14</b> 這四個時間點被安排進複習清單。<br>
+    系統每天自動告訴你：「今天有哪些過去的學習內容該複習」。<br>
+    週日為「☕ Chill Review」— 不學新字，但仍顯示今天到期的複習項目。</p>
+    <p><strong>建議學習節奏：</strong><br>
+    🕒 每天 30–60 分鐘，<br>
+    📗 每日固定時間（早晨或睡前），<br>
+    ✍️ 建議搭配手寫單字卡複習。<br>
+    若工作忙碌，可週末整合補複習。</p>
+  </div>
 </section>
-<section id="overall" class="card" style="display:none;"><h3 style="margin:0 0 8px;color:var(--pri)">📊 全期進度</h3>
-<div class="totals"><span class="kpi">開始日：<b id="kStart">—</b></span><span class="kpi">總天數：<b id="kTotal">0</b></span><span class="kpi">已完成：<b id="kDone">0</b> / <b id="kDen">0</b></span></div>
-<div class="progress"><div class="bar" id="overallBar"></div></div><div class="muted" id="overallPct" style="margin-top:6px;text-align:center">完成率：0%</div>
-<div class="tools"><button id="exportBtn">📤 匯出進度(CSV)</button>
-<label class="secondary" style="display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:10px;border:1px solid var(--pri2);cursor:pointer;">📥 匯入進度(CSV)<input id="importInput" type="file" accept=".csv" style="display:none;"></label></div></section>
-<section id="months"></section>
-<footer>💡 建議每日固定時段學習，並於週日檢視前週筆記，建立穩定節奏。<br>© 2025 TOEIC Study Tracker | Chill Review + Themes</footer>
+
+<section class="card">
+  <h3>🎯 設定你的學習計畫</h3>
+  <div class="inputRow">
+    <label>📅 開始日期 <input type="date" id="startDate"></label>
+    <label>📘 每日單字量 <input type="number" id="dailyWords" min="5" max="30" value="10" style="width:80px;"></label>
+    <button id="genBtn">開始生成課表</button>
+  </div>
+  <p style="margin-top:10px;color:var(--muted);font-size:14px;">系統將自動建立 180 天（約 6 個月）課表，含每日學習任務與複習提示。</p>
+</section>
+
+<section id="months" class="card">
+  <h3>📅 六個月課表</h3>
+  <div id="planWrap"><p>生成後會顯示每日任務與當天應複習的內容。</p></div>
+</section>
+
+<section id="stats" class="card">
+  <h3>📊 學習統計</h3>
+  <div>✅ 累積單字量：<span id="kAccum">0</span></div>
+  <div>🎯 預計總量：<span id="kExpect">0</span></div>
+  <div class="progress"><div class="bar" id="overallBar"></div></div>
+  <div style="text-align:right;"><span id="overallPct">0%</span></div>
+</section>
+
+<section class="card">
+  <h3>📈 每週完成率折線圖</h3>
+  <canvas id="weekChart" style="height:300px;width:100%;"></canvas>
+</section>
 </main>
-</body></html>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+(()=>{"use strict";
+const NS="toeic-v8-final";const $=q=>document.querySelector(q),$$=q=>document.querySelectorAll(q),
+save=(k,v)=>localStorage.setItem(NS+":"+k,v),load=k=>localStorage.getItem(NS+":"+k);
+const $start=$("#startDate"),$daily=$("#dailyWords"),$gen=$("#genBtn"),$wrap=$("#planWrap"),
+$bar=$("#overallBar"),$pct=$("#overallPct"),$kA=$("#kAccum"),$kE=$("#kExpect");
+let chart=null,startDate=null,dailyCount=10,totalDays=180,reviewMap=[];
+const fmtDate=d=>`${d.getMonth()+1}/${d.getDate()}`;
+const getDateFromIndex=i=>{const d=new Date(startDate);d.setDate(startDate.getDate()+i);return d};
+const isSun=i=>getDateFromIndex(i).getDay()===0;
+const weekLabel=i=>`W${Math.floor(i/7)+1} D${(i%7)+1}`;
+
+function drawChart(r){const ctx=$("#weekChart").getContext("2d");
+const avg=r.reduce((a,b)=>a+b,0)/Math.max(1,r.length);
+const data={labels:r.map((_,i)=>"W"+(i+1)),datasets:[
+{data:r,label:"每週完成率(%)",tension:.25,borderColor:"#43a047",backgroundColor:"#a5d6a770",fill:true},
+{data:r.map(()=>avg),label:"平均線",borderColor:"#888",borderDash:[5,5],pointRadius:0,borderWidth:1.5}]};
+if(chart){chart.data=data;chart.update();}else{chart=new Chart(ctx,{type:"line",data});}}
+
+function buildReviewMap(){
+  reviewMap=Array.from({length:totalDays},()=>({}));
+  const OFFSETS=[1,3,7,14];
+  for(let i=0;i<totalDays;i++){
+    if(isSun(i))continue;
+    for(const o of OFFSETS){
+      const due=i+o;
+      if(due<totalDays){
+        if(!reviewMap[due].due)reviewMap[due].due=[];
+        reviewMap[due].due.push({src:i,offset:o});
+      }
+    }
+  }
+}
+
+function renderDue(i){
+  if(!reviewMap[i]||!reviewMap[i].due)return"－";
+  const parts=reviewMap[i].due.map(x=>{
+    const d=getDateFromIndex(x.src);
+    return `D+${x.offset}：${weekLabel(x.src)}（${fmtDate(d)}）`;
+  });
+  return parts.join("； ");
+}
+
+function generate(){
+ if(!$start.value)return alert("請選擇開始日期！");
+ startDate=new Date($start.value);
+ dailyCount=parseInt($daily.value||10);
+ $kE.textContent=totalDays*dailyCount;
+ buildReviewMap();
+ $wrap.innerHTML="";
+ const today=new Date(),weeks=Math.ceil(totalDays/7);
+ for(let w=0;w<weeks;w++){
+   const s=new Date(startDate);s.setDate(s.getDate()+w*7);
+   const e=new Date(s);e.setDate(e.getDate()+6);
+   const mkey=`${s.getFullYear()}-${s.getMonth()+1}`;
+   let det=document.getElementById("m-"+mkey),mb;
+   if(!det){
+     det=document.createElement("details");det.className="month";det.id="m-"+mkey;
+     const sum=document.createElement("summary");
+     sum.innerHTML=`${s.getMonth()+1} 月 <span class="mBadge" id="mb-${mkey}">--%</span>`;
+     det.append(sum);mb=document.createElement("div");det.append(mb);$wrap.append(det);
+   }else mb=det.querySelector("div");
+   const wk=document.createElement("div");wk.className="week";
+   const wt=document.createElement("div");wt.className="weekTitle";wt.textContent=`W${w+1} (${fmtDate(s)}–${fmtDate(e)})`;
+   const wp=document.createElement("div");wp.className="weekPct";wp.textContent="0%";wk.append(wt,wp);
+   for(let d=0;d<7;d++){
+     const idx=w*7+d;if(idx>=totalDays)break;
+     const cur=getDateFromIndex(idx);const sun=isSun(idx);
+     const div=document.createElement("div");div.className="task"+(sun?" sun":"");
+     const h=document.createElement("div");h.textContent=fmtDate(cur)+(sun?" ☕ Chill Review":"");
+     const b=document.createElement("div");const cb=document.createElement("input");cb.type="checkbox";
+     cb.checked=load("chk"+idx)==="1";cb.onchange=()=>{save("chk"+idx,cb.checked?"1":"0");update();};
+     b.append(cb);
+     if(sun){
+       const prevWeek=w>0?`W${w}`:"前導週";
+       b.append(` ☕ 複習本週 ${prevWeek} 所學單字`);
+       const tip=document.createElement("div");
+       tip.style.fontSize="12px";tip.style.marginLeft="22px";tip.style.color="var(--muted)";
+       tip.innerHTML="📖 今日複習（到期）："+renderDue(idx);
+       b.append(tip);
+     }else{
+       b.append(` 學習 ${dailyCount} 個單字`);
+       const tip=document.createElement("div");
+       tip.style.fontSize="12px";tip.style.marginLeft="22px";tip.style.color="var(--muted)";
+       tip.innerHTML="📖 今日複習（到期）："+renderDue(idx);
+       b.append(tip);
+     }
+     div.append(h,b);
+     if(cur.toDateString()===today.toDateString())div.classList.add("today");
+     wk.append(div);
+   }
+   mb.append(wk);
+ }
+ document.querySelectorAll("details.month").forEach(m=>m.removeAttribute("open"));
+ const ck="m-"+(today.getFullYear())+"-"+(today.getMonth()+1);
+ const cm=document.getElementById(ck);if(cm)cm.setAttribute("open","");
+ update();
+}
+
+function update(){
+ const boxes=$$("input[type=checkbox]");let done=0;const weeks=Math.ceil(totalDays/7),arr=[];
+ for(let w=0;w<weeks;w++){let wd=0,wt=0;
+   for(let d=0;d<7;d++){const i=w*7+d;if(i>=boxes.length)break;
+     const sun=isSun(i);const cb=boxes[i];
+     if(!sun)wt+=dailyCount;if(cb&&cb.checked&&!sun){wd+=dailyCount;done+=dailyCount;}
+   }
+   const rate=Math.round(wd/(wt||1)*100);arr.push(rate);
+   const pctEl=$$(".weekPct")[w];if(pctEl)pctEl.textContent=rate+"%";}
+ const pct=Math.round(done/(totalDays*dailyCount)*100);
+ $kA.textContent=done;$bar.style.width=pct+"%";$pct.textContent=pct+"%";
+ drawChart(arr);updateMonthBadges();
+}
+
+function updateMonthBadges(){
+ const monthAgg={};
+ for(let i=0;i<totalDays;i++){
+   const key=`${getDateFromIndex(i).getFullYear()}-${getDateFromIndex(i).getMonth()+1}`;
+   const sun=isSun(i);
+   if(!monthAgg[key])monthAgg[key]={done:0,total:0};
+   if(!sun){monthAgg[key].total+=dailyCount;
+     const checked=load("chk"+i)==="1";if(checked)monthAgg[key].done+=dailyCount;}
+ }
+ Object.keys(monthAgg).forEach(k=>{
+   const {done,total}=monthAgg[k];const rate=Math.round((done/(total||1))*100);
+   const badge=document.getElementById("mb-"+k);
+   if(badge){badge.textContent=rate+"%";
+     badge.style.background=rate>=90?"#c8e6c9":rate>=70?"#fff9c4":"#ffebee";
+     badge.style.color=rate>=90?"#2e7d32":rate>=70?"#8a6d00":"#b71c1c";}
+ });
+}
+$gen.onclick=generate;
+})();
+</script>
+</body>
+</html>
