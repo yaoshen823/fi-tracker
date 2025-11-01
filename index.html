@@ -1,7 +1,4 @@
-<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>TOEIC Study Tracker (Chill + Themes)</title>
-<style>
+<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>TOEIC Study Tracker v2</title><style>
 :root{--bg:#f7fdf8;--card:#fff;--text:#233;--muted:#6b6b6b;--pri:#2e7d32;--pri2:#43a047;--accent:#a5d6a7;--chip:#e8f5e9;--bar:#2e7d32;--barBg:#c8e6c9;--head:linear-gradient(135deg,#b6e3b1,#d7f7c4);--sun:#fdf9f3;--sunText:#5a4a2c}
 :root.theme-calm{--bg:#f6fbff;--text:#203040;--pri:#1b5e83;--pri2:#1976d2;--accent:#b3d4f5;--chip:#e7f2ff;--bar:#1976d2;--barBg:#cfe8ff;--head:linear-gradient(135deg,#bcdfff,#d6ecff);--sun:#f2f7ff;--sunText:#284a6a}
 :root.theme-chill{--bg:#fffdf9;--text:#2b2b2b;--pri:#7a5d2f;--pri2:#b98938;--accent:#e8d9b9;--chip:#fbf3e5;--bar:#b98938;--barBg:#f0e3c9;--head:linear-gradient(135deg,#ffefcf,#fff6e6);--sun:#fdf6ea;--sunText:#6a512a}
@@ -11,6 +8,8 @@ header{background:var(--head);padding:22px 14px;text-align:center;position:stick
 h1{margin:0;color:#1b5e20;font-size:24px}h2{margin:6px 0 0;color:#2b7a2e;font-size:14px}header p{margin:8px 0 0;color:#2b7a2e;font-size:13px}
 main{max-width:980px;margin:14px auto;padding:0 14px 40px}
 .card{background:var(--card);border-radius:14px;box-shadow:0 2px 6px rgba(0,0,0,.08);padding:14px;margin:12px 0}
+ol{margin:6px 0 10px;padding-left:22px}
+li{margin-bottom:4px}
 .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 input[type=date],button,select{border:1px solid var(--accent);border-radius:10px;padding:8px 10px;font-size:14px;background:#fff;color:var(--text)}
 button{background:var(--pri2);color:#fff;border:none;cursor:pointer}button.secondary{background:#fff;color:var(--pri);border:1px solid var(--pri2)}
@@ -35,64 +34,34 @@ details>summary::-webkit-details-marker{display:none}
 .kpi{display:flex;gap:8px;align-items:center;color:var(--pri)}
 .totals{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:8px 0}.totals .progress{flex:1}
 footer{color:#777;text-align:center;margin:28px 0 10px}
-</style></head><body class="theme-auto">
+</style></head>
+<body class="theme-auto">
 <header><h1>TOEIC Study Tracker</h1><h2>6‑Month Flashcard Memory Plan</h2><p>☕ 每週日為 <b>Chill Review Day</b>：不學新字，輕鬆複習前期單字，讓記憶更穩定。</p></header>
 <main>
+<section id="guide" class="card">
+<h3>📘 使用說明</h3>
+<ol>
+<li>選擇你的學習開始日期（建議週一）。</li>
+<li>系統將自動建立 <b>6 個月 × 每日任務</b>。</li>
+<li>週一至週六學習 10 個新字，週日為 ☕ <b>Chill Review Day</b>。</li>
+<li>每日卡片會顯示記憶曲線複習批次（D+1 / D+3 / D+7 / D+14）。</li>
+<li>✔ 勾選與備註會自動保存，可於任何時候繼續。</li>
+<li>📤 <b>匯出進度</b> 會下載 CSV，可備份或轉移裝置使用。</li>
+<li>📥 <b>匯入進度</b> 可還原之前的勾選與備註。</li>
+<li>🎨 可透過右上角下拉選單切換主題（Fresh / Calm / Chill / Auto）。</li>
+</ol></section>
 <section id="setup" class="card">
-  <div class="row" style="justify-content:space-between;align-items:center">
-    <div class="row"><label>📅 開始日期 <input type="date" id="startDate"></label>
-      <button id="genBtn">開始生成</button><button id="resetBtn" class="secondary">🔄 重新設定</button></div>
-    <div class="row"><label>🎨 主題 <select id="themeSel"><option value="auto">Auto</option><option value="fresh">Fresh</option><option value="calm">Calm</option><option value="chill">Chill</option></select></label></div>
-  </div>
-  <div class="muted">生成後會自動保存你的起始日與進度（localStorage）。匯出/匯入可跨裝置延續。</div>
+<div class="row" style="justify-content:space-between;align-items:center">
+<div class="row"><label>📅 開始日期 <input type="date" id="startDate"></label><button id="genBtn">開始生成</button><button id="resetBtn" class="secondary">🔄 重新設定</button></div>
+<div class="row"><label>🎨 主題 <select id="themeSel"><option value="auto">Auto</option><option value="fresh">Fresh</option><option value="calm">Calm</option><option value="chill">Chill</option></select></label></div></div>
+<div class="muted">生成後會自動保存起始日與進度（localStorage）。匯出/匯入可跨裝置延續。</div>
 </section>
-<section id="overall" class="card" style="display:none;">
-  <h3 style="margin:0 0 8px;color:var(--pri)">📊 全期進度</h3>
-  <div class="totals">
-    <span class="kpi">開始日：<b id="kStart">—</b></span>
-    <span class="kpi">總天數：<b id="kTotal">0</b></span>
-    <span class="kpi">已完成：<b id="kDone">0</b> / <b id="kDen">0</b></span>
-  </div>
-  <div class="progress"><div class="bar" id="overallBar"></div></div>
-  <div class="muted" id="overallPct" style="margin-top:6px;text-align:center">完成率：0%</div>
-  <div class="tools">
-    <button id="exportBtn">📤 匯出進度(CSV)</button>
-    <label class="secondary" style="display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:10px;border:1px solid var(--pri2);cursor:pointer;">
-      📥 匯入進度(CSV) <input id="importInput" type="file" accept=".csv" style="display:none;">
-    </label>
-  </div>
-</section>
+<section id="overall" class="card" style="display:none;"><h3 style="margin:0 0 8px;color:var(--pri)">📊 全期進度</h3>
+<div class="totals"><span class="kpi">開始日：<b id="kStart">—</b></span><span class="kpi">總天數：<b id="kTotal">0</b></span><span class="kpi">已完成：<b id="kDone">0</b> / <b id="kDen">0</b></span></div>
+<div class="progress"><div class="bar" id="overallBar"></div></div><div class="muted" id="overallPct" style="margin-top:6px;text-align:center">完成率：0%</div>
+<div class="tools"><button id="exportBtn">📤 匯出進度(CSV)</button>
+<label class="secondary" style="display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:10px;border:1px solid var(--pri2);cursor:pointer;">📥 匯入進度(CSV)<input id="importInput" type="file" accept=".csv" style="display:none;"></label></div></section>
 <section id="months"></section>
-<footer>© 2025 TOEIC Study Tracker | Chill Review + Themes</footer>
+<footer>💡 建議每日固定時段學習，並於週日檢視前週筆記，建立穩定節奏。<br>© 2025 TOEIC Study Tracker | Chill Review + Themes</footer>
 </main>
-<script>
-(()=>{
-const NS="toeic-web-v2";const $start=$('#startDate'),$gen=$('#genBtn'),$reset=$('#resetBtn'),$months=$('#months'),$overall=$('#overall'),$kStart=$('#kStart'),$kDone=$('#kDone'),$kDen=$('#kDen'),$kTotal=$('#kTotal'),$bar=$('#overallBar'),$pct=$('#overallPct'),$exp=$('#exportBtn'),$imp=$('#importInput'),$themeSel=$('#themeSel');
-let startISO="";let days=[];let monthMap={};let idx2month={};let learnIndex=[];
-function $(q){return document.querySelector(q)}function ce(t){return document.createElement(t)}function load(k){return localStorage.getItem(k)}function save(k,v){localStorage.setItem(k,v)}function delPrefix(p){const rm=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith(p))rm.push(k)}rm.forEach(k=>localStorage.removeItem(k))}
-function addMonths(d,n){const x=new Date(d);const m=x.getMonth();x.setMonth(m+n);if(x.getMonth()!==((m+n)%12+12)%12)x.setDate(0);return x}
-function fmtMDW(d){return d.toLocaleDateString('zh-TW',{month:'2-digit',day:'2-digit',weekday:'short'})}
-const keyCHK=i=>`${NS}:${startISO}:chk:${i}`,keyNOTE=i=>`${NS}:${startISO}:note:${i}`,keyTHEME=`${NS}:theme`,keySTART=`${NS}:lastStart`;
-function setTheme(t){document.documentElement.className=`theme-${t}`;save(keyTHEME,t)}function initTheme(){setTheme(load(keyTHEME)||"auto");$themeSel.value=load(keyTHEME)||"auto"}$themeSel.onchange=e=>setTheme(e.target.value);
-function buildDays(){days=[];monthMap={};idx2month={};learnIndex=[];const s=new Date(startISO+"T00:00:00");const end=addMonths(s,6);let li=0;for(let d=new Date(s);d<end;d.setDate(d.getDate()+1)){const dt=new Date(d);const isSun=dt.getDay()===0;const label=isSun?null:++li;const mk=dt.getFullYear()+"-"+String(dt.getMonth()+1).padStart(2,'0');days.push({date:dt,isSun,label});(monthMap[mk]=monthMap[mk]||[]).push(days.length-1);idx2month[days.length-1]=mk;learnIndex.push(label)}$kTotal.textContent=String(days.length);$kDen.textContent=String(days.length)}
-function monthKeys(){return Object.keys(monthMap).sort()}
-function weekIdx(i){return Math.floor(i/7)}
-function reviewList(i){const li=learnIndex[i];if(!li)return [];const a=[];if(li-1>=1)a.push("D"+(li-1));if(li-3>=1)a.push("D"+(li-3));if(li-7>=1)a.push("D"+(li-7));if(li-14>=1)a.push("D"+(li-14));return a}
-function dayCard(i){const o=days[i],d=o.date,isSun=o.isSun,rev=reviewList(i),wrap=ce('div');wrap.className="task"+(isSun?" sun":"");const head=isSun?`☕ ${d.toLocaleDateString('en-US',{weekday:'short'})} ${d.getMonth()+1}/${String(d.getDate()).padStart(2,'0')}`:`${fmtMDW(d)}｜D${o.label}`;wrap.innerHTML=`<div class="task-head"><span>${head}</span><input type="checkbox" id="chk-${i}"></div><div class="task-body">${isSun?`🌤 <b>Sunday Chill Review</b>`:`🆕 今日新字：<b>10 個</b>`}<br/>${isSun?'💚':'🔁'} 今日複習：${rev.length?rev.join("、"):"—"}<br/>✍️ 備註：<input id="note-${i}" type="text" placeholder="例：已熟 3 字／易混 2 字"></div>`;return wrap}
-function weekCard(w){const div=ce('div');div.className="week";div.innerHTML=`🟩 第 ${w+1} 週進度<div class="progress" style="margin-top:6px"><div class="bar" id="wbar-${w}"></div></div><div id="wtext-${w}" class="muted" style="margin-top:4px">完成率：0%</div>`;return div}
-function buildUI(){ $months.innerHTML="";$overall.style.display="block";$kStart.textContent=startISO;
-monthKeys().forEach((mk,idx)=>{const det=ce('details');det.className="month";if(idx===0)det.open=true;const sum=ce('summary');sum.innerHTML=`<div class="m-left"><span>📅 <b>${mk.replace('-',' 年 ')} 月</b></span><span class="chip" id="chip-${mk}">完成率：0%</span></div><span class="muted">展開/收合</span>`;const body=ce('div');body.className="month-body grid";body.id=`month-${mk}`;det.append(sum,body);$months.append(det)});
-for(let i=0;i<days.length;i++){const mk=idx2month[i],m=document.getElementById(`month-${mk}`);m.append(dayCard(i));if((i+1)%7===0)m.append(weekCard(weekIdx(i)))}
-for(let i=0;i<days.length;i++){const chk=$(`#chk-${i}`),note=$(`#note-${i}`);chk.checked=(load(keyCHK(i))==="true");note.value=load(keyNOTE(i))||"";chk.onchange=()=>{save(keyCHK(i),chk.checked);updateProgress()};note.onchange=()=>save(keyNOTE(i),note.value)}
-updateProgress()}
-function updateProgress(){let done=0;for(let i=0;i<days.length;i++)if(load(keyCHK(i))==="true")done++;$kDone.textContent=String(done);$kDen.textContent=String(days.length);const pct=Math.round(done/days.length*100);$bar.style.width=pct+"%";$pct.textContent="完成率："+pct+"%";const W=Math.ceil(days.length/7);for(let w=0;w<W;w++){const s=w*7,e=Math.min(s+7,days.length);let wd=0;for(let i=s;i<e;i++)if(load(keyCHK(i))==="true")wd++;const wp=Math.round(wd/(e-s)*100),bar=$(`#wbar-${w}`),txt=$(`#wtext-${w}`);if(bar)bar.style.width=wp+"%";if(txt)txt.textContent=`完成率：${wp}%（${wd}/${e-s}）`}monthKeys().forEach(mk=>{const idxs=monthMap[mk];let md=0;idxs.forEach(i=>{if(load(keyCHK(i))==="true")md++});const mp=Math.round(md/idxs.length*100),chip=$(`#chip-${mk}`);if(chip)chip.textContent=`完成率：${mp}%（${md}/${idxs.length}）`})}
-function generate(){if(!$start.value)return alert("請先選擇開始日期");const newISO=$start.value;if(startISO&&startISO!==newISO)delPrefix(`${NS}:${startISO}:`);startISO=newISO;save(keySTART,startISO);buildDays();buildUI()}
-function tryLoad(){const last=load(keySTART);if(last){startISO=last;$start.value=last;buildDays();buildUI()}}
-function resetAll(){if(startISO)delPrefix(`${NS}:${startISO}:`);localStorage.removeItem(keySTART);$months.innerHTML="";$overall.style.display="none";$kStart.textContent="—";$kDone.textContent="0";$kDen.textContent="0";$kTotal.textContent="0";$bar.style.width="0%";$pct.textContent="完成率：0%";startISO="";$start.value=""}
-function exportCSV(){if(!startISO)return alert("請先生成計畫");const lines=[`start_date,${startISO}`,"index,date,isSunday,checked,note"];for(let i=0;i<days.length;i++){const o=days[i],dISO=o.date.toISOString().slice(0,10),checked=(load(keyCHK(i))==="true"),note=(load(keyNOTE(i))||"").replace(/,/g,"，");lines.push([i,dISO,o.isSun,checked,note].join(","))}const blob=new Blob([lines.join("\n")],{type:"text/csv;charset=utf-8;"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=`toeic_progress_${startISO}.csv`;a.click();URL.revokeObjectURL(url)}
-function importCSV(file){const fr=new FileReader();fr.onload=()=>{try{const rows=String(fr.result).split(/\r?\n/).filter(x=>x.trim());if(rows.length<3)return alert("CSV 內容不完整");if(!rows[0].startsWith("start_date,"))return alert("CSV 第一行應為 start_date,YYYY-MM-DD");const impStart=rows[0].split(",")[1].trim();if(!startISO||startISO!==impStart){const ok=confirm(`CSV 的開始日是 ${impStart}，目前是 ${startISO||"未設定"}。是否切換？`);if(!ok)return;if(startISO)delPrefix(`${NS}:${startISO}:`);startISO=impStart;save(keySTART,startISO)}else{delPrefix(`${NS}:${startISO}:`)}
-buildDays();buildUI();for(let i=2;i<rows.length;i++){const p=rows[i].split(",");if(p.length<4)continue;const idx=parseInt(p[0]);if(isNaN(idx)||idx<0||idx>=days.length)continue;save(keyCHK(idx),p[2]==="true");save(keyNOTE(idx),p.slice(3).join(",").trim());const chk=$(`#chk-${idx}`),nt=$(`#note-${idx}`);if(chk)chk.checked=(p[2]==="true");if(nt)nt.value=p.slice(3).join(",").trim()}updateProgress();alert("匯入完成！")}catch(e){console.error(e);alert("匯入失敗：CSV 格式或內容不正確")}};fr.readAsText(file,"utf-8")}
-$gen.onclick=generate;$reset.onclick=resetAll;$exp.onclick=exportCSV;$imp.onchange=e=>{if(e.target.files[0])importCSV(e.target.files[0]);e.target.value=""};tryLoad();initTheme();
-})();
-</script>
 </body></html>
