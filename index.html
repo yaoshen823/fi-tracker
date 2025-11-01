@@ -3,127 +3,114 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>TOEIC Study Tracker v10.5</title>
+<title>TOEIC Study Tracker v10.6.4</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#f7fdf8;--card:#fff;--text:#223;--muted:#6b6b6b;
+  --bg:#f8fbf8;--card:#fff;--text:#223;--muted:#666;
   --pri:#2e7d32;--pri2:#43a047;--sun:#fdf6ea;--sunText:#6a512a;
-  --bar:#2e7d32;--barBg:#c8e6c9;--btn:#43a047;--btnText:#fff;
+  --bar:#43a047;--barBg:#dcedc8;--btn:#43a047;--btnText:#fff;
 }
-body{margin:0;background:var(--bg);color:var(--text);font-family:"Noto Sans TC",sans-serif;}
-header{background:linear-gradient(135deg,#b6e3b1,#d7f7c4);padding:24px 14px;text-align:center;}
-h1{margin:0;font-size:26px;color:var(--pri)}h2{margin:6px 0 0;font-size:15px;color:var(--pri2)}
-main{max-width:1024px;margin:18px auto;padding:0 14px 64px}
-.card{background:#fff;border-radius:14px;box-shadow:0 2px 6px rgba(0,0,0,.08);padding:18px;margin:12px 0}
-.tip-box{background:#f3fbee;border-left:4px solid var(--pri2);border-radius:8px;padding:6px 10px;margin:8px 0 12px;color:#2e5933;font-size:13px}
-.progress{background:var(--barBg);height:16px;border-radius:30px;overflow:hidden}
-.bar{background:var(--bar);height:16px;width:0%}
-.task{background:var(--card);border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.06);padding:8px;margin:6px 0}
-.task.today{border:2px solid #c8e6c9}
-.task.sun{background:var(--sun);color:var(--sunText);border-left:4px solid #e0b65f;font-weight:600}
-details.weekDetails{margin:6px 0;background:#fafcfb;border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,.05);}
-details.weekDetails>summary{cursor:pointer;padding:8px 10px;font-weight:700;color:#2e7d32;display:flex;justify-content:space-between;align-items:center;background:linear-gradient(90deg,#e8f5e9,#f1f8e9);border-radius:10px;}
-details.weekDetails[open]>summary{background:linear-gradient(90deg,#c8e6c9,#e8f5e9);}
-.weekInner{padding:8px 10px}.weekPct{font-size:13px;color:#43a047}
-@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(255,215,0,.6)}70%{box-shadow:0 0 10px 10px rgba(255,215,0,0)}100%{box-shadow:0 0 0 0 rgba(255,215,0,0)}}
-@keyframes glow{0%,100%{filter:brightness(1)}50%{filter:brightness(1.4)}}
-.pulseBadge{animation:pulse 2s infinite}.glowBadge{animation:glow 1.6s infinite}
-  /* === 修正：輸入列排版與卡片間距 === */
-section.card .inputRow,
-section.card > div[style*="flex"] {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  align-items: center;
-  justify-content: flex-start;
-}
-section.card label {
-  font-size: 14px;
-  color: #2e5933;
-}
-section.card input[type="date"],
-section.card input[type="number"] {
-  padding: 4px 8px;
-  border: 1px solid #c8e6c9;
-  border-radius: 6px;
-  font-size: 14px;
-}
-section.card button {
-  background: var(--btn);
-  color: var(--btnText);
-  border: none;
-  padding: 6px 12px;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.2s;
-}
-section.card button:hover {
-  background: #2e7d32;
+body{margin:0;background:var(--bg);color:var(--text);
+  font-family:"Noto Sans TC",sans-serif;line-height:1.6;}
+header{background:linear-gradient(135deg,#c8f3c8,#e7fbe7);
+  padding:22px;text-align:center;position:sticky;top:0;z-index:10;}
+h1{margin:0;font-size:26px;color:var(--pri)}
+h2{margin:6px 0 0;font-size:15px;color:var(--pri2)}
+main{max-width:960px;margin:18px auto;padding:0 14px 100px}
+.card{background:#fff;border-radius:14px;
+  box-shadow:0 2px 6px rgba(0,0,0,.08);padding:18px;margin:12px 0;}
+.tip-box{background:#f3fbee;border-left:4px solid var(--pri2);
+  border-radius:8px;padding:6px 10px;margin:8px 0 12px;color:#2e5933;font-size:13px;}
+button{background:var(--btn);color:var(--btnText);border:none;
+  padding:8px 14px;border-radius:8px;cursor:pointer;font-weight:600;}
+button:hover{filter:brightness(0.95);}
+
+/* ========== 週卡容器（壓縮版） ========== */
+#weekSlider{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;
+  -webkit-overflow-scrolling:touch;padding:8px 0;scroll-behavior:smooth;}
+#weekSlider::-webkit-scrollbar{display:none;}
+.weekCard{scroll-snap-align:start;flex:0 0 90%;background:var(--card);
+  border-radius:14px;box-shadow:0 2px 6px rgba(0,0,0,.08);
+  margin:0 10px;padding:14px 18px;transition:.3s;}
+.weekHeader{display:flex;justify-content:space-between;align-items:center;
+  border-bottom:1px solid #e0e0e0;padding-bottom:4px;margin-bottom:8px;}
+.weekHeader span{font-weight:600;}
+.weekHeader .weekTitle{color:var(--pri);}
+.weekHeader .weekRate{font-size:13px;color:var(--muted);}
+
+/* 每日列（含🔍與複習明細） */
+.dayRow{display:flex;align-items:center;gap:10px;
+  padding:6px 0;border-bottom:1px dashed #eee;}
+.dayRow:last-child{border:none;}
+.dayRow.sun{background:var(--sun);border-left:4px solid #e0b65f;border-radius:6px;padding:6px 8px;}
+.dayName{width:56px;font-weight:700;color:var(--pri);}
+.taskInfo{flex:1;min-width:0;font-size:13px;color:#333;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.dayRow input[type=checkbox]{width:18px;height:18px;cursor:pointer;}
+.dayRow.done .taskInfo{color:#999;text-decoration:line-through;}
+.revToggle{font-size:12px;color:#2e7d32;border:1px solid #c8e6c9;border-radius:6px;padding:2px 6px;cursor:pointer;user-select:none;white-space:nowrap;}
+.revToggle:hover{background:#e8f5e9;}
+.revDetail{margin:6px 0 0 56px;background:#f7faf7;border:1px solid #e0f2e9;border-radius:8px;padding:6px 8px;font-size:13px;color:#2b3d2b;
+  display:none;overflow:hidden;max-height:0;transition:max-height .25s ease;}
+.revDetail.show{display:block;max-height:220px;}
+
+/* 週進度條 */
+.weekFooter{margin-top:8px;}
+.weekFooter .progress{background:var(--barBg);height:10px;border-radius:20px;overflow:hidden;}
+.weekFooter .progress .bar{background:var(--bar);height:10px;width:0%;transition:.5s;}
+
+/* 浮動進度條 */
+#floatingBar{position:fixed;bottom:0;left:0;right:0;
+  backdrop-filter:blur(10px);background:rgba(240,248,242,0.9);
+  border-top:2px solid #c8e6c9;padding:8px 14px;
+  display:flex;justify-content:space-between;align-items:center;
+  z-index:50;}
+#floatingBar .barWrap{flex-grow:1;margin:0 10px;}
+#floatingBar .barWrap .progress{height:10px;}
+#floatingBar span{font-size:13px;color:#2e5933;white-space:nowrap;}
+@media(max-width:600px){
+  header h1{font-size:22px;}
+  .weekCard{flex:0 0 95%;}
+  #floatingBar{flex-direction:column;gap:4px;}
+  #floatingBar .barWrap{width:100%;margin:4px 0;}
+  .dayName{width:48px;}
+  .taskInfo{font-size:12px;}
 }
 
-/* === 修正：六個月課表區塊排版 === */
-#planWrap {
-  margin-top: 10px;
-}
-details.month {
-  margin: 8px 0;
-  border-radius: 10px;
-  background: #fdfdfd;
-  box-shadow: 0 1px 3px rgba(0,0,0,.06);
-}
-details.month > summary {
-  cursor: pointer;
-  font-weight: 700;
-  color: #2e7d32;
-  padding: 8px 12px;
-  border-bottom: 1px solid #e0f2f1;
-  border-radius: 10px;
-  background: linear-gradient(90deg,#e8f5e9,#f1f8e9);
-}
-details.month[open] > summary {
-  background: linear-gradient(90deg,#c8e6c9,#e8f5e9);
-}
-.mBadge {
-  float: right;
-  font-size: 13px;
-  padding: 2px 8px;
-  border-radius: 12px;
-  background: #e0f7fa;
-  color: #004d40;
+/* 每月進度卡 */
+#monthGrid{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;}
+.monthCard{flex:1 1 calc(33% - 10px);min-width:120px;
+  background:linear-gradient(135deg,#e8f5e9,#f1f8e9);
+  border-radius:12px;padding:10px;text-align:center;
+  box-shadow:0 1px 4px rgba(0,0,0,.05);}
+.monthCard.high{background:linear-gradient(135deg,#c8e6c9,#dcedc8);}
+.monthCard.med{background:linear-gradient(135deg,#fff8e1,#fffde7);}
+.monthCard.low{background:linear-gradient(135deg,#eeeeee,#f5f5f5);}
+.monthCard .monthName{font-weight:600;color:var(--pri);}
+.monthCard .monthRate{font-size:14px;margin:4px 0;}
+.monthCard .monthBadge{font-size:20px;}
+@media(max-width:600px){
+  .monthCard{flex:1 1 calc(50% - 10px);}
 }
 
-/* === 手機相容 === */
-@media (max-width: 600px) {
-  section.card > div[style*="flex"] label,
-  section.card .inputRow label {
-    width: 100%;
-  }
-  section.card input,
-  section.card button {
-    width: 100%;
-  }
-  canvas#weekChart {
-    width: 100%!important;
-  }
-}
+/* 輕量動畫 */
+.dayRow input[type=checkbox]{transition:transform .15s ease-in-out;}
+.dayRow input[type=checkbox]:checked{transform:scale(1.15);}
+.weekCard:hover{box-shadow:0 3px 10px rgba(0,0,0,.12);transform:translateY(-2px);transition:.25s ease;}
+#overallBar,#floatBar{transition:width .6s ease-in-out;}
 </style>
 </head>
-
 <body>
+
 <header>
   <h1>TOEIC Study Tracker</h1>
-  <h2>v10.5｜半年計畫 × 智慧記憶曲線 × MSI × 月徽章</h2>
-  <p style="font-size:13px;color:#2e5933;margin-top:6px;">
-    週一至週六學新字，週日僅複習本週內容。系統依 D+1／3／7／14 記憶曲線自動規劃複習。
-  </p>
+  <h2>v10.6.4｜明確複習提示 × 壓縮週卡 × 智慧記憶曲線</h2>
 </header>
 
 <main>
 <section class="card">
   <h3>🎯 設定你的學習計畫</h3>
-  <div class="tip-box">設定開始日期與每日學習量後按「開始生成」，系統將自動建立 180 天課表。</div>
+  <div class="tip-box">設定開始日期與每日學習量後按「開始生成」，系統將自動建立180天課表。</div>
   <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
     <label>📅 開始日期 <input type="date" id="startDate"></label>
     <label>📘 每日單字量 <input type="number" id="dailyWords" min="5" max="30" value="10" style="width:80px;"></label>
@@ -133,49 +120,82 @@ details.month[open] > summary {
 
 <section id="summary" class="card">
   <h3>🔔 今日任務摘要</h3>
-  <div class="tip-box">根據記憶曲線與週日規則提示今日應學習與複習的內容。</div>
+  <div class="tip-box">今日新學與複習依 D+1/3/7/14 與週日規則自動安排。</div>
   <div id="summaryList"><p>請先建立課表。</p></div>
   <div style="margin-top:8px;font-size:14px;">
     🧠 記憶穩定度（MSI）：<b id="msiValue" style="color:#43a047">--%</b>
   </div>
 </section>
 
-<section id="months" class="card">
-  <h3>📅 六個月課表</h3>
-  <div class="tip-box">週一～週六學新字；週日僅複習本週內容。勾選核取框更新進度與複習狀態。</div>
-  <div id="planWrap"><p>尚未建立計畫。</p></div>
+<section id="weeks" class="card">
+  <h3>📅 每週課表（壓縮＋明細）</h3>
+  <div class="tip-box">每日行內顯示「學習＋複習類型」，點擊 🔍 可展開「確切要複習的 Day 與日期」。</div>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+    <button id="prevWeek">← 上一週</button>
+    <button id="nextWeek">下一週 →</button>
+  </div>
+  <div id="weekSlider"></div>
+</section>
+
+<section id="monthly" class="card">
+  <h3>🏅 每月進度總覽</h3>
+  <div class="tip-box">檢視各月份平均完成率，達標月份將自動獲得徽章。</div>
+  <div id="monthGrid"></div>
 </section>
 
 <section id="stats" class="card">
   <h3>📊 學習統計</h3>
-  <div class="tip-box">每週折線圖、每月徽章與累積單字量會即時更新。</div>
   <div>✅ 累積單字量：<span id="kAccum">0</span></div>
   <div>🎯 預計總量：<span id="kExpect">0</span></div>
   <div class="progress"><div class="bar" id="overallBar"></div></div>
   <div style="text-align:right;"><span id="overallPct">0%</span></div>
   <canvas id="weekChart"></canvas>
 </section>
-  <footer style="margin-top:30px;padding:16px;text-align:center;font-size:13px;color:#555;background:#f0f8f2;border-top:2px solid #c8e6c9;border-radius:10px;">
+
+<section id="backup" class="card">
+  <h3>💾 資料備份 / 還原</h3>
+  <div class="tip-box">可將進度匯出為 JSON 檔，或日後匯入還原（僅存放於本機）。</div>
+  <div class="inputRow">
+    <button id="exportBtn">匯出進度（JSON）</button>
+    <input type="file" id="importFile" accept="application/json" style="display:none;">
+    <button id="importBtn">匯入進度</button>
+  </div>
+</section>
+
+<footer style="margin-top:30px;padding:16px;text-align:center;font-size:13px;color:#555;background:#f0f8f2;border-top:2px solid #c8e6c9;border-radius:10px;">
 💡 本系統依 D+1／3／7／14 記憶曲線規劃複習。週日僅複習本週內容，所有資料皆儲存在本機。
 </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<!-- 浮動進度條 -->
+<div id="floatingBar">
+  <span id="floatMSI">MSI：--%</span>
+  <div class="barWrap"><div class="progress"><div class="bar" id="floatBar"></div></div></div>
+  <span id="floatPct">0%</span>
+</div>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script>
 (()=>{
-
-const NS="toeic-v10.5";  
-const $=q=>document.querySelector(q);
+const NS="toeic-v10.6.4";
 const TOTAL_DAYS=180;
+const $=q=>document.querySelector(q);
+const $$=q=>document.querySelectorAll(q);
+
 let config={startDate:null,dailyCount:10};
 let studyLog={};
+let _chart=null;
+let currentWeek=0;
 
-// ====== 輔助函式 ======
+/* ===== 日期工具 ===== */
 const idxDate=i=>{const d=new Date(config.startDate);d.setDate(d.getDate()+i);return d;}
 const fmtDate=d=>`${d.getMonth()+1}/${d.getDate()}`;
 const isSunIdx=i=>idxDate(i).getDay()===0;
-const todayIdx=()=>{if(!config.startDate)return null;const s=new Date(config.startDate);const t=new Date();t.setHours(0,0,0,0);s.setHours(0,0,0,0);return Math.floor((t-s)/86400000);};
+const todayIdx=()=>{if(!config.startDate)return null;
+  const s=new Date(config.startDate),t=new Date();
+  s.setHours(0,0,0,0);t.setHours(0,0,0,0);
+  return Math.floor((t-s)/86400000);
+};
 
-// ====== 初始化學習記錄 ======
+/* ===== 建立記錄（記憶曲線） ===== */
 function buildInitialLog(){
   studyLog={};
   for(let i=0;i<TOTAL_DAYS;i++){
@@ -183,41 +203,34 @@ function buildInitialLog(){
     if(!isSunIdx(i)){
       [1,3,7,14].forEach(off=>{
         const due=i+off;
-        if(due<TOTAL_DAYS)studyLog["day_"+i].reviews.push({due,completed:false,delay:0});
+        if(due<TOTAL_DAYS) studyLog["day_"+i].reviews.push({due,completed:false,delay:0});
       });
     }
   }
 }
 
-// ====== 自動順延（週日停用） ======
+/* ===== 延遲補複邏輯 ===== */
 function adaptiveDefer(){
-  const t=todayIdx(); if(t==null) return;
-  const isSunday=(new Date()).getDay()===0;
-  if(isSunday) return; // 週日不順延
-
+  const t=todayIdx(); if(t==null)return;
+  const sun=(new Date()).getDay()===0;
+  if(sun)return;
   Object.values(studyLog).forEach(e=>e.reviews.forEach(r=>{
-    if(!r.completed && r.due<t){
-      r.due=t+1;
-      r.delay=(r.delay||0)+1;
-    }
+    if(!r.completed&&r.due<t){r.due=t+1;r.delay=(r.delay||0)+1;}
   }));
 }
 
-// ====== 週日僅複習本週內容 ======
-function dueListFor(idx){
+/* ===== 複習提示與來源 ===== */
+function dueListFor(idx,withSources=false){
   const b={"+1":[],"+3":[],"+7":[],"+14":[]};
   const d=idxDate(idx);
-  const isSunday=d.getDay()===0;
-  let ws,we;
-  if(isSunday){ we=idx-1; ws=idx-6; }
-
+  const isSun=d.getDay()===0;
+  let ws,we; if(isSun){we=idx-1;ws=idx-6;}
   for(let s=0;s<TOTAL_DAYS;s++){
-    const e=studyLog["day_"+s];
-    if(!e||!e.learned) continue;
+    const e=studyLog["day_"+s]; if(!e||!e.learned)continue;
     e.reviews.forEach(r=>{
-      if(r.completed) return;
-      if(isSunday){
-        if(s>=ws && s<=we && r.due<=idx){
+      if(r.completed)return;
+      if(isSun){
+        if(s>=ws&&s<=we&&r.due<=idx){
           const off=r.due-s;
           if(off>=14)b["+14"].push(s);
           else if(off>=7)b["+7"].push(s);
@@ -233,241 +246,262 @@ function dueListFor(idx){
       }
     });
   }
-
-  const list=a=>a.map(i=>`Day${i+1}（${fmtDate(idxDate(i))}）`).join("、");
-  const parts=[];
-  if(b["+14"].length)parts.push("D+14："+list(b["+14"]));
-  if(b["+7"].length)parts.push("D+7："+list(b["+7"]));
-  if(b["+3"].length)parts.push("D+3："+list(b["+3"]));
-  if(b["+1"].length)parts.push("D+1："+list(b["+1"]));
-  return parts.length?parts.join("； "):"－";
+  if(withSources){
+    const src=[]; Object.values(b).forEach(arr=>src.push(...arr));
+    return {tags:Object.keys(b).filter(k=>b[k].length),sources:src};
+  }
+  const tags=[];
+  if(b["+1"].length)tags.push("D+1");
+  if(b["+3"].length)tags.push("D+3");
+  if(b["+7"].length)tags.push("D+7");
+  if(b["+14"].length)tags.push("D+14");
+  return tags.length?tags.join("、"):"－";
 }
 
-// ====== 標記完成 ======
-function markDayDone(i,d){
-  if(!isSunIdx(i)) studyLog["day_"+i].learned=!!d;
+/* ===== 完成標記 ===== */
+function markDayDone(i,done){
+  if(!isSunIdx(i))studyLog["day_"+i].learned=!!done;
   Object.values(studyLog).forEach(e=>e.reviews.forEach(r=>{
-    if(r.due===i) r.completed=!!d;
+    if(r.due===i)r.completed=!!done;
   }));
 }
 
-// ====== 生成課表 ======
+/* ===== 週卡生成（含🔍明細） ===== */
+function createWeekCard(W){
+  const ws=idxDate(W*7),we=idxDate(Math.min(W*7+6,TOTAL_DAYS-1));
+  const card=document.createElement("div");
+  card.className="weekCard";card.id="wkCard-"+(W+1);
+  card.innerHTML=`<div class="weekHeader"><span class="weekTitle">W${W+1}（${fmtDate(ws)}–${fmtDate(we)}）</span><span class="weekRate" id="wp-${W+1}">0%</span></div>`;
+  const list=document.createElement("div");
+  for(let d=0;d<7;d++){
+    const i=W*7+d;if(i>=TOTAL_DAYS)break;
+    const sun=isSunIdx(i);
+    const row=document.createElement("div");row.className="dayRow"+(sun?" sun":"");row.dataset.idx=i;
+    const dayName=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][idxDate(i).getDay()];
+    const name=document.createElement("span");name.className="dayName";name.textContent=sun?"Sun ☀️":dayName;
+    const info=document.createElement("span");info.className="taskInfo";
+    const learnTxt=sun?"—":`學 ${config.dailyCount} 字`;
+    const revTxt=(sun?"本週複 ":"複 ")+dueListFor(i);
+    info.textContent=`${learnTxt}　📖 ${revTxt}`;
+    const toggle=document.createElement("span");toggle.className="revToggle";toggle.textContent="🔍";
+    const detail=document.createElement("div");detail.className="revDetail";detail.textContent="";
+    toggle.onclick=()=>{
+      if(detail.classList.contains("show")){detail.classList.remove("show");detail.textContent="";}
+      else{
+        const {sources}=dueListFor(i,true);
+        if(sources.length){
+          detail.textContent="📚 需複習："+sources.map(x=>`Day ${x+1}（${fmtDate(idxDate(x))}）`).join("、");
+        }else detail.textContent="📚 今日無需複習。";
+        detail.classList.add("show");
+      }
+    };
+    const cb=document.createElement("input");cb.type="checkbox";
+    const key=NS+":chk:"+i;cb.checked=(localStorage.getItem(key)==="1");
+    if(cb.checked)row.classList.add("done");
+    cb.onchange=()=>{
+      localStorage.setItem(key,cb.checked?"1":"0");
+      row.classList.toggle("done",cb.checked);
+      markDayDone(i,cb.checked);
+      localStorage.setItem(NS+":studyLog",JSON.stringify(studyLog));
+      updateAll();
+    };
+    row.append(name,info,toggle,cb);
+    list.append(row,detail);
+  }
+  card.append(list);
+  card.insertAdjacentHTML("beforeend",`<div class="weekFooter"><div class="progress"><div class="bar" id="wbar-${W+1}"></div></div></div>`);
+  return card;
+}
+
+/* ===== 生成計畫 ===== */
 function generatePlan(){
   const s=$("#startDate").value;
-  if(!s) return alert("請選擇開始日期！");
+  if(!s)return alert("請選擇開始日期！");
   config.startDate=new Date(s);
   config.dailyCount=parseInt($("#dailyWords").value||10);
   localStorage.setItem(NS+":config",JSON.stringify(config));
-  buildInitialLog(); adaptiveDefer();
+  buildInitialLog();adaptiveDefer();
   localStorage.setItem(NS+":studyLog",JSON.stringify(studyLog));
-
-  const wrap=$("#planWrap"); wrap.innerHTML="";
+  const slider=$("#weekSlider");slider.innerHTML="";
   const weeks=Math.ceil(TOTAL_DAYS/7);
-
-  for(let W=0;W<weeks;W++){
-    const ws=idxDate(W*7), we=idxDate(Math.min(W*7+6,TOTAL_DAYS-1));
-    const mKey=`${ws.getFullYear()}-${ws.getMonth()+1}`;
-    let det=document.getElementById("m-"+mKey), mBody;
-    if(!det){
-      det=document.createElement("details");
-      det.className="month"; det.id="m-"+mKey;
-      const sum=document.createElement("summary");
-      sum.innerHTML=`${ws.getMonth()+1}月 <span class="mBadge" id="mb-${mKey}">--%</span>`;
-      det.append(sum);
-      mBody=document.createElement("div"); det.append(mBody);
-      wrap.append(det);
-    }else mBody=det.querySelector("div");
-
-    const wk=document.createElement("details");
-    wk.className="weekDetails"; wk.id="week-"+(W+1);
-    const sum=document.createElement("summary");
-    sum.innerHTML=`W${W+1}（${fmtDate(ws)}–${fmtDate(we)}） <span class="weekPct" id="wp-${W+1}">0%</span>`;
-    wk.append(sum);
-    const inner=document.createElement("div"); inner.className="weekInner";
-
-    for(let d=0;d<7;d++){
-      const i=W*7+d; if(i>=TOTAL_DAYS) break;
-      const date=idxDate(i), sun=isSunIdx(i);
-      const card=document.createElement("div");
-      card.className="task"+(sun?" sun":""); card.dataset.idx=i;
-      const head=document.createElement("div");
-      head.textContent=fmtDate(date)+(sun?" ☀️ 複習日":"");
-
-      const body=document.createElement("div");
-      const cb=document.createElement("input"); cb.type="checkbox";
-      const key=NS+":chk:"+i;
-      cb.checked=(localStorage.getItem(key)==="1");
-      cb.onchange=()=>{
-        localStorage.setItem(key,cb.checked?"1":"0");
-        markDayDone(i,cb.checked);
-        localStorage.setItem(NS+":studyLog",JSON.stringify(studyLog));
-        updateAll();
-      };
-      body.append(cb);
-      body.append(sun?" ☕ 僅複習本週":" 學習 "+config.dailyCount+" 個單字");
-
-      const tip=document.createElement("div");
-      tip.className="due-tip";
-      tip.style.fontSize="12px"; tip.style.marginLeft="22px"; tip.style.color="#555";
-      tip.innerHTML=(sun?"📖 本週複習（到期）：":"📖 今日複習（到期）：")+dueListFor(i);
-      body.append(tip);
-
-      card.append(head,body); inner.append(card);
-    }
-    wk.append(inner); mBody.append(wk);
-  }
+  for(let W=0;W<weeks;W++)slider.append(createWeekCard(W));
+  const t=todayIdx();currentWeek=(t!=null&&t>=0&&t<TOTAL_DAYS)?Math.floor(t/7):0;
+  goToWeek(currentWeek,false);
   updateAll();
 }
-  /* ========= 智慧複習指數 MSI ========= */
+
+/* ===== 週切換 ===== */
+function goToWeek(w,smooth=true){
+  const weeks=Math.ceil(TOTAL_DAYS/7);
+  currentWeek=Math.max(0,Math.min(weeks-1,w));
+  const card=$("#wkCard-"+(currentWeek+1));
+  if(card)card.scrollIntoView({behavior:smooth?"smooth":"auto",inline:"start",block:"nearest"});
+}
+
+/* ===== 摘要 ===== */
+function updateSummary(){
+  const t=todayIdx();const box=$("#summaryList");
+  if(t==null){box.innerHTML="<p>請先建立課表。</p>";return;}
+  const sun=isSunIdx(t);
+  const d=dueListFor(t);
+  box.innerHTML=`<p>📘 新學習：${sun?0:config.dailyCount} 字${sun?"（週日不新增）":""}</p><p>📖 ${sun?"本週":"今日"}複習：${d}</p>`;
+}
+
+/* ===== MSI ===== */
 function computeMSI(){
-  const t = todayIdx(); if(t==null) return 0;
-  let pending=0, delay=0, learned=0, learnable=0;
+  const t=todayIdx();if(t==null)return 0;
+  let p=0,d=0,l=0,la=0;
   Object.values(studyLog).forEach(e=>e.reviews.forEach(r=>{
-    if(!r.completed && r.due<=t){ pending++; delay+=(r.delay||0); }
+    if(!r.completed&&r.due<=t){p++;d+=(r.delay||0);}
   }));
   for(let i=0;i<=Math.min(t,TOTAL_DAYS-1);i++){
-    if(!isSunIdx(i)) learnable++;
-    if(studyLog["day_"+i]?.learned) learned++;
+    if(!isSunIdx(i))la++;
+    if(studyLog["day_"+i]?.learned)l++;
   }
-  const compRate = learnable ? (learned/learnable*100) : 0;
-  const score = Math.max(0, Math.min(100, Math.round(100 - (pending*4 + delay*2) + compRate*0.3)));
-  return score;
+  const c=la?(l/la*100):0;
+  return Math.max(0,Math.min(100,Math.round(100-(p*4+d*2)+c*0.3)));
 }
 function updateMSI(){
-  const val = computeMSI();
-  const el = $("#msiValue");
-  el.textContent = val + "%";
-  el.style.color = val>=85?"#43a047":val>=70?"#f9a825":"#e53935";
+  const v=computeMSI();
+  $("#msiValue").textContent=v+"%";
+  $("#floatMSI").textContent="MSI："+v+"%";
+  const c=v>=85?"#43a047":v>=70?"#f9a825":"#e53935";
+  $("#msiValue").style.color=c;
 }
 
-/* ========= 折線圖與月徽章 ========= */
-let _chart = null;
+/* ===== 折線圖 ===== */
 function drawChart(rates){
-  const ctx = document.getElementById("weekChart");
-  if(!ctx) return;
-  if(_chart) _chart.destroy();
-  _chart = new Chart(ctx,{
-    type:"line",
-    data:{
-      labels:rates.map((_,i)=>"W"+(i+1)),
-      datasets:[{
-        label:"每週完成率",
-        data:rates,
-        borderColor:"#43a047",
-        backgroundColor:"#a5d6a770",
-        fill:true,
-        tension:.25
-      }]
-    },
-    options:{
-      plugins:{legend:{display:false}},
-      scales:{y:{beginAtZero:true,max:100,ticks:{stepSize:20}}}
-    }
+  const ctx=$("#weekChart");if(!ctx)return;
+  if(_chart)_chart.destroy();
+  _chart=new Chart(ctx,{type:"line",data:{labels:rates.map((_,i)=>"W"+(i+1)),datasets:[{label:"每週完成率",data:rates,borderColor:"#43a047",backgroundColor:"#a5d6a770",fill:true,tension:.25}]},options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,max:100,ticks:{stepSize:20}}}}});
+}
+
+/* ===== 月卡 ===== */
+function updateMonthlyCards(weekRates){
+  const mR=[];for(let i=0;i<24;i+=4){const s=weekRates.slice(i,i+4);mR.push(Math.round(s.reduce((a,b)=>a+b,0)/(s.length||1)));}
+  const g=$("#monthGrid");g.innerHTML="";
+  mR.forEach((r,i)=>{
+    const c=document.createElement("div");
+    c.className="monthCard "+(r>=90?"high":r>=70?"med":"low");
+    c.innerHTML=`<div class="monthName">${i+1} 月</div><div class="monthRate">${isNaN(r)?0:r}%</div><div class="monthBadge">${r>=100?"🎉":r>=90?"🏅":r>=70?"🌿":"🕓"}</div>`;
+    g.append(c);
   });
 }
 
-function updateBadges(rates){
-  const weeksPerMonth = 4;
-  const monthRates = [];
-  for(let i=0;i<rates.length;i+=weeksPerMonth){
-    const subset = rates.slice(i,i+weeksPerMonth);
-    monthRates.push(subset.reduce((a,b)=>a+b,0)/(subset.length||1));
+/* ===== 匯出／匯入 ===== */
+function exportProgress(){
+  const data={};
+  for(let i=0;i<localStorage.length;i++){
+    const k=localStorage.key(i);
+    if(k&&k.startsWith(NS+":"))data[k]=localStorage.getItem(k);
   }
-  document.querySelectorAll(".mBadge").forEach((b,idx)=>{
-    const r = Math.round(monthRates[idx]||0);
-    b.classList.remove("pulseBadge","glowBadge");
-    if(r>=100){
-      b.textContent="🎉 完成！";
-      b.classList.add("glowBadge");
-      b.style.background="linear-gradient(135deg,#b9f6ca,#81c784)";
-      b.style.color="#1b5e20";
-    }else if(r>=90){
-      b.textContent=`🏅 ${r}%`;
-      b.classList.add("pulseBadge");
-      b.style.background="linear-gradient(135deg,#fff59d,#fbc02d)";
-      b.style.color="#6d4c00";
-    }else{
-      b.textContent=`${r}%`;
-      b.style.background=r>=70?"#fff9c4":"#ffebee";
-      b.style.color=r>=70?"#8a6d00":"#b71c1c";
-    }
-  });
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download=`toeic_backup_${new Date().toISOString().slice(0,10)}.json`;
+  document.body.appendChild(a);a.click();
+  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},1200);
+}
+function importProgress(file){
+  const r=new FileReader();
+  r.onload=e=>{
+    try{
+      const d=JSON.parse(e.target.result);let a=0;
+      Object.keys(d).forEach(k=>{
+        if(k.startsWith(NS+":")){localStorage.setItem(k,d[k]);a++;}
+      });
+      alert(`✅ 匯入成功 (${a} 筆)，將重新載入。`);location.reload();
+    }catch(err){alert("❌ 匯入失敗："+err.message);}
+  };
+  r.readAsText(file,"utf-8");
 }
 
-/* ========= 主控流程 ========= */
+/* ===== 更新全部 ===== */
 function updateAll(){
   adaptiveDefer();
   localStorage.setItem(NS+":studyLog",JSON.stringify(studyLog));
   updateSummary();
   updateProgress();
-  document.querySelectorAll(".task").forEach(el=>{
-    const idx=parseInt(el.dataset.idx,10);
-    const tip=el.querySelector(".due-tip");
-    if(tip)
-      tip.innerHTML=(isSunIdx(idx)?"📖 本週複習（到期）：":"📖 今日複習（到期）：")+dueListFor(idx);
-  });
 }
 
-function updateSummary(){
-  const t=todayIdx();
-  const box=$("#summaryList");
-  if(t==null){ box.innerHTML="<p>請先建立課表。</p>"; return; }
-  const sun=isSunIdx(t);
-  const dueTxt=dueListFor(t);
-  box.innerHTML=`<p>📘 新學習：${sun?0:config.dailyCount} 個${sun?"（週日不新增）":""}</p>
-                 <p>📖 ${sun?"本週":"今日"}複習（到期）：${dueTxt}</p>`;
-}
-
-/* ========= 進度統計（週率 + 月徽章 + MSI） ========= */
+/* ===== 進度統計 ===== */
 function updateProgress(){
-  let done=0, weekRates=[];
-  const weeks=Math.ceil(TOTAL_DAYS/7);
+  let done=0,weekRates=[];const weeks=Math.ceil(TOTAL_DAYS/7);
   for(let W=0;W<weeks;W++){
-    let count=0,total=0;
+    let c=0,t=0;
     for(let d=0;d<7;d++){
-      const i=W*7+d;
-      if(i>=TOTAL_DAYS) break;
-      if(!isSunIdx(i)){ total++; if(localStorage.getItem(NS+":chk:"+i)==="1") count++; }
+      const i=W*7+d;if(i>=TOTAL_DAYS)break;
+      if(!isSunIdx(i)){t++;if(localStorage.getItem(NS+":chk:"+i)==="1")c++;}
     }
-    weekRates.push(Math.round((count/(total||1))*100));
+    const rate=Math.round((c/(t||1))*100);
+    weekRates.push(rate);
+    const sp=$("#wp-"+(W+1));if(sp)sp.textContent=rate+"%";
+    const wb=$("#wbar-"+(W+1));if(wb)wb.style.width=rate+"%";
   }
-
-  for(let W=0;W<weeks;W++){
-    const span=$("#wp-"+(W+1));
-    if(span) span.textContent=weekRates[W]+"%";
-  }
-
   for(let i=0;i<TOTAL_DAYS;i++){
-    if(localStorage.getItem(NS+":chk:"+i)==="1" && !isSunIdx(i))
-      done+=config.dailyCount;
+    if(localStorage.getItem(NS+":chk:"+i)==="1"&&!isSunIdx(i))done+=config.dailyCount;
   }
-
   const total=TOTAL_DAYS*config.dailyCount;
   const pct=Math.round(done/(total||1)*100);
   $("#kAccum").textContent=done;
   $("#kExpect").textContent=total;
   $("#overallBar").style.width=pct+"%";
   $("#overallPct").textContent=pct+"%";
-
+  $("#floatBar").style.width=pct+"%";
+  $("#floatPct").textContent=pct+"%";
   drawChart(weekRates);
-  updateBadges(weekRates);
+  updateMonthlyCards(weekRates);
   updateMSI();
 }
 
-/* ========= 初始化 ========= */
+/* ===== 初始化 ===== */
 window.addEventListener("DOMContentLoaded",()=>{
   $("#genBtn").addEventListener("click",()=>generatePlan());
+  $("#prevWeek").addEventListener("click",()=>goToWeek(currentWeek-1));
+  $("#nextWeek").addEventListener("click",()=>goToWeek(currentWeek+1));
+  $("#exportBtn")?.addEventListener("click",exportProgress);
+  $("#importBtn")?.addEventListener("click",()=>$("#importFile").click());
+  $("#importFile")?.addEventListener("change",e=>{
+    const f=e.target.files&&e.target.files[0];if(f)importProgress(f);
+  });
   const c=localStorage.getItem(NS+":config");
   if(c){
-    const conf=JSON.parse(c);
-    config=conf;
-    if(conf.startDate) $("#startDate").value=new Date(conf.startDate).toISOString().slice(0,10);
-    if(conf.dailyCount) $("#dailyWords").value=conf.dailyCount;
+    const conf=JSON.parse(c);config=conf;
+    if(conf.startDate)$("#startDate").value=new Date(conf.startDate).toISOString().slice(0,10);
+    if(conf.dailyCount)$("#dailyWords").value=conf.dailyCount;
+    const sl=localStorage.getItem(NS+":studyLog");if(sl)studyLog=JSON.parse(sl);
     generatePlan();
   }
 });
-
-})(); // end IIFE
+})(); 
 </script>
+  <style>
+/* 🔧 補強：🔍 明細展開更順暢（高度過渡） */
+.revDetail {
+  transition: max-height .25s ease, padding .2s ease;
+}
+.revDetail.show {
+  padding: 8px 10px;
+}
+
+/* 📱 額外手機優化：縮短行高避免卡片過長 */
+@media (max-width: 480px) {
+  .dayRow { padding: 4px 0; }
+  .revDetail { font-size: 12px; }
+}
+</style>
+
+<script>
+// 🛡️ 安全提示（避免第三方阻擋 Chart.js 時無感）
+window.addEventListener("error", (e) => {
+  if ((e?.filename||"").includes("chart.umd.min.js")) {
+    console.warn("⚠️ Chart.js 載入失敗，統計圖表將不顯示。其他功能不受影響。");
+  }
+});
+
+// ℹ️ Console 標記
+console.info("%cTOEIC Study Tracker v10.6.4 loaded","color:#2e7d32;font-weight:bold;");
+</script>
+
 </body>
 </html>
