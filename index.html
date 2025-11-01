@@ -2,180 +2,159 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>TOEIC Study Tracker – 6-Month Flashcard Memory Plan</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>TOEIC Study Tracker – Web Edition (Full Memory Curve + Import/Export)</title>
 <style>
-body {
-  font-family: "Noto Sans TC", Arial, sans-serif;
-  background-color: #f7fdf8;
-  margin: 0;
-  padding: 0;
-  color: #333;
+:root{
+  --green-0:#f7fdf8;--green-1:#e8f5e9;--green-2:#c8e6c9;--green-3:#a5d6a7;
+  --green-4:#81c784;--green-5:#66bb6a;--green-6:#43a047;--green-7:#2e7d32;
+  --text:#2e2e2e;--muted:#6b6b6b;--card:#fff;--shadow:0 2px 6px rgba(0,0,0,.08);
+  --radius:14px;
 }
-header {
-  background: linear-gradient(135deg, #b6e3b1, #d7f7c4);
-  padding: 2rem 1rem;
-  text-align: center;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+body{margin:0;padding:0;background:var(--green-0);color:var(--text);
+  font-family:"Noto Sans TC",system-ui,-apple-system,Arial,"Segoe UI","PingFang TC","Heiti TC",sans-serif;}
+header{background:linear-gradient(135deg,#b6e3b1,#d7f7c4);padding:28px 16px;text-align:center;
+  box-shadow:var(--shadow);position:sticky;top:0;z-index:9;}
+header h1{margin:0;font-size:26px;color:#1b5e20;}
+header h2{margin:6px 0 0;font-size:15px;color:#2b7a2e;font-weight:600;}
+header p{margin:8px 0 0;color:#2b7a2e;font-size:13px}
+main{max-width:960px;margin:14px auto;padding:0 14px 40px;}
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin:12px 0;}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:8px 0}
+input[type="date"],button{
+  border:1px solid var(--green-3);border-radius:10px;padding:10px 12px;font-size:14px;background:#fff;color:var(--text)
 }
-header h1 {
-  margin: 0;
-  font-size: 1.8rem;
-  color: #1b5e20;
-}
-header h2 {
-  margin: 0.5rem 0 0;
-  font-size: 1.1rem;
-  color: #388e3c;
-}
-section {
-  max-width: 700px;
-  margin: 1rem auto;
-  padding: 0 1rem;
-}
-.task-card {
-  background: #fff;
-  border-radius: 12px;
-  padding: 1rem;
-  margin-bottom: 1rem;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-}
-.task-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-weight: bold;
-  color: #2e7d32;
-}
-.task-body { margin-top: 0.5rem; line-height: 1.4; }
-.week-summary {
-  background: #e8f5e9;
-  border-left: 6px solid #66bb6a;
-  border-radius: 8px;
-  padding: 0.8rem;
-  margin: 1rem 0;
-  font-weight: bold;
-  color: #2e7d32;
-}
-.progress { background: #c8e6c9; border-radius: 20px; height: 20px; width: 100%; margin-top: 6px;}
-.progress-bar { background: #388e3c; height: 20px; border-radius: 20px; width: 0%; transition: width 0.3s;}
-input[type="checkbox"] { width: 20px; height: 20px; }
-footer { text-align: center; color: #777; font-size: 0.9rem; margin: 2rem 0;}
+button{background:var(--green-6);color:#fff;border:none;cursor:pointer}
+button.secondary{background:#fff;color:var(--green-7);border:1px solid var(--green-5)}
+button:disabled{opacity:.6;cursor:not-allowed}
+.muted{color:var(--muted);font-size:13px}
+.grid{display:grid;gap:12px}
+.task{background:#fff;border-radius:12px;box-shadow:var(--shadow);padding:12px;}
+.task-head{display:flex;justify-content:space-between;align-items:center;font-weight:700;color:var(--green-7)}
+.task-body{margin-top:6px;line-height:1.5}
+.task-body input[type="text"]{border:none;border-bottom:1px solid #ddd;width:70%}
+.week{background:var(--green-1);border-left:6px solid var(--green-5);padding:10px;border-radius:10px;margin:8px 0 4px;font-weight:700;color:var(--green-7)}
+.progress{background:var(--green-2);height:18px;border-radius:30px;overflow:hidden}
+.bar{background:var(--green-7);height:18px;width:0%}
+details.month{background:#fff;border-radius:14px;box-shadow:var(--shadow);padding:10px}
+details>summary{list-style:none;cursor:pointer;padding:8px 4px;border-radius:10px;display:flex;justify-content:space-between;align-items:center;}
+details>summary::-webkit-details-marker{display:none}
+.m-left{display:flex;gap:10px;align-items:center}
+.chip{background:var(--green-1);color:var(--green-7);border-radius:999px;padding:4px 10px;font-size:12px}
+.month-body{padding:6px 2px}
+.kpi{display:flex;gap:8px;align-items:center;color:var(--green-7)}
+.totals{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:8px 0}
+.totals .progress{flex:1}
+footer{color:#777;text-align:center;margin:28px 0 10px}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 </style>
 </head>
 <body>
 <header>
   <h1>TOEIC Study Tracker</h1>
   <h2>6-Month Flashcard Memory Plan</h2>
-  <p>每日10字 × 記憶曲線 × 手寫複習追蹤</p>
+  <p>每日10字 × 記憶曲線（D+1/D+3/D+7/D+14）× 手寫單字卡 × 可勾選保存進度</p>
 </header>
+<main>
+  <section id="setup" class="card">
+    <h3>📘 使用說明</h3>
+    <ol style="margin:6px 0 10px;padding-left:20px;">
+      <li>選擇你的學習開始日期（建議週一）。</li>
+      <li>系統將自動生成 <b>6個月 × 每週6天</b> 的每日任務。</li>
+      <li>每日卡片含：<b>新字10個</b>、複習批次（D+1 / D+3 / D+7 / D+14）。</li>
+      <li>✔ 勾選完成、自動保存進度與備註（localStorage）。</li>
+      <li>📤 匯出進度可保存CSV、📥 匯入可復原資料。</li>
+    </ol>
+    <div class="row">
+      <label>📅 選擇開始日期：
+        <input type="date" id="startDate">
+      </label>
+      <button id="genBtn">開始生成</button>
+      <button id="resetBtn" class="secondary">🔄 重新設定</button>
+    </div>
+  </section>
 
-<section id="task-list"></section>
+  <section id="overall" class="card" style="display:none;">
+    <h3 style="margin-top:0;color:#2e7d32;">📊 全期進度</h3>
+    <div class="totals">
+      <span class="kpi">開始日：<b id="kStart">—</b></span>
+      <span class="kpi">總天數：<b>144</b></span>
+      <span class="kpi">已完成：<b id="kDone">0</b> / 144</span>
+    </div>
+    <div class="progress"><div class="bar" id="overallBar"></div></div>
+    <div class="muted" id="overallPct" style="margin-top:6px;text-align:center;">完成率：0%</div>
+    <div class="tools">
+      <button id="exportBtn">📤 匯出進度(CSV)</button>
+      <label class="secondary" style="display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:10px;border:1px solid var(--green-5);cursor:pointer;">
+        📥 匯入進度(CSV)
+        <input id="importInput" type="file" accept=".csv" style="display:none;">
+      </label>
+    </div>
+  </section>
 
-<section style="max-width:700px;margin:auto;padding:1rem;">
-  <h3>📊 全期進度統計</h3>
-  <div class="progress"><div class="progress-bar" id="progress-bar"></div></div>
-  <p id="progress-text" style="text-align:center;margin-top:8px;">完成率：0%</p>
-</section>
-
-<footer>
-  <p>© 2025 TOEIC Study Tracker | Handwritten Flashcard Memory Plan</p>
-</footer>
+  <section id="months"></section>
+  <footer>© 2025 TOEIC Study Tracker | Flashcard Memory Plan</footer>
+</main>
 
 <script>
-const taskList = document.getElementById("task-list");
-const progressBar = document.getElementById("progress-bar");
-const progressText = document.getElementById("progress-text");
-const start = new Date("2025-11-03");
-const totalDays = 144; // 24週×6天
-const daysPerWeek = 6;
-const totalWeeks = totalDays / daysPerWeek;
-let total = 0;
-
-function makeWeekSummary(weekIndex) {
-  const div = document.createElement("div");
-  div.className = "week-summary";
-  div.innerHTML = `
-    🟩 第 ${weekIndex + 1} 週進度<br>
-    <div class="progress"><div class="progress-bar" id="weekbar${weekIndex}"></div></div>
-    <p style="margin:6px 0;" id="weektext${weekIndex}">完成率：0%</p>
-  `;
-  taskList.appendChild(div);
-}
-
-// 建立每日任務
-for (let i = 0; i < totalDays; i++) {
-  const weekIndex = Math.floor(i / daysPerWeek);
-
-  const date = new Date(start);
-  date.setDate(start.getDate() + i);
-  const dayStr = date.toLocaleDateString('zh-TW', { month: '2-digit', day: '2-digit', weekday: 'short' });
-  const dLabel = `D${i + 1}`;
-  const review = [];
-  if (i >= 1) review.push(`D${i}`);
-  if (i >= 3) review.push(`D${i - 2}`);
-  if (i >= 7) review.push(`D${i - 6}`);
-
-  const card = document.createElement("div");
-  card.className = "task-card";
-  card.innerHTML = `
-    <div class="task-header">
-      <span>${dayStr}｜${dLabel}</span>
-      <input type="checkbox" id="chk${i}">
-    </div>
-    <div class="task-body">
-      🆕 今日新字：10 個<br>
-      🔁 今日複習：${review.length ? review.join("、") : "—"}<br>
-      ✍️ 備註：<input type="text" id="note${i}" style="width:60%;border:none;border-bottom:1px solid #ccc;">
-    </div>`;
-
-  taskList.appendChild(card);
-  total++;
-
-  // 在每週結尾插入統計卡
-  if ((i + 1) % daysPerWeek === 0) {
-    makeWeekSummary(weekIndex);
-  }
-}
-
-function updateProgress() {
-  let done = 0;
-  for (let i = 0; i < total; i++) {
-    if (localStorage.getItem("chk" + i) === "true") done++;
-  }
-  const percent = Math.round((done / total) * 100);
-  progressBar.style.width = percent + "%";
-  progressText.textContent = "完成率：" + percent + "%";
-
-  // 每週統計
-  for (let w = 0; w < totalWeeks; w++) {
-    const startI = w * daysPerWeek;
-    const endI = startI + daysPerWeek;
-    let weekDone = 0;
-    for (let i = startI; i < endI; i++) {
-      if (localStorage.getItem("chk" + i) === "true") weekDone++;
-    }
-    const weekPercent = Math.round((weekDone / daysPerWeek) * 100);
-    const bar = document.getElementById("weekbar" + w);
-    const txt = document.getElementById("weektext" + w);
-    if (bar && txt) {
-      bar.style.width = weekPercent + "%";
-      txt.textContent = "完成率：" + weekPercent + "%（" + weekDone + "/6）";
-    }
-  }
-}
-
-for (let i = 0; i < total; i++) {
-  const chk = document.getElementById("chk" + i);
-  const saved = localStorage.getItem("chk" + i) === "true";
-  chk.checked = saved;
-  chk.addEventListener("change", () => {
-    localStorage.setItem("chk" + i, chk.checked);
-    updateProgress();
-  });
-}
-
-updateProgress();
+(function(){
+const DAYS_PER_WEEK=6,TOTAL_WEEKS=24,TOTAL_DAYS=DAYS_PER_WEEK*TOTAL_WEEKS,STORAGE_NS="toeic-web";
+let startISO="",dates=[],monthMap={},dayIndexToMonthKey={};
+const $startInput=document.getElementById("startDate"),$genBtn=document.getElementById("genBtn"),
+$resetBtn=document.getElementById("resetBtn"),$months=document.getElementById("months"),
+$overall=document.getElementById("overall"),$kStart=document.getElementById("kStart"),
+$kDone=document.getElementById("kDone"),$overallBar=document.getElementById("overallBar"),
+$overallPct=document.getElementById("overallPct"),$exportBtn=document.getElementById("exportBtn"),
+$importInput=document.getElementById("importInput");
+const fmtMDW=d=>d.toLocaleDateString('zh-TW',{month:'2-digit',day:'2-digit',weekday:'short'});
+const yyyymm=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+const keyFor=i=>`${STORAGE_NS}:${startISO}:chk:${i}`,noteKey=i=>`${STORAGE_NS}:${startISO}:note:${i}`;
+function clearNamespace(pre){Object.keys(localStorage).filter(k=>k.startsWith(pre)).forEach(k=>localStorage.removeItem(k));}
+function buildDates(){dates=[];const s=new Date(startISO+"T00:00:00");for(let i=0;i<TOTAL_DAYS;i++){const d=new Date(s);d.setDate(s.getDate()+i);dates.push(d);}}
+function groupByMonth(){monthMap={};dayIndexToMonthKey={};dates.forEach((d,i)=>{const mk=yyyymm(d);(monthMap[mk]=monthMap[mk]||[]).push(i);dayIndexToMonthKey[i]=mk;});}
+function buildDayCard(i,d){const review=[];if(i>=1)review.push(`D${i}`);if(i>=3)review.push(`D${i-2}`);if(i>=7)review.push(`D${i-6}`);if(i>=14)review.push(`D${i-13}`);
+const c=document.createElement("div");c.className="task";c.innerHTML=`<div class="task-head"><span>${fmtMDW(d)}｜D${i+1}</span><input type="checkbox" id="chk-${i}"></div>
+<div class="task-body">🆕 今日新字：<b>10 個</b><br>🔁 今日複習：${review.join("、")||"—"}<br>✍️ 備註：<input id="note-${i}" type="text"></div>`;return c;}
+function buildWeekCard(w){const d=document.createElement("div");d.className="week";d.innerHTML=`🟩 第 ${w+1} 週進度
+<div class="progress"><div class="bar" id="wbar-${w}"></div></div><div id="wtext-${w}" class="muted">完成率：0%（0/6）</div>`;return d;}
+function buildUI(){ $months.innerHTML="";$overall.style.display="block";$kStart.textContent=startISO;
+const monthKeys=Object.keys(monthMap).sort();
+monthKeys.forEach((mk,idx)=>{const det=document.createElement("details");det.className="month";if(idx===0)det.open=true;
+const sum=document.createElement("summary");sum.innerHTML=`<div class="m-left"><span>📅 <b>${mk.replace("-"," 年 ")} 月</b></span><span class="chip" id="chip-${mk}">完成率：0%</span></div><span class="muted">展開/收合</span>`;
+const body=document.createElement("div");body.className="month-body grid";body.id=`month-${mk}`;det.append(sum,body);$months.append(det);});
+for(let i=0;i<TOTAL_DAYS;i++){const mk=dayIndexToMonthKey[i],m=document.getElementById(`month-${mk}`);m.append(buildDayCard(i,dates[i]));if((i+1)%DAYS_PER_WEEK===0)m.append(buildWeekCard(Math.floor(i/DAYS_PER_WEEK)));}
+for(let i=0;i<TOTAL_DAYS;i++){const chk=document.getElementById(`chk-${i}`),note=document.getElementById(`note-${i}`);chk.checked=localStorage.getItem(keyFor(i))==="true";note.value=localStorage.getItem(noteKey(i))||"";
+chk.onchange=()=>{localStorage.setItem(keyFor(i),chk.checked);updateAllProgress();};note.onchange=()=>localStorage.setItem(noteKey(i),note.value);}
+updateAllProgress();}
+function updateAllProgress(){let done=0;for(let i=0;i<TOTAL_DAYS;i++)if(localStorage.getItem(keyFor(i))==="true")done++;
+const pct=Math.round(done/TOTAL_DAYS*100);$kDone.textContent=done;$overallBar.style.width=pct+"%";$overallPct.textContent=`完成率：${pct}%`;
+for(let w=0;w<TOTAL_WEEKS;w++){let wDone=0;for(let i=w*DAYS_PER_WEEK;i<w*DAYS_PER_WEEK+DAYS_PER_WEEK;i++)if(localStorage.getItem(keyFor(i))==="true")wDone++;
+const wp=Math.round(wDone/DAYS_PER_WEEK*100);const bar=document.getElementById(`wbar-${w}`),txt=document.getElementById(`wtext-${w}`);
+if(bar)bar.style.width=wp+"%";if(txt)txt.textContent=`完成率：${wp}%（${wDone}/6）`;}
+Object.keys(monthMap).forEach(mk=>{const idxs=monthMap[mk];let mDone=0;idxs.forEach(i=>{if(localStorage.getItem(keyFor(i))==="true")mDone++;});
+const mp=Math.round(mDone/idxs.length*100),chip=document.getElementById(`chip-${mk}`);if(chip)chip.textContent=`完成率：${mp}%（${mDone}/${idxs.length}）`;});}
+function generatePlan(){if(!$startInput.value)return alert("請先選擇開始日期。");const newISO=$startInput.value;
+if(startISO&&startISO!==newISO)clearNamespace(`${STORAGE_NS}:${startISO}:`);startISO=newISO;localStorage.setItem(`${STORAGE_NS}:lastStart`,startISO);
+buildDates();groupByMonth();buildUI();}
+function tryAutoLoad(){const last=localStorage.getItem(`${STORAGE_NS}:lastStart`);if(last){startISO=last;$startInput.value=last;buildDates();groupByMonth();buildUI();}}
+function resetAll(){if(startISO)clearNamespace(`${STORAGE_NS}:${startISO}:`);localStorage.removeItem(`${STORAGE_NS}:lastStart`);
+$months.innerHTML="";$overall.style.display="none";$kStart.textContent="—";$kDone.textContent="0";$overallBar.style.width="0%";$overallPct.textContent="完成率：0%";startISO="";$startInput.value="";}
+function exportCSV(){if(!startISO)return alert("請先生成計畫。");const lines=[`start_date,${startISO}`,"index,date,checked,note"];
+dates.forEach((d,i)=>{const c=localStorage.getItem(keyFor(i))==="true",n=(localStorage.getItem(noteKey(i))||"").replace(/,/g,"，");lines.push(`${i},${d.toISOString().slice(0,10)},${c},${n}`);});
+const blob=new Blob([lines.join("\n")],{type:"text/csv;charset=utf-8;"}),url=URL.createObjectURL(blob),a=document.createElement("a");
+a.href=url;a.download=`toeic_progress_${startISO}.csv`;a.click();URL.revokeObjectURL(url);}
+function importCSV(f){const r=new FileReader();r.onload=()=>{const t=r.result.split(/\r?\n/).filter(l=>l.trim());if(t.length<3)return alert("CSV內容不完整。");
+const sLine=t[0];if(!sLine.startsWith("start_date,"))return alert("缺少start_date欄位。");const impStart=sLine.split(",")[1].trim();
+if(startISO!==impStart&&(!confirm(`CSV開始日是${impStart}，目前為${startISO||"未設定"}，是否切換？`)))return;
+if(startISO&&startISO!==impStart)clearNamespace(`${STORAGE_NS}:${startISO}:`);startISO=impStart;localStorage.setItem(`${STORAGE_NS}:lastStart`,startISO);
+buildDates();groupByMonth();buildUI();
+for(let i=2;i<t.length;i++){const p=t[i].split(",");if(p.length<4)continue;const idx=+p[0];if(isNaN(idx)||idx>=TOTAL_DAYS)continue;
+localStorage.setItem(keyFor(idx),p[2].trim()==="true");localStorage.setItem(noteKey(idx),p.slice(3).join(",").trim());}
+updateAllProgress();alert("匯入完成！");};r.readAsText(f,"utf-8");}
+$genBtn.onclick=generatePlan;$resetBtn.onclick=resetAll;$exportBtn.onclick=exportCSV;
+$importInput.onchange=e=>{if(e.target.files[0])importCSV(e.target.files[0]);e.target.value="";};
+tryAutoLoad();
+})();
 </script>
 </body>
 </html>
