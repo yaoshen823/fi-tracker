@@ -3,20 +3,18 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>TOEIC Study Tracker v10.6.6b</title>
+<title>TOEIC Study Tracker v10.6.7g</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;700&display=swap" rel="stylesheet" />
 <style>
 :root{
-  --bg:#f8fbf8;--card:#fff;--text:#223;--muted:#666;
-  --pri:#2e7d32;--pri2:#43a047;--sun:#fdf6ea;--sunText:#6a512a;
+  --bg:#f8fbf8;--card:#fff;--text:#223;
+  --pri:#2e7d32;--pri2:#43a047;--sun:#fff9e5;--sunText:#6a512a;
   --bar:#43a047;--barBg:#dcedc8;--btn:#43a047;--btnText:#fff;
+  --accent:#a5d6a7;
 }
 *{box-sizing:border-box}
-body{
-  margin:0;background:var(--bg);color:var(--text);
-  font-family:"Noto Sans TC",sans-serif;
-  font-size:16.5px;line-height:1.7;
-}
+body{margin:0;background:var(--bg);color:var(--text);
+  font-family:"Noto Sans TC",sans-serif;font-size:16.5px;line-height:1.7;}
 header{
   background:linear-gradient(135deg,#c8f3c8,#e7fbe7);
   padding:26px 22px;text-align:center;position:sticky;top:0;z-index:10;
@@ -25,39 +23,96 @@ h1{margin:0;font-size:28px;color:var(--pri)}
 h2{margin:6px 0 0;font-size:16px;color:var(--pri2)}
 h3{font-size:19px;font-weight:700;color:var(--pri);margin:0 0 8px}
 main{max-width:980px;margin:18px auto;padding:0 14px 110px}
-.card{
-  background:#fff;border-radius:14px;box-shadow:0 2px 6px rgba(0,0,0,.08);
-  padding:18px;margin:12px 0;
-}
-button{
-  background:var(--btn);color:var(--btnText);border:none;
-  padding:10px 16px;border-radius:8px;cursor:pointer;font-weight:600;font-size:15px;
-}
+.card{background:#fff;border-radius:14px;box-shadow:0 2px 6px rgba(0,0,0,.08);padding:18px;margin:12px 0}
+button{background:var(--btn);color:var(--btnText);border:none;padding:10px 16px;border-radius:8px;cursor:pointer;font-weight:600;font-size:15px}
 button:hover{filter:brightness(.96)}
-.weekNav:disabled{opacity:.45;cursor:not-allowed}
-.dayRow{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px dashed #eee;}
-.dayRow.sun{background:var(--sun);color:var(--sunText);border-left:4px solid #e0b65f;border-radius:6px;padding:6px 8px;}
-.dayName{width:60px;min-width:60px;font-weight:800;color:var(--pri)}
-.taskInfo{flex:1;min-width:0;font-size:15px;color:#333;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.revToggle{font-size:13px;color:#2e7d32;border:1px solid #c8e6c9;border-radius:6px;padding:2px 8px;cursor:pointer;}
-.revToggle:hover{background:#e8f5e9}
-.revDetail{
-  margin:6px 0 0 60px;background:#f4fbf4;border:1px solid #dcefdc;border-radius:8px;
-  padding:0 8px;font-size:15px;color:#2b3d2b;display:none;max-height:0;
-  transition:max-height .25s ease, padding .2s ease;
+input[type="date"],input[type="number"]{
+  border:1.5px solid var(--accent);border-radius:8px;padding:6px 10px;font-size:15px;background:#fdfdfd;transition:border-color .2s,box-shadow .2s;
 }
-.revDetail.show{display:block;max-height:240px;padding:8px 10px;}
-.weekCard{flex:0 0 90%;background:var(--card);border-radius:14px;box-shadow:0 2px 6px rgba(0,0,0,.08);
-  margin:0 10px;padding:14px 18px;font-size:15.5px;}
-.weekHeader{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #e0e0e0;padding-bottom:4px;margin-bottom:8px;}
-#weekSlider{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;padding:8px 0;}
-#weekSlider::-webkit-scrollbar{display:none;}
-#floatingBar{position:fixed;bottom:0;left:0;right:0;z-index:50;backdrop-filter:blur(10px);
-  background:rgba(240,248,242,.9);border-top:2px solid #c8e6c9;padding:12px 18px;display:flex;
-  align-items:center;justify-content:space-between;flex-wrap:nowrap;gap:14px;white-space:nowrap;font-size:15px;}
-#floatingBar .barWrap{flex:1 1 auto;margin:0 10px;}
-#floatingBar .barWrap .progress{height:12px;background:var(--barBg);border-radius:10px;overflow:hidden;}
-#floatingBar .barWrap .progress .bar{height:12px;background:var(--bar);width:0%;transition:width .5s;}
+input[type="date"]:focus,input[type="number"]:focus{outline:none;border-color:var(--pri2);box-shadow:0 0 0 2px rgba(67,160,71,.15)}
+.weekNav:disabled{opacity:.45;cursor:not-allowed}
+.tip{font-size:14px;color:#555;margin:8px 0 0 4px;background:#f6f9f6;padding:6px 10px;border-radius:8px}
+
+/* ===== 橫向滑動週卡（允許上下滾動） ===== */
+#weekSlider{
+  display:flex;flex-direction:row;gap:16px;
+  overflow-x:auto;overflow-y:visible;
+  scroll-snap-type:x proximity;
+  -webkit-overflow-scrolling:touch;scroll-behavior:smooth;
+  overscroll-behavior-inline:contain;touch-action:pan-x pan-y;
+  padding:10px 8px 20px;
+}
+#weekSlider::-webkit-scrollbar{height:8px}
+#weekSlider::-webkit-scrollbar-thumb{background:#cfe8d2;border-radius:6px}
+.weekCard{
+  flex:0 0 90%;max-width:720px;scroll-snap-align:start;
+  background:var(--card);border-radius:16px;box-shadow:0 2px 8px rgba(0,0,0,.08);
+  padding:18px 22px;font-size:15.5px;transition:transform .2s, box-shadow .3s;
+}
+.weekCard:hover{transform:translateY(-2px);box-shadow:0 4px 10px rgba(0,0,0,.1)}
+@media(min-width:900px){.weekCard{flex:0 0 70%}}
+
+/* 週卡頂部即時進度條 */
+.weekProgressWrap{
+  background:#e8f5e9;height:6px;border-radius:6px;overflow:hidden;margin-bottom:10px;
+}
+.weekProgressBar{
+  background:linear-gradient(90deg,#66bb6a,#43a047);
+  height:100%;width:0%;transition:width .4s ease;
+}
+.weekHeader{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #e0f2e9;padding-bottom:8px;margin-bottom:12px}
+.weekHeader .weekTitle{font-weight:700;color:#2e7d32;background:#eaf6ea;padding:4px 10px;border-radius:6px}
+
+/* 每日行（極簡預覽：只說明有/無複習） */
+.dayRow{
+  display:flex;align-items:center;gap:12px;padding:14px 12px;border-radius:10px;margin-bottom:8px;
+  border:1px dashed #ccc;cursor:pointer;transition:background .25s;
+}
+.dayRow:hover{background:#f5faf5}
+.dayRow.sun{background:var(--sun);border:1px solid #f7e0a3;color:var(--sunText);border-left:4px solid #e0b65f}
+.dayRow.done{
+  background:#e6f5ea;border:1.5px solid #9ed69c;position:relative;padding-left:40px;
+  transition:background .25s ease, border-color .25s ease;
+}
+.dayRow.done::before{content:"✅";position:absolute;left:14px;font-size:18px;color:#2e7d32;transform:scale(.95)}
+.dayName{width:60px;font-weight:700;color:var(--pri)}
+.taskInfo{flex:1;min-width:0;font-size:15px;color:#333}
+
+/* 有/無複習導引條（直覺判斷） */
+.dayRow.hasRev{border-left:4px solid #81c784}
+.dayRow.noRev{border-left:4px solid #e0e0e0}
+
+/* 🔍 展開按鈕更明顯但不突兀 */
+.revToggle{
+  font-size:15px;color:#2e7d32;background:#eaf5ea;border:1px solid #b7deb7;
+  border-radius:6px;padding:2px 8px;cursor:pointer;user-select:none
+}
+.revToggle:hover{background:#dff0df}
+
+/* 展開後才顯示詳細複習內容 */
+.revDetail{
+  margin:10px 0 8px 70px;background:#f4fbf4;border:1px solid #dcefdc;border-radius:8px;
+  padding:0 8px;font-size:15px;color:#2b3d2b;display:none;max-height:0;transition:max-height .3s ease, padding .2s ease;
+}
+.revDetail.show{display:block;max-height:320px;padding:10px 12px}
+
+/* 浮動進度條（單行） */
+#floatingBar{
+  position:fixed;bottom:0;left:0;right:0;z-index:50;backdrop-filter:blur(10px);
+  background:rgba(240,248,242,.9);border-top:2px solid #c8e6c9;padding:12px 18px;
+  display:flex;align-items:center;justify-content:space-between;gap:14px;white-space:nowrap;font-size:15px;
+}
+#floatingBar .barWrap{flex:1 1 auto;margin:0 10px}
+#floatingBar .barWrap .progress{height:12px;background:var(--barBg);border-radius:10px;overflow:hidden}
+#floatingBar .barWrap .progress .bar{height:12px;background:var(--bar);width:0%;transition:width .5s}
+
+/* 月平均卡 */
+#monthGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-top:12px}
+.monthCard{border-radius:10px;text-align:center;padding:10px 6px;background:#f5faf5;border:1px solid #c8e6c9;transition:transform .15s,background .2s}
+.monthCard:hover{transform:translateY(-3px);background:#edf7ed}
+.monthName{font-weight:700;color:#2e7d32}
+.monthRate{font-size:20px;font-weight:700;color:#388e3c}
+.monthBadge{font-size:22px;margin-top:4px}
 </style>
 </head>
 <body>
@@ -69,22 +124,29 @@ button:hover{filter:brightness(.96)}
 <main>
   <section class="card">
     <h3>🎯 設定你的學習計畫</h3>
-    <p>選擇開始日期與每日單字量後按「開始生成」，系統會自動建立 180 天課表與複習鏈。</p>
-    <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+    <p>請選擇開始日期與每日單字量，按「開始生成」建立 180 天課表。</p>
+    <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;
+                background:#f7fbf7;border:1px solid #c8e6c9;border-radius:10px;
+                padding:10px 12px;">
       <label>📅 開始日期 <input type="date" id="startDate" /></label>
       <label>📘 每日單字量 <input type="number" id="dailyWords" min="5" max="30" value="10" style="width:90px" /></label>
       <button id="genBtn">開始生成</button>
     </div>
+    <div class="tip">💡 重新設定會覆蓋先前規劃（可先匯出備份）。</div>
   </section>
 
   <section class="card">
     <h3>🔔 今日任務摘要</h3>
     <div id="summaryList"><p>請先建立課表。</p></div>
     <div style="margin-top:8px;font-size:15px">🧠 記憶穩定度（MSI）：<b id="msiValue">--%</b></div>
+    <div class="tip">📌 依完成率與延遲複習自動更新。</div>
   </section>
 
   <section class="card">
     <h3>📅 每週課表</h3>
+    <div class="tip" style="margin-bottom:12px;border:1px solid #c8e6c9;background:#f5faf5;padding:10px 12px;border-radius:8px;">
+      💡 <b>操作說明：</b>左右滑動切換週卡，或用「← / →」按鈕切換。點擊整行可標示「已完成」，點 🔍 展開查看當日需複習清單（週日僅複習本週內容）。
+    </div>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
       <button id="prevWeek" class="weekNav">← 上一週</button>
       <button id="nextWeek" class="weekNav">下一週 →</button>
@@ -93,7 +155,7 @@ button:hover{filter:brightness(.96)}
   </section>
 
   <section class="card">
-    <h3>📊 統計</h3>
+    <h3>📊 統計與每月進度</h3>
     <div>✅ 累積單字：<span id="kAccum">0</span></div>
     <div>🎯 預計總量：<span id="kExpect">0</span></div>
     <div class="progress" style="height:12px;background:#dcedc8;border-radius:20px;overflow:hidden">
@@ -101,6 +163,19 @@ button:hover{filter:brightness(.96)}
     </div>
     <div style="text-align:right"><span id="overallPct">0%</span></div>
     <canvas id="weekChart"></canvas>
+    <h4 style="margin-top:18px;font-size:17px;color:#2e7d32;">📆 每月平均進度</h4>
+    <div id="monthGrid"></div>
+    <div class="tip">🏅 每月顯示平均完成率與勳章。</div>
+  </section>
+
+  <section class="card" style="text-align:center;">
+    <h3>💾 匯出與匯入進度</h3>
+    <p>可備份學習紀錄或於其他裝置匯入後繼續。</p>
+    <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:8px;">
+      <button id="exportBtn">📤 匯出進度</button>
+      <button id="importBtn">📥 匯入進度</button>
+      <input type="file" id="importFile" accept="application/json" style="display:none" />
+    </div>
   </section>
 </main>
 
@@ -109,33 +184,24 @@ button:hover{filter:brightness(.96)}
   <div class="barWrap"><div class="progress"><div class="bar" id="floatBar"></div></div></div>
   <span id="floatPct">0%</span>
 </div>
-  <!-- Chart.js (統計圖) -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script>
 (()=>{
-/* ====== 全域設定 ====== */
-const NS="toeic-v10.6.6b";
+const NS="toeic-v10.6.7g";
 const TOTAL_DAYS=180;
 const $=q=>document.querySelector(q);
-
 let config={startDate:null,dailyCount:10};
-let studyLog={};              // day_i: { learned:bool, reviews:[{due,completed,delay}] }
-let _chart=null;              // 折線圖實例
-let currentWeek=0;            // 目前顯示的週索引
-let weeksCount=0;             // 總週數（依 180 天切分）
+let studyLog={};
+let _chart=null;
+let currentWeek=0, weeksCount=0;
 
-/* ====== 日期工具 ====== */
+/* 日期工具 */
 const idxDate=i=>{const d=new Date(config.startDate);d.setDate(d.getDate()+i);return d;}
 const fmtDate=d=>`${d.getMonth()+1}/${d.getDate()}`;
 const isSunIdx=i=>idxDate(i).getDay()===0;
-const todayIdx=()=>{ if(!config.startDate) return null;
-  const s=new Date(config.startDate), t=new Date();
-  s.setHours(0,0,0,0); t.setHours(0,0,0,0);
-  return Math.floor((t - s)/86400000);
-};
+const todayIdx=()=>{if(!config.startDate)return null;const s=new Date(config.startDate),t=new Date();s.setHours(0,0,0,0);t.setHours(0,0,0,0);return Math.floor((t-s)/86400000);};
 
-/* ====== 初始結構（記憶曲線：D+1/3/7/14） ====== */
+/* 建立初始紀錄 */
 function buildInitialLog(){
   studyLog={};
   for(let i=0;i<TOTAL_DAYS;i++){
@@ -143,462 +209,343 @@ function buildInitialLog(){
     if(!isSunIdx(i)){
       [1,3,7,14].forEach(off=>{
         const due=i+off;
-        if(due<TOTAL_DAYS){
-          studyLog["day_"+i].reviews.push({due,completed:false,delay:0});
-        }
+        if(due<TOTAL_DAYS)studyLog["day_"+i].reviews.push({due,completed:false,delay:0});
       });
     }
   }
 }
 
-/* ====== 延遲補複（非周日自動把過期複習推到明天） ====== */
+/* 自動延後未複習的任務 */
 function adaptiveDefer(){
-  const t=todayIdx(); if(t==null) return;
-  const isSun=(new Date()).getDay()===0;
-  if(isSun) return;
+  const t=todayIdx();if(t==null)return;
+  const isSun=(new Date()).getDay()===0;if(isSun)return;
   Object.values(studyLog).forEach(e=>e.reviews.forEach(r=>{
-    if(!r.completed && r.due < t){
-      r.due = t+1;                 // 推遲到明天
-      r.delay = (r.delay||0)+1;    // 紀錄延遲次數
-    }
+    if(!r.completed&&r.due<t){r.due=t+1;r.delay=(r.delay||0)+1;}
   }));
 }
 
-/* ====== 取得某天的複習型別與來源 ====== */
-function dueListFor(idx, withSources=false){
-  const bucket={"+1":[],"+3":[],"+7":[],"+14":[]};
-  const d=idxDate(idx);
-  const sunday = d.getDay()===0;
-  let ws,we; if(sunday){ we=idx-1; ws=idx-6; }   // 週日只複習本週 Mon~Sat
-
+/* 計算該日待複習任務 */
+function dueListFor(idx,withSources=false){
+  const b={"+1":[],"+3":[],"+7":[],"+14":[]};
+  const sun=idxDate(idx).getDay()===0;let ws,we;if(sun){we=idx-1;ws=idx-6;}
   for(let s=0;s<TOTAL_DAYS;s++){
-    const e=studyLog["day_"+s];
-    if(!e || !e.learned) continue;
-
+    const e=studyLog["day_"+s];if(!e||!e.learned)continue;
     e.reviews.forEach(r=>{
-      if(r.completed) return;
-
-      if(sunday){
-        // 週日：只要來源在本週範圍且到期日 <= 今天，就納入
-        if(s>=ws && s<=we && r.due <= idx){
-          const off = r.due - s;
-          if(off>=14) bucket["+14"].push(s);
-          else if(off>=7) bucket["+7"].push(s);
-          else if(off>=3) bucket["+3"].push(s);
-          else bucket["+1"].push(s);
+      if(r.completed)return;
+      if(sun){
+        if(s>=ws&&s<=we&&r.due<=idx){
+          const off=r.due-s;
+          if(off>=14)b["+14"].push(s);else if(off>=7)b["+7"].push(s);
+          else if(off>=3)b["+3"].push(s);else b["+1"].push(s);
         }
-      }else{
-        // 平日：只顯示「今天剛好到期」的複習
-        if(r.due === idx){
-          const off = r.due - s;
-          if(off>=14) bucket["+14"].push(s);
-          else if(off>=7) bucket["+7"].push(s);
-          else if(off>=3) bucket["+3"].push(s);
-          else bucket["+1"].push(s);
-        }
+      }else if(r.due===idx){
+        const off=r.due-s;
+        if(off>=14)b["+14"].push(s);else if(off>=7)b["+7"].push(s);
+        else if(off>=3)b["+3"].push(s);else b["+1"].push(s);
       }
     });
   }
-
   if(withSources){
-    const src=[]; Object.values(bucket).forEach(arr=>src.push(...arr));
-    return { tags:Object.keys(bucket).filter(k=>bucket[k].length), sources:src };
+    const src=[];Object.values(b).forEach(arr=>src.push(...arr));
+    return{tags:Object.keys(b).filter(k=>b[k].length),sources:src};
   }
-
-  const tags=[];
-  if(bucket["+1"].length) tags.push("D+1");
-  if(bucket["+3"].length) tags.push("D+3");
-  if(bucket["+7"].length) tags.push("D+7");
-  if(bucket["+14"].length) tags.push("D+14");
-  return tags.length ? tags.join("、") : "－";
+  const tags=[];if(b["+1"].length)tags.push("D+1");if(b["+3"].length)tags.push("D+3");if(b["+7"].length)tags.push("D+7");if(b["+14"].length)tags.push("D+14");
+  return tags.length?tags.join("、"):"－";
 }
 
-/* ====== 完成標記：學習當日 + 到期複習（以「當天打勾」代表學+複已做） ====== */
-function markDayDone(i, done){
-  if(!isSunIdx(i)) studyLog["day_"+i].learned = !!done;
+/* 點整行標記完成 */
+function markDayDone(i,done){
+  if(!isSunIdx(i))studyLog["day_"+i].learned=!!done;
   Object.values(studyLog).forEach(e=>e.reviews.forEach(r=>{
-    if(r.due === i) r.completed = !!done;
+    if(r.due===i)r.completed=!!done;
   }));
+  localStorage.setItem(NS+":studyLog",JSON.stringify(studyLog));
+  updateAll(); // ← 即時刷新日卡與複習狀態
 }
 
-/* ====== 產生單一週卡（含 🔍 展開） ====== */
+/* 生成每週卡片 */
 function createWeekCard(W){
-  const wsIdx=W*7, weIdx=Math.min(W*7+6, TOTAL_DAYS-1);
-  const ws=idxDate(wsIdx), we=idxDate(weIdx);
-
+  const wsIdx=W*7,weIdx=Math.min(W*7+6,TOTAL_DAYS-1);
+  const ws=idxDate(wsIdx),we=idxDate(weIdx);
   const card=document.createElement("div");
-  card.className="weekCard";
-  card.id="wkCard-"+(W+1);
+  card.className="weekCard";card.id="wkCard-"+(W+1);
 
-  card.innerHTML=`
-    <div class="weekHeader">
-      <span class="weekTitle">W${W+1}（${fmtDate(ws)}–${fmtDate(we)}）</span>
-      <span class="weekRate" id="wp-${W+1}">0%</span>
-    </div>
-  `;
+  // 頂部進度條
+  const progWrap=document.createElement("div");
+  progWrap.className="weekProgressWrap";
+  const progBar=document.createElement("div");
+  progBar.className="weekProgressBar";
+  progWrap.append(progBar);
+  card.append(progWrap);
+
+  card.innerHTML+=`<div class="weekHeader">
+    <span class="weekTitle">W${W+1}（${fmtDate(ws)}–${fmtDate(we)}）</span>
+    <span class="weekRate" id="wp-${W+1}">0%</span>
+  </div>`;
 
   const list=document.createElement("div");
   const dayNames=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-
-  for(let d=0; d<7; d++){
-    const i=W*7 + d;
-    if(i>=TOTAL_DAYS) break;
-
-    const sunday=isSunIdx(i);
+  for(let d=0;d<7;d++){
+    const i=W*7+d;if(i>=TOTAL_DAYS)break;
+    const sun=isSunIdx(i);
     const row=document.createElement("div");
-    row.className="dayRow" + (sunday ? " sun" : "");
+    row.className="dayRow"+(sun?" sun":"");
     row.dataset.idx=i;
 
     const name=document.createElement("span");
     name.className="dayName";
-    name.textContent = dayNames[idxDate(i).getDay()] + (sunday ? " ☀️" : "");
+    name.textContent=dayNames[idxDate(i).getDay()]+(sun?" ☀️":"");
 
     const info=document.createElement("span");
     info.className="taskInfo";
-    const learnTxt = sunday ? "—" : `學 ${config.dailyCount} 字`;
-    const revTxt   = (sunday?"本週複 ":"複 ")+dueListFor(i);
-    info.textContent = `${learnTxt}　📖 ${revTxt}`;
+    const learnTxt = sun ? "—" : `學 ${config.dailyCount} 字`;
+    const hasRev = dueListFor(i) !== "－";
+    info.innerHTML = `${learnTxt}　${sun ? "📖 本週複習日" : (hasRev ? "📖 有複習任務" : "💤 無複習")}`;
+    row.classList.toggle("hasRev", hasRev);
+    row.classList.toggle("noRev", !hasRev);
 
     const toggle=document.createElement("span");
-    toggle.className="revToggle";
-    toggle.textContent="🔍";
+    toggle.className="revToggle"; toggle.textContent="🔍";
+    const detail=document.createElement("div"); detail.className="revDetail";
 
-    const detail=document.createElement("div");
-    detail.className="revDetail";
-    detail.textContent="";
-
-    // 🔍 展開／收合（有平滑高度動畫，同週只開一個）
-    toggle.onclick = () => {
-      // 關閉本週其他已展開
-      const opened = card.querySelectorAll(".revDetail.show");
-      opened.forEach(el=>{
-        if(el!==detail){
-          el.classList.remove("show");
-          el.style.maxHeight="0px";
-          el.textContent="";
-        }
-      });
-
+    toggle.addEventListener("click",(e)=>{
+      e.stopPropagation();
+      const opened=card.querySelectorAll(".revDetail.show");
+      opened.forEach(el=>{if(el!==detail){el.classList.remove("show");el.style.maxHeight="0px";el.textContent="";}});
       if(detail.classList.contains("show")){
-        detail.classList.remove("show");
-        detail.style.maxHeight="0px";
-        detail.textContent="";
+        detail.classList.remove("show");detail.style.maxHeight="0px";detail.textContent="";
       }else{
-        const {sources} = dueListFor(i, true);
-        if(sources.length){
-          detail.textContent = "📚 需複習：" + sources.map(x=>`Day ${x+1}（${fmtDate(idxDate(x))}）`).join("、");
-        }else{
-          detail.textContent = "📚 今日無需複習。";
-        }
+        const{sources}=dueListFor(i,true);
+        detail.textContent=sources.length
+          ? ("📚 需複習："+sources.map(x=>`Day ${x+1}（${fmtDate(idxDate(x))}）`).join("、"))
+          : "📚 今日無需複習。";
         detail.classList.add("show");
-        // 先讓瀏覽器計算內容高度，再設定 maxHeight 觸發動畫
-        requestAnimationFrame(()=>{ detail.style.maxHeight = detail.scrollHeight + "px"; });
+        requestAnimationFrame(()=>{detail.style.maxHeight=detail.scrollHeight+"px";});
       }
-    };
+    });
 
-    // ✅ 當天完成勾選（儲存＋更新統計）
-    const cb=document.createElement("input");
-    cb.type="checkbox";
     const k=NS+":chk:"+i;
-    cb.checked = (localStorage.getItem(k)==="1");
-    if(cb.checked) row.classList.add("done");
-    cb.onchange=()=>{
-      localStorage.setItem(k, cb.checked?"1":"0");
-      row.classList.toggle("done", cb.checked);
-      markDayDone(i, cb.checked);
-      localStorage.setItem(NS+":studyLog", JSON.stringify(studyLog));
-      updateAll();
-    };
+    const checked=(localStorage.getItem(k)==="1");
+    if(checked)row.classList.add("done");
+    row.addEventListener("click",()=>{
+      const now=row.classList.toggle("done");
+      localStorage.setItem(k,now?"1":"0");
+      markDayDone(i,now);
+    });
 
-    row.append(name, info, toggle, cb);
-    list.append(row, detail);
+    row.append(name,info,toggle);
+    list.append(row,detail);
   }
-
   card.append(list);
   return card;
 }
-
-/* ====== 產生整體週卡區塊並自動捲到「今日所在週」 ====== */
+  /* ========= 渲染所有週卡 & 定位 ========= */
 function renderWeeks(){
-  const slider=$("#weekSlider");
-  slider.innerHTML="";
-  weeksCount = Math.ceil(TOTAL_DAYS/7);
-
-  for(let W=0; W<weeksCount; W++){
-    slider.append(createWeekCard(W));
-  }
-
-  // 自動定位
+  const s=$("#weekSlider"); s.innerHTML="";
+  weeksCount=Math.ceil(TOTAL_DAYS/7);
+  for(let W=0;W<weeksCount;W++) s.append(createWeekCard(W));
   const t=todayIdx();
-  currentWeek = (t!=null && t>=0 && t<TOTAL_DAYS) ? Math.floor(t/7) : 0;
-  goToWeek(currentWeek, false);
-
+  currentWeek=(t!=null&&t>=0&&t<TOTAL_DAYS)?Math.floor(t/7):0;
+  goToWeek(currentWeek,false);
   updateAll();
 }
 
-/* ====== 週切換 ====== */
-function goToWeek(w, smooth=true){
-  currentWeek = Math.max(0, Math.min(weeksCount-1, w));
-  const card = document.getElementById("wkCard-"+(currentWeek+1));
-  if(card){
-    card.scrollIntoView({behavior: smooth?"smooth":"auto", block:"nearest", inline:"start"});
-  }
-  // 按鈕可用狀態
-  const prevBtn=$("#prevWeek"), nextBtn=$("#nextWeek");
-  if(prevBtn) prevBtn.disabled = (currentWeek===0);
-  if(nextBtn) nextBtn.disabled = (currentWeek===weeksCount-1);
+/* ========= 週切換 ========= */
+function goToWeek(w,smooth=true){
+  currentWeek=Math.max(0,Math.min(weeksCount-1,w));
+  const c=$("#wkCard-"+(currentWeek+1));
+  if(c)c.scrollIntoView({behavior:smooth?"smooth":"auto",block:"nearest",inline:"start"});
+  const p=$("#prevWeek"),n=$("#nextWeek");
+  if(p)p.disabled=currentWeek===0;
+  if(n)n.disabled=currentWeek===weeksCount-1;
 }
 
-/* ====== 摘要（今日新學＋複習類型） ====== */
+/* ========= 今日摘要 & MSI ========= */
 function updateSummary(){
-  const t=todayIdx(); const box=$("#summaryList");
-  if(t==null){ box.innerHTML="<p>請先建立課表。</p>"; return; }
-  const sunday=isSunIdx(t);
-  const d=dueListFor(t);
-  box.innerHTML = `
-    <p>📘 新學習：${sunday?0:config.dailyCount} 字${sunday?"（週日不新增）":""}</p>
-    <p>📖 ${sunday?"本週":"今日"}複習：${d}</p>
-  `;
+  const t=todayIdx(),b=$("#summaryList");
+  if(t==null){b.innerHTML="<p>請先建立課表。</p>";return;}
+  const sun=isSunIdx(t),d=dueListFor(t);
+  b.innerHTML=`<p>📘 新學習：${sun?0:config.dailyCount} 字${sun?"（週日不新增）":""}</p>
+  <p>📖 ${sun?"本週":"今日"}複習：${d}</p>`;
 }
-
-/* ====== MSI（簡易穩定度指標） ====== */
 function computeMSI(){
   const t=todayIdx(); if(t==null) return 0;
-  let pending=0, delay=0, learned=0, learnable=0;
+  let pending=0,delay=0,learned=0,learnable=0;
   Object.values(studyLog).forEach(e=>e.reviews.forEach(r=>{
-    if(!r.completed && r.due<=t){ pending++; delay += (r.delay||0); }
+    if(!r.completed&&r.due<=t){pending++;delay+=(r.delay||0);}
   }));
   for(let i=0;i<=Math.min(t,TOTAL_DAYS-1);i++){
-    if(!isSunIdx(i)) learnable++;
-    if(studyLog["day_"+i]?.learned) learned++;
+    if(!isSunIdx(i))learnable++;
+    if(studyLog["day_"+i]?.learned)learned++;
   }
-  const comp = learnable ? (learned/learnable*100) : 0;
-  return Math.max(0, Math.min(100, Math.round(100 - (pending*4 + delay*2) + comp*0.3)));
+  const comp=learnable?(learned/learnable*100):0;
+  return Math.max(0,Math.min(100,Math.round(100-(pending*4+delay*2)+comp*0.3)));
 }
 function updateMSI(){
   const v=computeMSI();
-  $("#msiValue").textContent = v+"%";
-  $("#floatMSI").textContent = "MSI："+v+"%";
-  $("#msiValue").style.color = (v>=85?"#43a047": v>=70?"#f9a825":"#e53935");
+  $("#msiValue").textContent=v+"%";
+  $("#floatMSI").textContent="MSI："+v+"%";
 }
 
-/* ====== 折線圖（每週完成率） ====== */
-function drawChart(weekRates){
-  const ctx=document.getElementById("weekChart");
-  if(!ctx) return;
+/* ========= 圖表 & 每月卡 ========= */
+function drawChart(rates){
+  const ctx=$("#weekChart"); if(!ctx) return;
   if(_chart) _chart.destroy();
-  _chart = new Chart(ctx,{
-    type:"line",
-    data:{
-      labels:weekRates.map((_,i)=>"W"+(i+1)),
-      datasets:[{
-        label:"每週完成率",
-        data:weekRates,
-        borderColor:"#43a047",
-        backgroundColor:"#a5d6a770",
-        fill:true,
-        tension:.25
-      }]
-    },
-    options:{
-      plugins:{ legend:{ display:false } },
-      scales:{ y:{ beginAtZero:true, max:100, ticks:{ stepSize:20 } } }
-    }
+  _chart=new Chart(ctx,{type:"line",
+    data:{labels:rates.map((_,i)=>"W"+(i+1)),
+      datasets:[{label:"每週完成率",data:rates,borderColor:"#43a047",backgroundColor:"#a5d6a770",fill:true,tension:.25}]},
+    options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,max:100,ticks:{stepSize:20}}}}
   });
 }
-
-/* ====== 每月進度卡（4 週為一月） ====== */
-function updateMonthlyCards(weekRates){
-  const g = document.getElementById("monthGrid");
-  if(!g) return;
-  g.innerHTML="";
-  const monthRates=[];
-  for(let i=0;i<24;i+=4){   // 6 個月
-    const seg=weekRates.slice(i,i+4);
-    const avg = Math.round(seg.reduce((a,b)=>a+b,0)/(seg.length||1));
-    monthRates.push(avg);
-  }
-  monthRates.forEach((r,i)=>{
-    const c=document.createElement("div");
-    c.className="monthCard "+(r>=90?"high": r>=70?"med":"low");
-    c.innerHTML = `
-      <div class="monthName">${i+1} 月</div>
-      <div class="monthRate">${isNaN(r)?0:r}%</div>
-      <div class="monthBadge">${r>=100?"🎉": r>=90?"🏅": r>=70?"🌿":"🕓"}</div>
-    `;
+function updateMonthlyCards(rates){
+  const g=$("#monthGrid"); if(!g) return; g.innerHTML="";
+  for(let i=0;i<24;i+=4){
+    const seg=rates.slice(i,i+4),avg=Math.round(seg.reduce((a,b)=>a+b,0)/(seg.length||1));
+    const badge=avg>=90?"🏅":avg>=70?"🌿":avg>=50?"🕓":"💤";
+    const c=document.createElement("div"); c.className="monthCard";
+    c.innerHTML=`<div class="monthName">${i/4+1} 月</div>
+      <div class="monthRate">${isNaN(avg)?0:avg}%</div>
+      <div class="monthBadge">${badge}</div>`;
     g.append(c);
-  });
+  }
 }
 
-/* ====== 匯出／匯入（localStorage） ====== */
+/* ========= 匯出／匯入 ========= */
 function exportProgress(){
   const data={};
   for(let i=0;i<localStorage.length;i++){
     const k=localStorage.key(i);
-    if(k && k.startsWith(NS+":")) data[k]=localStorage.getItem(k);
+    if(k&&k.startsWith(NS+":")) data[k]=localStorage.getItem(k);
   }
   const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
   const a=document.createElement("a");
   a.href=URL.createObjectURL(blob);
   a.download=`toeic_backup_${new Date().toISOString().slice(0,10)}.json`;
   document.body.appendChild(a); a.click();
-  setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 1200);
+  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},1200);
 }
-function importProgress(file){
+function importProgress(f){
   const r=new FileReader();
   r.onload=e=>{
     try{
-      const d=JSON.parse(e.target.result); let count=0;
-      Object.keys(d).forEach(k=>{
-        if(k.startsWith(NS+":")){ localStorage.setItem(k,d[k]); count++; }
-      });
-      alert(`✅ 匯入成功（${count} 筆），將重新載入。`);
-      location.reload();
-    }catch(err){
-      alert("❌ 匯入失敗："+err.message);
-    }
+      const d=JSON.parse(e.target.result); let c=0;
+      Object.keys(d).forEach(k=>{ if(k.startsWith(NS+":")){ localStorage.setItem(k,d[k]); c++; }});
+      alert(`✅ 匯入成功（${c} 筆），將重新載入。`); location.reload();
+    }catch(err){ alert("❌ 匯入失敗："+err.message); }
   };
-  r.readAsText(file,"utf-8");
+  r.readAsText(f,"utf-8");
 }
 
-/* ====== 更新全部（摘要、進度、圖表、MSI、月卡） ====== */
+/* ========= 更新全部（含「有/無複習」即時刷新） ========= */
 function updateAll(){
   adaptiveDefer();
-  localStorage.setItem(NS+":studyLog", JSON.stringify(studyLog));
-  updateSummary();
+  localStorage.setItem(NS+":studyLog",JSON.stringify(studyLog));
 
-  // 每週完成率
+  // 週完成率、頂部進度條
   const weekRates=[];
-  for(let W=0; W<weeksCount; W++){
+  for(let W=0;W<weeksCount;W++){
     let c=0,t=0;
-    for(let d=0; d<7; d++){
+    for(let d=0;d<7;d++){
       const i=W*7+d; if(i>=TOTAL_DAYS) break;
       if(!isSunIdx(i)){ t++; if(localStorage.getItem(NS+":chk:"+i)==="1") c++; }
     }
-    const rate = Math.round((c/(t||1))*100);
+    const rate=Math.round((c/(t||1))*100);
     weekRates.push(rate);
-
-    const sp=document.getElementById("wp-"+(W+1));
-    const wb=document.getElementById("wbar-"+(W+1)); // 預留（若之後加上週內小進度條）
-    if(sp) sp.textContent = rate+"%";
-    if(wb) wb.style.width  = rate+"%";
+    const sp=$("#wp-"+(W+1)); if(sp) sp.textContent=rate+"%";
+    const bar=document.querySelector(`#wkCard-${W+1} .weekProgressBar`);
+    if(bar) bar.style.width=rate+"%";
   }
 
-  // 累積單字、總量、整體百分比
-  let learnedWords=0;
-  for(let i=0;i<TOTAL_DAYS;i++){
-    if(localStorage.getItem(NS+":chk:"+i)==="1" && !isSunIdx(i)){
-      learnedWords += config.dailyCount;
-    }
-  }
-  const totalWords = TOTAL_DAYS * config.dailyCount;
-  const overallPct = Math.round((learnedWords/(totalWords||1))*100);
+  // 總進度、浮動條
+  let learned=0;
+  for(let i=0;i<TOTAL_DAYS;i++)
+    if(localStorage.getItem(NS+":chk:"+i)==="1" && !isSunIdx(i))
+      learned+=config.dailyCount;
+  const total=TOTAL_DAYS*config.dailyCount;
+  const pct=Math.round((learned/(total||1))*100);
+  $("#kAccum").textContent=learned; $("#kExpect").textContent=total;
+  $("#overallBar").style.width=pct+"%"; $("#overallPct").textContent=pct+"%";
+  $("#floatBar").style.width=pct+"%"; $("#floatPct").textContent=pct+"%";
 
-  // UI 同步
-  const el = (id)=>document.getElementById(id);
-  el("kAccum") && (el("kAccum").textContent=learnedWords);
-  el("kExpect") && (el("kExpect").textContent=totalWords);
-  el("overallBar") && (el("overallBar").style.width=overallPct+"%");
-  el("overallPct") && (el("overallPct").textContent=overallPct+"%");
-  el("floatBar") && (el("floatBar").style.width=overallPct+"%");
-  el("floatPct") && (el("floatPct").textContent=overallPct+"%");
+  // 今日摘要與 MSI
+  updateSummary(); updateMSI();
 
-  drawChart(weekRates);
-  updateMonthlyCards(weekRates);
-  updateMSI();
-}
-
-/* ====== 生成計畫（入口） ====== */
-function generatePlan(){
-  const s=$("#startDate")?.value?.trim();
-  const n=$("#dailyWords")?.value?.trim();
-
-  if(!s) return alert("請先選擇開始日期！");
-  if(!n || isNaN(n) || +n<=0) return alert("請輸入正確的每日單字量！");
-
-  config.startDate = new Date(s);
-  config.dailyCount = parseInt(n,10);
-
-  localStorage.setItem(NS+":config", JSON.stringify(config));
-  buildInitialLog();
-  localStorage.setItem(NS+":studyLog", JSON.stringify(studyLog));
-
-  renderWeeks();     // 產生週卡 & 自動定位
-}
-
-/* ====== 初始化（DOM Ready） ====== */
-window.addEventListener("DOMContentLoaded", ()=>{
-  // 主要按鈕
-  const gen = document.getElementById("genBtn");
-  if(!gen){ console.warn("⚠️ 找不到 genBtn 按鈕，請確認 HTML 結構。"); return; }
-  gen.addEventListener("click", generatePlan);
-
-  // 週切換
-  const prevBtn = document.getElementById("prevWeek");
-  const nextBtn = document.getElementById("nextWeek");
-  if(prevBtn && nextBtn){
-    prevBtn.addEventListener("click", ()=> goToWeek(currentWeek - 1));
-    nextBtn.addEventListener("click", ()=> goToWeek(currentWeek + 1));
-  }
-
-  // 匯出／匯入
-  const exp=document.getElementById("exportBtn");
-  const imp=document.getElementById("importBtn");
-  const file=document.getElementById("importFile");
-  exp && exp.addEventListener("click", exportProgress);
-  imp && imp.addEventListener("click", ()=> file && file.click());
-  file && file.addEventListener("change", e=>{
-    const f=e.target.files && e.target.files[0];
-    if(f) importProgress(f);
+  // 🔁 重新檢查每個日卡的「有/無複習」狀態（即時刷新）
+  document.querySelectorAll(".dayRow").forEach(row=>{
+    const i=parseInt(row.dataset.idx); if(isNaN(i)) return;
+    const info=row.querySelector(".taskInfo"); if(!info) return;
+    const sun=isSunIdx(i);
+    const revNow=dueListFor(i);
+    const hasRev=revNow!=="－";
+    info.innerHTML = `${sun ? "—" : `學 ${config.dailyCount} 字`}　${sun ? "📖 本週複習日" : (hasRev ? "📖 有複習任務" : "💤 無複習")}`;
+    row.classList.toggle("hasRev",hasRev);
+    row.classList.toggle("noRev",!hasRev);
   });
 
-  // 若已有設定 → 自動載入
-  const c = localStorage.getItem(NS+":config");
-  if(c){
-    try{
-      const conf = JSON.parse(c);
-      config = conf;
-      if(conf.startDate){
-        const iso = new Date(conf.startDate).toISOString().slice(0,10);
-        const sd  = document.getElementById("startDate");
-        sd && (sd.value = iso);
-      }
-      if(conf.dailyCount){
-        const dw = document.getElementById("dailyWords");
-        dw && (dw.value = conf.dailyCount);
-      }
-      const sl = localStorage.getItem(NS+":studyLog");
-      if(sl) studyLog = JSON.parse(sl);
+  // 圖表 & 每月卡
+  drawChart(weekRates);
+  updateMonthlyCards(weekRates);
+}
 
-      renderWeeks(); // 依既有資料渲染
-    }catch(e){ console.error("設定載入失敗：", e); }
+/* ========= 入口：生成課表 ========= */
+function generatePlan(){
+  const s=$("#startDate").value.trim(), n=$("#dailyWords").value.trim();
+  if(!s) return alert("請先選擇開始日期！");
+  if(!n||isNaN(n)||+n<=0) return alert("請輸入正確的每日單字量！");
+  config.startDate=new Date(s);
+  config.dailyCount=parseInt(n,10);
+  localStorage.setItem(NS+":config",JSON.stringify(config));
+  buildInitialLog();
+  localStorage.setItem(NS+":studyLog",JSON.stringify(studyLog));
+  renderWeeks();
+}
+
+/* ========= 初始化 ========= */
+window.addEventListener("DOMContentLoaded",()=>{
+  $("#genBtn").addEventListener("click",generatePlan);
+  $("#prevWeek").addEventListener("click",()=>goToWeek(currentWeek-1));
+  $("#nextWeek").addEventListener("click",()=>goToWeek(currentWeek+1));
+  $("#exportBtn").addEventListener("click",exportProgress);
+  $("#importBtn").addEventListener("click",()=>$("#importFile").click());
+  $("#importFile").addEventListener("change",e=>{const f=e.target.files[0]; if(f) importProgress(f);});
+
+  // 若已有設定 → 自動載入
+  const c=localStorage.getItem(NS+":config");
+  if(c){ try{
+      const cf=JSON.parse(c); config=cf;
+      if(cf.startDate) $("#startDate").value=new Date(cf.startDate).toISOString().slice(0,10);
+      if(cf.dailyCount) $("#dailyWords").value=cf.dailyCount;
+      const sl=localStorage.getItem(NS+":studyLog"); if(sl) studyLog=JSON.parse(sl);
+      renderWeeks();
+    }catch(e){ console.error("設定載入失敗",e); }
+  }
+
+  // 橫向滑動後校準 currentWeek（讓按鈕禁用狀態更精準）
+  const slider=document.getElementById("weekSlider");
+  if(slider){
+    let tId;
+    slider.addEventListener("scroll", ()=>{
+      clearTimeout(tId);
+      tId=setTimeout(()=>{
+        const cards=[...slider.querySelectorAll(".weekCard")];
+        let min=Infinity, idx=0;
+        cards.forEach((c,i)=>{
+          const x=Math.abs(c.getBoundingClientRect().left - slider.getBoundingClientRect().left);
+          if(x<min){min=x;idx=i;}
+        });
+        currentWeek=idx;
+        const p=$("#prevWeek"),n=$("#nextWeek");
+        if(p)p.disabled=currentWeek===0;
+        if(n)n.disabled=currentWeek===weeksCount-1;
+      }, 80);
+    }, {passive:true});
   }
 });
 })();
 </script>
-  <!-- ✅ 匯出／匯入按鈕區 -->
-<section class="card" style="text-align:center;margin-bottom:120px;">
-  <h3>💾 匯出與匯入進度</h3>
-  <p>可將學習進度備份為 JSON 檔，或於其他裝置匯入後繼續使用。</p>
-  <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:8px;">
-    <button id="exportBtn">📤 匯出進度</button>
-    <button id="importBtn">📥 匯入進度</button>
-    <input type="file" id="importFile" accept="application/json" style="display:none" />
-  </div>
-</section>
 
-<!-- 📘 使用說明（置於頁尾前） -->
-<footer style="background:#f1f8e9;padding:18px 20px;text-align:left;font-size:15px;color:#355;">
-  <h3 style="margin-top:0;">📝 使用說明</h3>
-  <ul style="margin-top:6px;line-height:1.8;">
-    <li><b>設定開始日期與每日單字量</b>，按「開始生成」即可建立 180 天課表。</li>
-    <li><b>週一至週六：</b>學新單字並依記憶曲線（D+1、3、7、14）進行複習。</li>
-    <li><b>週日：</b>不學新單字，僅複習當週學習內容。</li>
-    <li>🔍 點擊可展開每日的「需複習內容」，平滑顯示。</li>
-    <li>可使用「← / →」切換每週課表，浮動條會顯示整體進度與 MSI。</li>
-    <li>若換裝置或瀏覽器，可利用「匯出／匯入」保存與延續進度。</li>
-  </ul>
-  <p style="text-align:center;margin-top:14px;color:#556;">© 2025 TOEIC Study Tracker v10.6.6b</p>
+<footer style="background:#f1f8e9;padding:14px 20px;text-align:center;font-size:14.5px;color:#556;">
+  © 2025 TOEIC Study Tracker v2-release
 </footer>
 
 </body>
