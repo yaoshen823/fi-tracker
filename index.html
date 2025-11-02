@@ -398,14 +398,22 @@ function drawChart(rates){
   });
 }
 function updateMonthlyCards(rates){
-  const g=$("#monthGrid"); if(!g) return; g.innerHTML="";
-  for(let i=0;i<24;i+=4){
-    const seg=rates.slice(i,i+4),avg=Math.round(seg.reduce((a,b)=>a+b,0)/(seg.length||1));
-    const badge=avg>=90?"🏅":avg>=70?"🌿":avg>=50?"🕓":"💤";
-    const c=document.createElement("div"); c.className="monthCard";
-    c.innerHTML=`<div class="monthName">${i/4+1} 月</div>
-      <div class="monthRate">${isNaN(avg)?0:avg}%</div>
-      <div class="monthBadge">${badge}</div>`;
+  const g = $("#monthGrid"); 
+  if(!g) return; 
+  g.innerHTML = "";
+
+  for(let i = 0; i < 24; i += 4){ // 每四週為一月
+    const seg = rates.slice(i, i + 4);
+    const avg = Math.round(seg.reduce((a, b) => a + b, 0) / (seg.length || 1));
+    const badge = avg >= 90 ? "🏅" : avg >= 70 ? "🌿" : avg >= 50 ? "🕓" : "💤";
+    
+    const c = document.createElement("div");
+    c.className = "monthCard";
+    c.innerHTML = `
+      <div class="monthName">第 ${i / 4 + 1} 個月</div>
+      <div class="monthRate">${isNaN(avg) ? 0 : avg}%</div>
+      <div class="monthBadge">${badge}</div>
+    `;
     g.append(c);
   }
 }
