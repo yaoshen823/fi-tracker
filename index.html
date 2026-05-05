@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>財務自主投資追蹤系統 v3</title>
+<title>財務自主投資追蹤系統 v4</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -28,11 +28,11 @@ header{background:linear-gradient(135deg,#0d1525,#1a2540);border-bottom:1px soli
 .logo{display:flex;align-items:center;gap:10px;font-family:'Playfair Display',serif;font-size:17px;}
 .logo-icon{width:34px;height:34px;background:linear-gradient(135deg,var(--a1),var(--a2));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;}
 .hdr-right{display:flex;align-items:center;gap:10px;}
-.price-status{font-size:11px;font-family:'JetBrains Mono',monospace;padding:4px 10px;border-radius:6px;border:1px solid;}
+.price-status{font-size:14px;font-family:'JetBrains Mono',monospace;padding:4px 10px;border-radius:6px;border:1px solid;}
 .status-live{color:var(--a2);border-color:rgba(0,212,170,.3);background:rgba(0,212,170,.1);}
 .status-manual{color:var(--a3);border-color:rgba(255,179,68,.3);background:rgba(255,179,68,.1);}
 .status-error{color:var(--a4);border-color:rgba(255,107,107,.3);background:rgba(255,107,107,.1);}
-.btn{padding:6px 14px;border-radius:8px;cursor:pointer;font-size:12px;font-family:'Noto Sans TC',sans-serif;border:1px solid;display:flex;align-items:center;gap:5px;transition:all .2s;}
+.btn{padding:6px 14px;border-radius:8px;cursor:pointer;font-size:15px;font-family:'Noto Sans TC',sans-serif;border:1px solid;display:flex;align-items:center;gap:5px;transition:all .2s;}
 .btn-blue{background:rgba(74,158,255,.15);border-color:rgba(74,158,255,.3);color:var(--a1);}
 .btn-blue:hover{background:rgba(74,158,255,.25);}
 .btn-green{background:rgba(0,212,170,.15);border-color:rgba(0,212,170,.3);color:var(--a2);}
@@ -45,7 +45,7 @@ header{background:linear-gradient(135deg,#0d1525,#1a2540);border-bottom:1px soli
 
 /* ── NAV ── */
 nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px;display:flex;gap:0;overflow-x:auto;}
-.nav-tab{padding:13px 18px;cursor:pointer;color:var(--text2);font-size:13px;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;display:flex;align-items:center;gap:5px;}
+.nav-tab{padding:13px 18px;cursor:pointer;color:var(--text2);font-size:15px;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;display:flex;align-items:center;gap:5px;}
 .nav-tab:hover{color:var(--text);}
 .nav-tab.active{color:var(--a1);border-bottom-color:var(--a1);}
 
@@ -61,7 +61,7 @@ nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px;d
 /* ── CARD ── */
 .card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:16px;}
 .card-hdr{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
-.card-title{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.08em;}
+.card-title{font-size:14px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.08em;}
 .card-body{padding:18px;}
 
 /* ── STOCK CARD ── */
@@ -72,23 +72,23 @@ nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px;d
 .sc-taiment::before{background:linear-gradient(90deg,var(--a4),#c94444);}
 .sc-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;}
 .sc-name{font-size:15px;font-weight:700;}
-.sc-code{font-size:10px;color:var(--text2);font-family:'JetBrains Mono',monospace;margin-top:2px;}
-.sc-badge{padding:3px 9px;border-radius:20px;font-size:10px;font-weight:600;}
+.sc-code{font-size:14px;color:var(--text2);font-family:'JetBrains Mono',monospace;margin-top:2px;}
+.sc-badge{padding:3px 9px;border-radius:20px;font-size:14px;font-weight:600;}
 .badge-hold{background:rgba(0,212,170,.15);color:var(--a2);border:1px solid rgba(0,212,170,.3);}
 .badge-watch{background:rgba(255,107,107,.15);color:var(--a4);border:1px solid rgba(255,107,107,.3);}
 .sc-price-row{display:flex;align-items:flex-end;gap:10px;margin-bottom:6px;}
 .sc-price{font-family:'JetBrains Mono',monospace;font-size:30px;font-weight:600;line-height:1;cursor:pointer;}
 .sc-price:hover{opacity:.8;}
-.price-chg{font-family:'JetBrains Mono',monospace;font-size:12px;padding:3px 7px;border-radius:5px;margin-bottom:2px;}
+.price-chg{font-family:'JetBrains Mono',monospace;font-size:15px;padding:3px 7px;border-radius:5px;margin-bottom:2px;}
 .up{background:rgba(0,212,170,.15);color:var(--a2);}
 .dn{background:rgba(255,107,107,.15);color:var(--a4);}
 .flat{background:rgba(138,149,168,.15);color:var(--text2);}
 .sc-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:14px;}
 .met{text-align:center;background:rgba(255,255,255,.04);border-radius:8px;padding:8px;}
-.met-l{font-size:9px;color:var(--text2);margin-bottom:3px;text-transform:uppercase;}
-.met-v{font-size:12px;font-weight:600;font-family:'JetBrains Mono',monospace;}
+.met-l{font-size:15px;color:var(--text2);margin-bottom:3px;text-transform:uppercase;}
+.met-v{font-size:15px;font-weight:600;font-family:'JetBrains Mono',monospace;}
 .ybar-wrap{margin-top:12px;}
-.ybar-label{display:flex;justify-content:space-between;font-size:9px;color:var(--text2);margin-bottom:4px;}
+.ybar-label{display:flex;justify-content:space-between;font-size:15px;color:var(--text2);margin-bottom:4px;}
 .ybar-track{height:8px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden;}
 .ybar-fill{height:100%;border-radius:4px;transition:width 1s ease;}
 .ybar-spring{background:linear-gradient(90deg,var(--a2),#00a382);}
@@ -96,16 +96,16 @@ nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px;d
 
 /* ── BIG NUMBERS ── */
 .big-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 18px;}
-.big-l{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;}
+.big-l{font-size:14px;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;}
 .big-v{font-size:22px;font-weight:700;font-family:'JetBrains Mono',monospace;}
-.big-s{font-size:10px;color:var(--text2);margin-top:3px;}
+.big-s{font-size:14px;color:var(--text2);margin-top:3px;}
 .c-blue .big-v{color:var(--a1);}
 .c-green .big-v{color:var(--a2);}
 .c-amber .big-v{color:var(--a3);}
 .c-red .big-v{color:var(--a4);}
 
 /* ── ALERTS ── */
-.alert{padding:10px 14px;border-radius:9px;margin-bottom:12px;font-size:13px;display:flex;align-items:flex-start;gap:9px;}
+.alert{padding:10px 14px;border-radius:9px;margin-bottom:12px;font-size:15px;display:flex;align-items:flex-start;gap:9px;}
 .al-yield{background:rgba(0,212,170,.1);border:1px solid rgba(0,212,170,.2);color:#b8ffe9;}
 .al-warn{background:rgba(255,179,68,.1);border:1px solid rgba(255,179,68,.2);color:#ffe0a8;}
 .al-info{background:rgba(74,158,255,.1);border:1px solid rgba(74,158,255,.2);color:#c4dcff;}
@@ -114,7 +114,7 @@ nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px;d
 
 /* ── PRICE SOURCE INFO ── */
 .price-info-bar{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
-.pib-text{font-size:12px;color:var(--text2);}
+.pib-text{font-size:15px;color:var(--text2);}
 .pib-text strong{color:var(--text);}
 
 /* ── NEWS ── */
@@ -122,34 +122,34 @@ nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px;d
 .news-item:hover{background:rgba(255,255,255,.03);}
 .news-item:last-child{border-bottom:none;}
 .ni-meta{display:flex;align-items:center;gap:8px;margin-bottom:5px;}
-.ni-tag{font-size:9px;padding:2px 6px;border-radius:3px;font-weight:600;}
+.ni-tag{font-size:15px;padding:2px 6px;border-radius:3px;font-weight:600;}
 .tag-pos{background:rgba(0,212,170,.15);color:var(--a2);}
 .tag-neg{background:rgba(255,107,107,.15);color:var(--a4);}
 .tag-neu{background:rgba(74,158,255,.15);color:var(--a1);}
 .tag-war{background:rgba(255,179,68,.15);color:var(--a3);}
-.ni-time{font-size:10px;color:var(--text2);font-family:'JetBrains Mono',monospace;}
-.ni-hl{font-size:13px;line-height:1.5;}
-.ni-src{font-size:11px;color:var(--text2);margin-top:3px;}
+.ni-time{font-size:14px;color:var(--text2);font-family:'JetBrains Mono',monospace;}
+.ni-hl{font-size:15px;line-height:1.5;}
+.ni-src{font-size:14px;color:var(--text2);margin-top:3px;}
 .news-list{max-height:300px;overflow-y:auto;}
 .news-list::-webkit-scrollbar{width:3px;}
 .news-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px;}
 
 /* ── FORMS ── */
 .form-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;}
-.fg label{font-size:10px;color:var(--text2);display:block;margin-bottom:5px;text-transform:uppercase;}
-.fg input,.fg select,.fg textarea{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--text);border-radius:7px;padding:7px 10px;font-size:13px;font-family:'Noto Sans TC',sans-serif;outline:none;transition:border-color .2s;}
+.fg label{font-size:14px;color:var(--text2);display:block;margin-bottom:5px;text-transform:uppercase;}
+.fg input,.fg select,.fg textarea{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--text);border-radius:7px;padding:7px 10px;font-size:15px;font-family:'Noto Sans TC',sans-serif;outline:none;transition:border-color .2s;}
 .fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--a1);background:rgba(74,158,255,.08);}
 .fg select option{background:#1e2a3a;}
 .fg textarea{resize:vertical;min-height:60px;}
-.btn-primary{background:linear-gradient(135deg,var(--a1),#2b6ef5);color:white;border:none;padding:8px 18px;border-radius:7px;cursor:pointer;font-size:12px;font-family:'Noto Sans TC',sans-serif;font-weight:600;transition:opacity .2s;width:100%;}
+.btn-primary{background:linear-gradient(135deg,var(--a1),#2b6ef5);color:white;border:none;padding:8px 18px;border-radius:7px;cursor:pointer;font-size:15px;font-family:'Noto Sans TC',sans-serif;font-weight:600;transition:opacity .2s;width:100%;}
 .btn-primary:hover{opacity:.9;}
-.btn-danger{background:rgba(255,107,107,.15);color:var(--a4);border:1px solid rgba(255,107,107,.3);padding:4px 10px;border-radius:5px;cursor:pointer;font-size:11px;font-family:'Noto Sans TC',sans-serif;transition:all .2s;}
+.btn-danger{background:rgba(255,107,107,.15);color:var(--a4);border:1px solid rgba(255,107,107,.3);padding:4px 10px;border-radius:5px;cursor:pointer;font-size:14px;font-family:'Noto Sans TC',sans-serif;transition:all .2s;}
 .btn-danger:hover{background:rgba(255,107,107,.25);}
 
 /* ── TABLE ── */
 .tbl-wrap{overflow-x:auto;}
-table{width:100%;border-collapse:collapse;font-size:12px;}
-th{background:rgba(255,255,255,.04);padding:9px 12px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--text2);border-bottom:1px solid var(--border);white-space:nowrap;}
+table{width:100%;border-collapse:collapse;font-size:15px;}
+th{background:rgba(255,255,255,.04);padding:9px 12px;text-align:left;font-size:14px;text-transform:uppercase;letter-spacing:.05em;color:var(--text2);border-bottom:1px solid var(--border);white-space:nowrap;}
 td{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle;}
 tr:hover td{background:rgba(255,255,255,.02);}
 .mono{font-family:'JetBrains Mono',monospace;}
@@ -162,8 +162,8 @@ tr:hover td{background:rgba(255,255,255,.02);}
 .tl-item{display:flex;gap:14px;padding:12px 0;border-bottom:1px solid var(--border);}
 .tl-item:last-child{border-bottom:none;}
 .tl-yr{width:90px;flex-shrink:0;}
-.tl-year-text{font-size:11px;font-weight:700;font-family:'JetBrains Mono',monospace;}
-.tl-phase{font-size:9px;color:var(--text2);}
+.tl-year-text{font-size:14px;font-weight:700;font-family:'JetBrains Mono',monospace;}
+.tl-phase{font-size:15px;color:var(--text2);}
 .tl-dot-col{display:flex;flex-direction:column;align-items:center;padding-top:3px;}
 .tl-dot{width:11px;height:11px;border-radius:50%;border:2px solid;flex-shrink:0;}
 .tl-dot-done{background:var(--a2);border-color:var(--a2);}
@@ -172,27 +172,27 @@ tr:hover td{background:rgba(255,255,255,.02);}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 .tl-line{flex:1;width:1px;background:rgba(255,255,255,.08);margin:3px 0;}
 .tl-content{flex:1;}
-.tl-title{font-size:13px;font-weight:600;margin-bottom:3px;}
-.tl-detail{font-size:11px;color:var(--text2);line-height:1.5;}
+.tl-title{font-size:15px;font-weight:600;margin-bottom:3px;}
+.tl-detail{font-size:14px;color:var(--text2);line-height:1.5;}
 .tl-badges{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px;}
-.tl-badge{font-size:9px;padding:2px 7px;border-radius:3px;background:rgba(74,158,255,.1);color:var(--a1);border:1px solid rgba(74,158,255,.2);}
+.tl-badge{font-size:15px;padding:2px 7px;border-radius:3px;background:rgba(74,158,255,.1);color:var(--a1);border:1px solid rgba(74,158,255,.2);}
 
 /* ── CHECKLIST ── */
-.cl-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px;}
+.cl-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);font-size:15px;}
 .cl-item:last-child{border-bottom:none;}
 .cl-box{width:17px;height:17px;border-radius:4px;border:2px solid rgba(255,255,255,.2);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .2s;}
 .cl-box.ck{background:var(--a2);border-color:var(--a2);}
-.cl-box.ck::after{content:'✓';font-size:10px;color:white;font-weight:700;}
+.cl-box.ck::after{content:'✓';font-size:14px;color:white;font-weight:700;}
 
 /* ── EXPORT/IMPORT ── */
 .io-section{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:11px;padding:16px;margin-bottom:16px;}
-.io-title{font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;}
+.io-title{font-size:15px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;}
 .io-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;}
 .io-btn{background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:9px;padding:12px 14px;cursor:pointer;transition:all .2s;text-align:left;}
 .io-btn:hover{background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.15);}
 .io-btn-icon{font-size:20px;margin-bottom:6px;}
-.io-btn-title{font-size:12px;font-weight:600;margin-bottom:2px;}
-.io-btn-sub{font-size:10px;color:var(--text2);}
+.io-btn-title{font-size:15px;font-weight:600;margin-bottom:2px;}
+.io-btn-sub{font-size:14px;color:var(--text2);}
 .io-btn.export{border-color:rgba(0,212,170,.3);}
 .io-btn.export:hover{background:rgba(0,212,170,.08);}
 .io-btn.import{border-color:rgba(74,158,255,.3);}
@@ -202,13 +202,13 @@ tr:hover td{background:rgba(255,255,255,.02);}
 /* ── HOLDINGS SUMMARY ── */
 .hs-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;}
 .hs-item{background:rgba(255,255,255,.04);border-radius:9px;padding:12px;text-align:center;}
-.hs-l{font-size:9px;color:var(--text2);margin-bottom:5px;text-transform:uppercase;}
+.hs-l{font-size:15px;color:var(--text2);margin-bottom:5px;text-transform:uppercase;}
 .hs-v{font-size:18px;font-weight:700;font-family:'JetBrains Mono',monospace;}
 
 /* ── WAVE STATS ── */
 .ws-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;}
 .ws-card{background:rgba(255,255,255,.04);border-radius:9px;padding:12px;}
-.ws-l{font-size:9px;color:var(--text2);margin-bottom:5px;text-transform:uppercase;}
+.ws-l{font-size:15px;color:var(--text2);margin-bottom:5px;text-transform:uppercase;}
 .ws-v{font-size:17px;font-weight:700;font-family:'JetBrains Mono',monospace;}
 
 @media(max-width:768px){
@@ -230,7 +230,7 @@ tr:hover td{background:rgba(255,255,255,.02);}
   </div>
   <div class="hdr-right">
     <span id="priceStatus" class="price-status status-manual">手動模式</span>
-    <span id="lastUpdate" style="font-size:10px;color:var(--text2);font-family:'JetBrains Mono',monospace;"></span>
+    <span id="lastUpdate" style="font-size:14px;color:var(--text2);font-family:'JetBrains Mono',monospace;"></span>
     <button class="btn btn-blue" onclick="fetchPrices()">
       <span class="spin" id="spinIcon">↻</span> 更新股價
     </button>
@@ -318,7 +318,7 @@ tr:hover td{background:rgba(255,255,255,.02);}
     <div class="card">
       <div class="card-hdr">
         <span class="card-title">春源操作決策摘要</span>
-        <span id="springDecisionBadge" style="font-size:11px;"></span>
+        <span id="springDecisionBadge" style="font-size:14px;"></span>
       </div>
       <div class="card-body" id="springDecisionPanel"></div>
     </div>
@@ -345,11 +345,11 @@ tr:hover td{background:rgba(255,255,255,.02);}
   <div class="card" style="margin-bottom:16px;">
     <div class="card-body" style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
       <div>
-        <div style="font-size:10px;color:var(--text2);margin-bottom:4px;text-transform:uppercase;">目前殖利率決策</div>
+        <div style="font-size:14px;color:var(--text2);margin-bottom:4px;text-transform:uppercase;">目前殖利率決策</div>
         <div style="font-size:22px;font-weight:700;" id="yldDecision">計算中...</div>
       </div>
       <div style="flex:1;min-width:200px;">
-        <div style="font-size:12px;color:var(--text2);" id="yldAction">—</div>
+        <div style="font-size:15px;color:var(--text2);" id="yldAction">—</div>
       </div>
     </div>
   </div>
@@ -373,7 +373,7 @@ tr:hover td{background:rgba(255,255,255,.02);}
   <div class="card">
     <div class="card-hdr">
       <span class="card-title">春源買入記錄</span>
-      <span id="spCount" style="font-size:11px;color:var(--text2)">0筆</span>
+      <span id="spCount" style="font-size:14px;color:var(--text2)">0筆</span>
     </div>
     <div class="tbl-wrap">
       <table><thead><tr><th>日期</th><th>張數</th><th>買入價</th><th>投入金額</th><th>殖利率</th><th>資金來源</th><th>備註</th><th></th></tr></thead>
@@ -385,47 +385,108 @@ tr:hover td{background:rgba(255,255,255,.02);}
 <!-- ══ TAIMENT ══ -->
 <div class="page" id="page-taiment">
   <div id="tmAlerts" style="margin-bottom:14px;"></div>
-  <div class="hs-grid">
-    <div class="hs-item"><div class="hs-l">持有張數</div><div class="hs-v red">25</div></div>
-    <div class="hs-item"><div class="hs-l">成交均價</div><div class="hs-v amber">35.08</div></div>
-    <div class="hs-item"><div class="hs-l">帳面虧損</div><div class="hs-v red" id="tmLoss">—</div></div>
+
+  <!-- 現況快照 6格 -->
+  <div class="hs-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px;">
+    <div class="hs-item"><div class="hs-l">目前持有</div><div class="hs-v red" id="tmShares">25張</div></div>
+    <div class="hs-item"><div class="hs-l">成交均價</div><div class="hs-v amber" id="tmAvgDisplay">35.08元</div></div>
+    <div class="hs-item"><div class="hs-l">帳面損益</div><div class="hs-v red" id="tmLoss">—</div></div>
     <div class="hs-item"><div class="hs-l">回本需漲</div><div class="hs-v red" id="tmRecov">—</div></div>
-    <div class="hs-item"><div class="hs-l">年度股利</div><div class="hs-v amber">20,000元</div></div>
-    <div class="hs-item"><div class="hs-l">26元委託</div><div class="hs-v blue">掛單中</div></div>
+    <div class="hs-item"><div class="hs-l">年度股利</div><div class="hs-v amber" id="tmDivDisplay">20,000元</div></div>
+    <div class="hs-item"><div class="hs-l">釋出資金</div><div class="hs-v blue" id="tmReleasedCap">0元</div></div>
   </div>
 
-  <div class="card" style="margin-bottom:16px;">
-    <div class="card-hdr"><span class="card-title">減碼路線圖</span></div>
-    <div class="tbl-wrap">
-      <table><thead><tr><th>價格目標</th><th>行動</th><th>賣後持有</th><th>資金去向</th><th>狀態</th></tr></thead>
-      <tbody>
-        <tr><td class="mono amber">26–27元</td><td>第一次減碼 5張</td><td>20張</td><td>5成春源＋5成波段</td><td><span class="amber">⏳ 等待中</span></td></tr>
-        <tr><td class="mono">30元以上</td><td>第二次減碼 5張</td><td>15張</td><td>5成春源＋5成波段</td><td><span style="color:var(--text2)">— 未啟動</span></td></tr>
-        <tr><td class="mono">35元（解套）</td><td>視情況全出</td><td>0張</td><td>全數買春源</td><td><span style="color:var(--text2)">— 未啟動</span></td></tr>
-        <tr><td class="mono red">跌破22元</td><td>重新評估換股</td><td>視情況</td><td>若換股全買春源</td><td><span style="color:var(--text2)">— 監控中</span></td></tr>
-      </tbody></table>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-hdr">
-      <span class="card-title">重大事件記錄</span>
-      <button class="btn btn-blue" onclick="toggleEvForm()">＋ 新增事件</button>
-    </div>
-    <div id="evForm" style="display:none;padding:14px;border-bottom:1px solid var(--border);">
-      <div class="form-grid">
-        <div class="fg"><label>日期</label><input type="date" id="evDate"></div>
-        <div class="fg"><label>事件描述</label><input type="text" id="evText" placeholder="事件..."></div>
-        <div class="fg"><label>影響</label>
-          <select id="evImpact"><option value="neutral">中性</option><option value="positive">正面</option><option value="negative">負面</option><option value="warning">需關注</option></select>
+  <div class="grid2">
+    <!-- 買賣操作記錄 -->
+    <div class="card">
+      <div class="card-hdr"><span class="card-title">新增買賣記錄</span></div>
+      <div class="card-body">
+        <div class="form-grid">
+          <div class="fg"><label>日期</label><input type="date" id="tmDate"></div>
+          <div class="fg"><label>操作類型</label>
+            <select id="tmType">
+              <option value="buy">買入</option>
+              <option value="sell">賣出（減碼）</option>
+              <option value="sell_all">賣出（清倉）</option>
+            </select>
+          </div>
+          <div class="fg"><label>張數</label><input type="number" id="tmQty" min="1" placeholder="5"></div>
+          <div class="fg"><label>成交價（元）</label><input type="number" id="tmPrice" step="0.01" placeholder="26.00"></div>
+          <div class="fg"><label>資金去向/來源</label>
+            <select id="tmCapFlow">
+              <option value="spring">資金→買春源</option>
+              <option value="wave">資金→補波段本金</option>
+              <option value="both">資金→5成春源+5成波段</option>
+              <option value="hold">資金暫時保留</option>
+              <option value="buy_src">資金來自波段獲利</option>
+            </select>
+          </div>
+          <div class="fg"><label>備註</label><input type="text" id="tmNote" placeholder="第一次減碼..."></div>
+          <div class="fg" style="align-self:flex-end;"><label>&nbsp;</label>
+            <button class="btn-primary" onclick="addTmTrade()">記錄操作</button>
+          </div>
         </div>
-        <div class="fg"><label>我的決策</label><input type="text" id="evAction" placeholder="維持/調整..."></div>
-        <div class="fg" style="align-self:flex-end;"><label>&nbsp;</label><button class="btn-primary" onclick="addEvent()">記錄</button></div>
       </div>
     </div>
+
+    <!-- 減碼路線圖 -->
+    <div class="card">
+      <div class="card-hdr"><span class="card-title">減碼路線圖</span></div>
+      <div class="card-body" style="padding:0;">
+        <table>
+          <thead><tr><th>價格目標</th><th>行動</th><th>賣後持有</th><th>資金去向</th><th>狀態</th></tr></thead>
+          <tbody id="tmRoadmapTbody">
+            <tr><td class="mono amber">26–27元</td><td>第一次減碼 5張</td><td>20張</td><td>5成春源＋5成波段</td><td id="tmR1"><span class="amber">⏳ 等待中</span></td></tr>
+            <tr><td class="mono">30元以上</td><td>第二次減碼 5張</td><td>15張</td><td>5成春源＋5成波段</td><td id="tmR2"><span style="color:var(--text2)">— 未啟動</span></td></tr>
+            <tr><td class="mono">35元（解套）</td><td>視情況全出</td><td>0張</td><td>全數買春源</td><td id="tmR3"><span style="color:var(--text2)">— 未啟動</span></td></tr>
+            <tr><td class="mono red">跌破22元</td><td>重新評估換股</td><td>視情況</td><td>若換股全買春源</td><td id="tmR4"><span style="color:var(--text2)">— 監控中</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 買賣記錄表 -->
+  <div class="card" style="margin-bottom:16px;">
+    <div class="card-hdr">
+      <span class="card-title">台泥買賣記錄</span>
+      <span id="tmTradeCount" style="font-size:13px;color:var(--text2)">0筆</span>
+    </div>
     <div class="tbl-wrap">
-      <table><thead><tr><th>日期</th><th>事件</th><th>影響</th><th>決策</th><th></th></tr></thead>
-      <tbody id="evTbody"></tbody></table>
+      <table>
+        <thead><tr><th>日期</th><th>類型</th><th>張數</th><th>成交價</th><th>金額（元）</th><th>損益（元）</th><th>損益率</th><th>資金去向</th><th>備註</th><th></th></tr></thead>
+        <tbody id="tmTbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 資金流向摘要 -->
+  <div class="grid2">
+    <div class="card">
+      <div class="card-hdr"><span class="card-title">資金釋出追蹤</span></div>
+      <div class="card-body" id="tmCapSummary">
+        <div style="color:var(--text2);font-size:15px;text-align:center;padding:20px;">尚無賣出記錄</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><span class="card-title">重大事件記錄</span>
+        <button class="btn btn-blue" onclick="toggleEvForm()">＋ 新增</button>
+      </div>
+      <div id="evForm" style="display:none;padding:14px;border-bottom:1px solid var(--border);">
+        <div class="form-grid">
+          <div class="fg"><label>日期</label><input type="date" id="evDate"></div>
+          <div class="fg"><label>事件</label><input type="text" id="evText" placeholder="事件描述..."></div>
+          <div class="fg"><label>影響</label>
+            <select id="evImpact"><option value="neutral">中性</option><option value="positive">正面</option><option value="negative">負面</option><option value="warning">需關注</option></select>
+          </div>
+          <div class="fg"><label>我的決策</label><input type="text" id="evAction" placeholder="維持/調整..."></div>
+          <div class="fg" style="align-self:flex-end;"><label>&nbsp;</label><button class="btn-primary" onclick="addEvent()">記錄</button></div>
+        </div>
+      </div>
+      <div class="tbl-wrap">
+        <table><thead><tr><th>日期</th><th>事件</th><th>影響</th><th>決策</th><th></th></tr></thead>
+        <tbody id="evTbody"></tbody></table>
+      </div>
     </div>
   </div>
 </div>
@@ -450,7 +511,18 @@ tr:hover td{background:rgba(255,255,255,.02);}
     <div class="card-body">
       <div class="form-grid">
         <div class="fg"><label>進場日期</label><input type="date" id="wDate"></div>
-        <div class="fg"><label>股票</label><select id="wStock"><option>春源 (2010)</option><option>台泥 (1101)</option><option>其他</option></select></div>
+        <div class="fg"><label>股票代號/名稱</label>
+            <input type="text" id="wStock" placeholder="如：2010 春源" list="stockSuggestions">
+            <datalist id="stockSuggestions">
+              <option value="2010 春源">
+              <option value="1101 台泥">
+              <option value="0050 元大台灣50">
+              <option value="2330 台積電">
+              <option value="2412 中華電">
+              <option value="2882 國泰金">
+              <option value="2884 玉山金">
+            </datalist>
+          </div>
         <div class="fg"><label>張數</label><input type="number" id="wQty" min="1" placeholder="1"></div>
         <div class="fg"><label>進場價</label><input type="number" id="wEntry" step="0.01" placeholder="24.80"></div>
         <div class="fg"><label>停損價（自動-2.5%）</label><input type="number" id="wStop" step="0.01"></div>
@@ -644,6 +716,9 @@ let st={
   ],
   monthly: S.get('monthly')||[],
   waveCapital: S.get('waveCapital')||121000,
+  tmTrades: S.get('tmTrades')||[],
+  tmShares: S.get('tmShares')||25,
+  tmAvg: S.get('tmAvg')||35.08,
 };
 
 // ════════════════════════════════════════
@@ -892,18 +967,145 @@ function renderSpring(){
 // ════════════════════════════════════════
 // TAIMENT
 // ════════════════════════════════════════
+// ════════════════════════════════════════
+// TAIMENT TRADES
+// ════════════════════════════════════════
+function addTmTrade(){
+  const type=document.getElementById('tmType').value;
+  const qty=parseInt(document.getElementById('tmQty').value)||1;
+  const price=parseFloat(document.getElementById('tmPrice').value)||0;
+  const capFlow=document.getElementById('tmCapFlow').value;
+  const note=document.getElementById('tmNote').value;
+  const date=document.getElementById('tmDate').value;
+  if(!date||!price){alert('請填寫日期和成交價');return;}
+
+  const isSell=type==='sell'||type==='sell_all';
+  const avgCost=37.08; // original avg before any trades
+  const pnl=isSell?Math.round((price-st.tmAvg)*qty*1000):null;
+  const pnlRate=isSell?((price-st.tmAvg)/st.tmAvg*100).toFixed(1):null;
+  const amt=qty*price*1000;
+
+  const trade={id:Date.now(),date,type,qty,price,amt,pnl,pnlRate,capFlow,note};
+  st.tmTrades.push(trade);
+
+  // Update shares
+  if(isSell){
+    st.tmShares=Math.max(0,st.tmShares-qty);
+    // Update wave capital if applicable
+    if(capFlow==='wave') st.waveCapital+=amt;
+    else if(capFlow==='both') st.waveCapital+=Math.round(amt*0.5);
+  } else {
+    st.tmShares+=qty;
+    // Recalculate avg cost
+    const oldVal=st.tmAvg*((st.tmShares-qty))*1000;
+    const newVal=price*qty*1000;
+    st.tmAvg=(oldVal+newVal)/(st.tmShares*1000);
+    S.set('tmAvg',st.tmAvg);
+  }
+
+  S.set('tmTrades',st.tmTrades);
+  S.set('tmShares',st.tmShares);
+  S.set('waveCapital',st.waveCapital);
+  renderTaiment(); refreshDash();
+  ['tmDate','tmQty','tmPrice','tmNote'].forEach(i=>{document.getElementById(i).value='';});
+  showToast((isSell?'✅ 賣出':'✅ 買入')+'記錄已新增','green');
+}
+function delTmTrade(id){
+  const t=st.tmTrades.find(t=>t.id===id);
+  if(!t) return;
+  const isSell=t.type==='sell'||t.type==='sell_all';
+  if(isSell) st.tmShares=Math.min(25,st.tmShares+t.qty);
+  else st.tmShares=Math.max(0,st.tmShares-t.qty);
+  st.tmTrades=st.tmTrades.filter(t=>t.id!==id);
+  S.set('tmTrades',st.tmTrades); S.set('tmShares',st.tmShares);
+  renderTaiment(); refreshDash();
+}
+
 function renderTaiment(){
-  const tm=st.tm;
-  const loss=(tm-35.08)*25*1000;
+  const tm=st.tm, shares=st.tmShares, avg=st.tmAvg||35.08;
+  const loss=(tm-avg)*shares*1000;
+  const recov=shares>0?((avg-tm)/tm*100).toFixed(1):0;
+  const totalReleased=st.tmTrades.filter(t=>t.type==='sell'||t.type==='sell_all').reduce((s,t)=>s+t.amt,0);
+  const annualDiv=Math.round(shares*0.8*1000);
+
+  // Update summary cards
+  document.getElementById('tmShares').textContent=shares+'張';
+  document.getElementById('tmAvgDisplay').textContent=avg.toFixed(2)+'元';
   const lEl=document.getElementById('tmLoss');
-  lEl.textContent=Math.abs(Math.round(loss/1000))+'K元';
-  lEl.style.color=loss>=0?'var(--a2)':'var(--a4)';
-  document.getElementById('tmRecov').textContent='+'+((35.08-tm)/tm*100).toFixed(1)+'%';
+  lEl.textContent=(loss>=0?'+':'')+Math.round(loss/1000)+'K元';
+  lEl.className='hs-v '+(loss>=0?'green':'red');
+  document.getElementById('tmRecov').textContent=shares>0?'+'+recov+'%':'已清倉';
+  document.getElementById('tmDivDisplay').textContent=annualDiv.toLocaleString()+'元';
+  document.getElementById('tmReleasedCap').textContent=(totalReleased/10000).toFixed(1)+'萬元';
+
+  // Alerts
   const alerts=[];
-  if(tm>=26) alerts.push({t:'al-yield',i:'💰',m:`現價 ${tm} 元已達第一減碼目標！考慮賣出5張，取回約 ${Math.round(tm*5*1000/10000)}萬元。`});
-  else if(tm<=22) alerts.push({t:'al-danger',i:'🚨',m:'跌破22元警戒線，請認真評估是否換股或停損。'});
-  else alerts.push({t:'al-info',i:'⏳',m:`現價 ${tm}元，距26元目標還需漲 ${((26-tm)/tm*100).toFixed(1)}%。繼續持有，每年領取股利20,000元。`});
+  if(shares===0){
+    alerts.push({t:'al-info',i:'✅',m:'台泥已完全清倉，釋出資金共'+Math.round(totalReleased/10000)+'萬元。'});
+  } else if(tm>=26){
+    alerts.push({t:'al-yield',i:'💰',m:`現價 ${tm} 元已達第一減碼目標（26至27元）！考慮賣出5張，取回約${Math.round(tm*5*1000/10000)}萬元。`});
+  } else if(tm<=22){
+    alerts.push({t:'al-danger',i:'🚨',m:'跌破22元警戒線，請認真評估是否認賠換股。'});
+  } else {
+    alerts.push({t:'al-info',i:'⏳',m:`現價 ${tm}元，距26元減碼目標還需漲 ${((26-tm)/tm*100).toFixed(1)}%。繼續持有，每年領取股利${annualDiv.toLocaleString()}元。`});
+  }
   document.getElementById('tmAlerts').innerHTML=alerts.map(a=>`<div class="alert ${a.t}"><span class="al-icon">${a.i}</span><div>${a.m}</div></div>`).join('');
+
+  // Roadmap status update
+  const hasSold5=st.tmTrades.some(t=>(t.type==='sell')&&t.qty>=5&&t.price>=26);
+  const hasSold10=st.tmTrades.filter(t=>t.type==='sell').reduce((s,t)=>s+t.qty,0)>=10;
+  if(document.getElementById('tmR1')) document.getElementById('tmR1').innerHTML=hasSold5?'<span class="green">✅ 完成</span>':'<span class="amber">⏳ 等待中</span>';
+  if(document.getElementById('tmR2')) document.getElementById('tmR2').innerHTML=hasSold10?'<span class="green">✅ 完成</span>':'<span style="color:var(--text2)">— 未啟動</span>';
+  if(document.getElementById('tmR4')) document.getElementById('tmR4').innerHTML=tm<=22?'<span class="red">⚠️ 觸發警戒</span>':'<span style="color:var(--text2)">— 監控中</span>';
+
+  // Trade table
+  const capFlowLabel={spring:'→買春源',wave:'→補波段',both:'→5成各半',hold:'→暫時保留',buy_src:'來自波段獲利'};
+  const typeLabel={buy:'買入',sell:'賣出(減碼)',sell_all:'賣出(清倉)'};
+  const typeColor={buy:'green',sell:'red',sell_all:'red'};
+  document.getElementById('tmTradeCount').textContent=st.tmTrades.length+'筆';
+  document.getElementById('tmTbody').innerHTML=st.tmTrades.map(t=>`
+    <tr>
+      <td class="mono">${t.date}</td>
+      <td class="${typeColor[t.type]||''}" style="font-weight:600">${typeLabel[t.type]||t.type}</td>
+      <td>${t.qty}張</td>
+      <td class="mono">${t.price.toFixed(2)}</td>
+      <td class="mono">${Math.round(t.amt).toLocaleString()}</td>
+      <td class="mono ${t.pnl!==null?(t.pnl>=0?'green':'red'):''}">${t.pnl!==null?(t.pnl>=0?'+':'')+t.pnl.toLocaleString():'—'}</td>
+      <td class="${t.pnlRate!==null?(parseFloat(t.pnlRate)>=0?'green':'red'):''}">${t.pnlRate!==null?(parseFloat(t.pnlRate)>=0?'+':'')+t.pnlRate+'%':'—'}</td>
+      <td style="font-size:13px;color:var(--text2)">${capFlowLabel[t.capFlow]||t.capFlow}</td>
+      <td style="font-size:13px;color:var(--text2)">${t.note||'—'}</td>
+      <td><button class="btn-danger" onclick="delTmTrade(${t.id})">刪除</button></td>
+    </tr>`).join('')||`<tr><td colspan="10" style="text-align:center;color:var(--text2);padding:16px">尚無買賣記錄</td></tr>`;
+
+  // Capital flow summary
+  const sells=st.tmTrades.filter(t=>t.type==='sell'||t.type==='sell_all');
+  if(sells.length>0){
+    const toSpring=sells.filter(t=>t.capFlow==='spring'||t.capFlow==='both').reduce((s,t)=>s+(t.capFlow==='both'?t.amt*0.5:t.amt),0);
+    const toWave=sells.filter(t=>t.capFlow==='wave'||t.capFlow==='both').reduce((s,t)=>s+(t.capFlow==='both'?t.amt*0.5:t.amt),0);
+    const onHold=sells.filter(t=>t.capFlow==='hold').reduce((s,t)=>s+t.amt,0);
+    document.getElementById('tmCapSummary').innerHTML=`
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;justify-content:space-between;padding:10px;background:rgba(0,212,170,.08);border-radius:8px;border-left:3px solid var(--a2);">
+          <span style="font-size:14px;">→ 買入春源</span>
+          <span style="font-size:16px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--a2)">${(toSpring/10000).toFixed(1)}萬元</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:10px;background:rgba(74,158,255,.08);border-radius:8px;border-left:3px solid var(--a1);">
+          <span style="font-size:14px;">→ 補波段本金</span>
+          <span style="font-size:16px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--a1)">${(toWave/10000).toFixed(1)}萬元</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:10px;background:rgba(255,255,255,.04);border-radius:8px;border-left:3px solid var(--text2);">
+          <span style="font-size:14px;">→ 暫時保留</span>
+          <span style="font-size:16px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--text2)">${(onHold/10000).toFixed(1)}萬元</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:10px;background:rgba(255,179,68,.08);border-radius:8px;border-left:3px solid var(--a3);">
+          <span style="font-size:14px;font-weight:700;">合計釋出</span>
+          <span style="font-size:18px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--a3)">${(totalReleased/10000).toFixed(1)}萬元</span>
+        </div>
+      </div>`;
+  } else {
+    document.getElementById('tmCapSummary').innerHTML='<div style="color:var(--text2);font-size:14px;text-align:center;padding:20px;">尚無賣出記錄</div>';
+  }
+
   renderEvents();
 }
 
@@ -1032,31 +1234,187 @@ function renderDecisionPanels(sp,tm,sy){
 // TIMELINE
 // ════════════════════════════════════════
 const TL=[
-  {y:'2026',ph:'啟動期',st:'active',t:'計畫正式啟動 🚀',d:'台泥掛委託、設定每月定投、建立操作記錄',ms:['台泥5張取得波段本金','每月1萬自動轉帳','春源首次定投@24.80']},
-  {y:'2027',ph:'打底期',st:'future',t:'春源衝刺至80張',d:'三條水管齊開，有條件定期定額持續買入',ms:['春源年股利突破16萬','波段本金達20萬','台泥EPS方向確認']},
-  {y:'2028 Q1',ph:'里程碑',st:'future',t:'春源達到100張 🎯',d:'存股第一引擎完成，月均股利達16,667元',ms:['開始研究第二存股','資金分配調整','年收益突破26萬']},
-  {y:'2029',ph:'加速期',st:'future',t:'雙存股引擎並行',d:'波段本金衝至30萬，第二存股建倉',ms:['春源約130張','第二存股30張','年收益突破35萬']},
-  {y:'2030',ph:'收成期',st:'future',t:'月均被動收入突破3萬元 💎',d:'三引擎全速，被動收入開始有感',ms:['春源約160張','月均>30,000元']},
-  {y:'2036',ph:'驗證點',st:'future',t:'10年計畫驗證完成 ✅',d:'系統經一個完整週期，啟動第二期',ms:['春源約240張','月均~61,000元','評估太太副軌']},
-  {y:'2046',ph:'退休期',st:'future',t:'60歲退休準備完成 🌅',d:'自建系統月均14萬，加雙份退撫月均18至22萬',ms:['春源約390張','月均~140,000元','享用模式啟動']},
+  {y:'2026',m:'5月',ph:'🚀 啟動期',st:'active',
+   t:'計畫正式啟動',
+   d:'三條水管同步開啟，系統從今天開始運轉',
+   items:[
+     {icon:'💼',label:'台泥掛26元限價委託賣出5張',note:'取得波段引擎起始本金約12至13萬元'},
+     {icon:'⚙️',label:'設定每月1萬元自動轉帳',note:'讓定投成為不需要意志力的習慣'},
+     {icon:'🌱',label:'春源首次定投 @24.80元',note:'殖利率8.06%，計畫正式啟動'},
+     {icon:'📒',label:'建立操作記錄本（本系統）',note:'記錄每次進出場原因，沒有記錄就沒有進步'},
+   ],
+   kpi:'春源：42張　波段本金：12萬　年股利：10.4萬'},
+
+  {y:'2026',m:'下半年',ph:'🔵 打底期開始',st:'future',
+   t:'波段引擎正式運轉，春源加速累積',
+   d:'三條水管齊開，有條件定期定額持續執行',
+   items:[
+     {icon:'⚡',label:'第一次波段操作',note:'嚴守停損-2至3%、停利+3至5%'},
+     {icon:'💰',label:'第一次年終獎金投入（約10萬）',note:'7成買春源、3成補波段本金，分三批'},
+     {icon:'📊',label:'台泥Q1財報確認EPS方向',note:'若轉正→等27至28元減碼；若仍負→守22元底線'},
+     {icon:'🎯',label:'春源目標：累積至60張',note:'殖利率仍>8%時加大買入'},
+   ],
+   kpi:'春源：~60張　波段本金：~15萬　年股利：~12萬'},
+
+  {y:'2027',m:'全年',ph:'🔵 打底期深化',st:'future',
+   t:'春源衝刺至80張，波段引擎逐步放大',
+   d:'系統進入穩定執行節奏，每月例行操作固定化',
+   items:[
+     {icon:'🌱',label:'春源繼續有條件定期定額',note:'殖利率>8.3%甜蜜區時全力加碼'},
+     {icon:'📈',label:'波段本金目標：突破20萬',note:'月均波段收益提升至約4,000元'},
+     {icon:'🏛️',label:'台泥持續觀察IPO進度',note:'歐洲IPO定價是最重要的催化劑'},
+     {icon:'📋',label:'第一次年度大體檢（年底）',note:'對照里程碑，春源是否達80張？'},
+   ],
+   kpi:'春源：~80張　波段本金：~20萬　年股利：~16萬'},
+
+  {y:'2028',m:'Q1',ph:'🎯 第一大里程碑',st:'future',
+   t:'春源達到100張 🎉',
+   d:'存股第一引擎完成，月均股利突破16,667元',
+   items:[
+     {icon:'🏆',label:'春源100張，存股第一引擎完成',note:'月均股利從8,667元提升至16,667元'},
+     {icon:'🔄',label:'資金分配策略調整',note:'波段獲利改為：50%滾本金+30%存股二+20%備用'},
+     {icon:'🔍',label:'開始研究第二存股標的',note:'方向：電信或官股金融，殖利率4至6%，防禦型'},
+     {icon:'📊',label:'年收益首次突破26萬元',note:'月均被動收入超過21,700元'},
+   ],
+   kpi:'春源：100張 🎯　波段本金：~20萬　年收益：~26萬'},
+
+  {y:'2028',m:'下半年',ph:'🟢 加速期開始',st:'future',
+   t:'第二存股引擎開始建倉',
+   d:'雙存股策略啟動，分散單一標的風險',
+   items:[
+     {icon:'🏦',label:'選定第二存股標的並開始買入',note:'目標：防禦型，與春源景氣相關性低'},
+     {icon:'💡',label:'台泥若已出現反彈機會',note:'在27至28元附近執行第一次減碼5張'},
+     {icon:'⚡',label:'波段本金持續成長',note:'月均波段收益目標：6,000元'},
+   ],
+   kpi:'春源：~110張　存股二：~10張　年收益：~30萬'},
+
+  {y:'2029',m:'全年',ph:'🟢 加速期深化',st:'future',
+   t:'雙存股引擎並行，波段本金衝30萬',
+   d:'系統規模明顯擴大，複利效果開始加速顯現',
+   items:[
+     {icon:'📈',label:'波段本金目標：突破30萬',note:'月均波段收益約6,000元'},
+     {icon:'🌱',label:'春源目標：130張',note:'年股利約26萬元（配息1.5元保守版）'},
+     {icon:'🏦',label:'第二存股目標：30至40張',note:'年股利約3至4萬元'},
+     {icon:'📋',label:'第二次年度大體檢',note:'系統是否如期運轉？有無需要調整的標的？'},
+   ],
+   kpi:'春源：~130張　存股二：~35張　波段：~30萬　年收益：~35萬'},
+
+  {y:'2030',m:'全年',ph:'🏆 收成期開始',st:'future',
+   t:'月均被動收入首次突破3萬元 💎',
+   d:'三個引擎全速運轉，被動收入開始真正有感',
+   items:[
+     {icon:'💰',label:'月均被動收入突破30,000元',note:'存股股利+波段收益合計首次超越3萬'},
+     {icon:'🌱',label:'春源目標：160張',note:'年股利約32萬元'},
+     {icon:'🏛️',label:'退撫基金中期評估',note:'自建系統月均已超過3萬，退撫存在與否已非關鍵'},
+     {icon:'🔄',label:'台泥若仍持有，再次評估換股可能性',note:'依殖利率比較，決定去留'},
+   ],
+   kpi:'春源：~160張　存股二：~80張　波段：~30萬　月均：~30,000元'},
+
+  {y:'2031',m:'年底',ph:'🟡 收成期深化',st:'future',
+   t:'系統三引擎穩定成熟',
+   d:'年收益突破43萬，開始評估是否啟動太太副軌',
+   items:[
+     {icon:'🌱',label:'春源目標：180張',note:'年股利約36萬元'},
+     {icon:'💡',label:'評估是否正式啟動太太投資系統',note:'太太副軌建議：防禦型存股+保守波段'},
+     {icon:'📊',label:'年度大體檢：系統是否如計畫書執行',note:'回答五個核心問題，誠實評估'},
+   ],
+   kpi:'春源：~180張　存股二：~100張　月均：~37,000元'},
+
+  {y:'2033',m:'全年',ph:'🔴 自由期',st:'future',
+   t:'春源突破200張 🏆',
+   d:'高速複利區間，退休準備加速',
+   items:[
+     {icon:'🌱',label:'春源200張重要里程碑',note:'年股利40萬元（配息2元版）'},
+     {icon:'💰',label:'月均被動收入接近50,000元',note:'距財務自由初階目標越來越近'},
+     {icon:'🏛️',label:'退撫基金狀況再評估',note:'自建系統已能完全支撐退休基本生活'},
+   ],
+   kpi:'春源：~200張　月均：~47,000元　年收益：~56萬'},
+
+  {y:'2036',m:'年底',ph:'✅ 10年驗證點',st:'future',
+   t:'10年計畫驗證完成',
+   d:'系統經過一個完整複利週期，若成功則進入第二期加速',
+   items:[
+     {icon:'🎊',label:'春源約240張，系統完全成熟',note:'月均被動收入約61,000元'},
+     {icon:'🔍',label:'啟動第二期計畫修訂',note:'根據10年實際執行結果，調整後10年策略'},
+     {icon:'👫',label:'若太太副軌已啟動，雙軌合計評估',note:'雙軌合計月均被動收入應超過12萬元'},
+   ],
+   kpi:'春源：~240張　存股二：~150張　月均：~61,000元　年收益：~73萬'},
+
+  {y:'2041',m:'全年',ph:'💎 第15年里程碑',st:'future',
+   t:'月均被動收入接近10萬元',
+   d:'複利加速區間，每一年的增量都遠超過前幾年',
+   items:[
+     {icon:'💰',label:'月均被動收入約98,000元',note:'春源320張+存股二150張+波段80萬'},
+     {icon:'🏛️',label:'退休前最後財務規劃',note:'確認退撫實際金額，調整退休後資金提取策略'},
+   ],
+   kpi:'春源：~320張　存股二：~150張　波段：~80萬　月均：~98,000元'},
+
+  {y:'2046',m:'年底',ph:'🌅 退休期',st:'future',
+   t:'60歲退休，從建立模式切換到享用模式',
+   d:'自建系統月均14萬，加雙份退撫月均18至22萬',
+   items:[
+     {icon:'🎊',label:'正式退休，系統模式切換',note:'停止每月定投，股利部分提取作生活費'},
+     {icon:'📉',label:'波段操作降頻',note:'由每月2次降為每月1次或按季，降低心理負擔'},
+     {icon:'💑',label:'雙份退撫月退開始領取',note:'夫妻各自月退3至5萬，加上自建系統'},
+     {icon:'♾️',label:'系統永動機持續運作',note:'春源繼續配息，波段繼續產生收益，不需賣出股票'},
+   ],
+   kpi:'春源：~390張　存股二：~220張　波段：~110萬　月均：~140,000元'},
+
+  {y:'2051',m:'第25年',ph:'🎊 計畫圓滿',st:'future',
+   t:'25年財務自主計畫完成',
+   d:'月均被動收入約173,000元，財務完全自主',
+   items:[
+     {icon:'🌟',label:'春源約440張，第二存股約260張',note:'年度被動收入約208萬元'},
+     {icon:'💑',label:'雙份退撫+自建系統合計',note:'月均總收入約21至25萬元'},
+     {icon:'🎯',label:'當年那個為退撫擔心的決定',note:'成為改變人生的最重要選擇'},
+   ],
+   kpi:'春源：~440張　存股二：~260張　波段：~130萬　月均：~173,000元'},
 ];
 function renderTimeline(){
-  document.getElementById('tlContainer').innerHTML=TL.map((t,i)=>`
-    <div class="tl-item">
+  const phaseColors={
+    '🚀 啟動期':'var(--a5)','🔵 打底期開始':'var(--a1)','🔵 打底期深化':'var(--a1)',
+    '🎯 第一大里程碑':'var(--a2)','🟢 加速期開始':'var(--a2)','🟢 加速期深化':'var(--a2)',
+    '🏆 收成期開始':'var(--a3)','🟡 收成期深化':'var(--a3)',
+    '🔴 自由期':'var(--a4)','✅ 10年驗證點':'var(--a2)',
+    '💎 第15年里程碑':'var(--a5)','🌅 退休期':'var(--a2)','🎊 計畫圓滿':'var(--a2)',
+  };
+  document.getElementById('tlContainer').innerHTML=TL.map((t,i)=>{
+    const col=phaseColors[t.ph]||'var(--text2)';
+    const isActive=t.st==='active';
+    const isDone=t.st==='done';
+    const dotCls=isDone?'tl-dot-done':isActive?'tl-dot-active':'tl-dot-future';
+    return `
+    <div class="tl-item" style="${isActive?'background:rgba(74,158,255,0.04);border-radius:12px;padding:14px;margin:-2px;':''}">
       <div class="tl-yr">
-        <div class="tl-year-text" style="color:${t.st==='active'?'var(--a1)':t.st==='done'?'var(--a2)':'var(--text2)'}">${t.y}</div>
-        <div class="tl-phase">${t.ph}</div>
+        <div class="tl-year-text" style="color:${isActive?'var(--a1)':isDone?'var(--a2)':'var(--text2)'};font-size:16px;">${t.y}</div>
+        <div class="tl-phase" style="color:${col};font-size:12px;font-weight:600;margin-top:2px;">${t.m}</div>
       </div>
       <div class="tl-dot-col">
-        <div class="tl-dot tl-dot-${t.st}"></div>
-        ${i<TL.length-1?'<div class="tl-line"></div>':''}
+        <div class="tl-dot ${dotCls}" style="width:14px;height:14px;border-width:2px;${isActive?'box-shadow:0 0 8px var(--a1);':''}"></div>
+        ${i<TL.length-1?'<div class="tl-line" style="min-height:30px;"></div>':''}
       </div>
-      <div class="tl-content">
-        <div class="tl-title">${t.t}</div>
-        <div class="tl-detail">${t.d}</div>
-        <div class="tl-badges">${t.ms.map(m=>`<span class="tl-badge">${m}</span>`).join('')}</div>
+      <div class="tl-content" style="padding-bottom:16px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap;">
+          <span style="font-size:11px;padding:2px 8px;border-radius:4px;background:rgba(255,255,255,0.06);color:${col};font-weight:700;">${t.ph}</span>
+        </div>
+        <div class="tl-title" style="font-size:17px;margin-bottom:6px;">${t.t}</div>
+        <div class="tl-detail" style="font-size:14px;margin-bottom:10px;">${t.d}</div>
+        <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:10px;">
+          ${t.items.map(item=>`
+          <div style="display:flex;align-items:flex-start;gap:8px;background:rgba(255,255,255,0.03);border-radius:7px;padding:7px 10px;">
+            <span style="font-size:15px;flex-shrink:0;margin-top:1px;">${item.icon}</span>
+            <div>
+              <div style="font-size:14px;font-weight:600;">${item.label}</div>
+              <div style="font-size:13px;color:var(--text2);margin-top:1px;">${item.note}</div>
+            </div>
+          </div>`).join('')}
+        </div>
+        <div style="font-size:13px;font-family:'JetBrains Mono',monospace;color:${col};background:rgba(255,255,255,0.04);border-radius:7px;padding:8px 12px;border-left:3px solid ${col};">
+          ${t.kpi}
+        </div>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 // ════════════════════════════════════════
@@ -1085,6 +1443,7 @@ function exportAll(){
   const wb=XLSX.utils.book_new();
   appendSheet(wb,'春源買入記錄',buildSpringData());
   appendSheet(wb,'波段操作記錄',buildWaveData());
+  appendSheet(wb,'台泥買賣記錄',buildTmData());
   appendSheet(wb,'台泥事件記錄',buildEventData());
   appendSheet(wb,'新聞記錄',buildNewsData());
   appendSheet(wb,'月度記錄',buildMonthlyData());
@@ -1124,6 +1483,10 @@ function buildWaveData(){
   const hdr=['進場日期','股票','張數','進場價','停損價','停利價','出場日期','出場價','損益（元）','損益率（%）','進場理由','出場檢討'];
   const rows=st.waveTrades.map(t=>[t.date,t.stock,t.qty,t.entry,t.stop,t.target,t.exitDate||'',t.exit||'',t.exit?Math.round((t.exit-t.entry)*t.qty*1000):'',t.exit?((t.exit-t.entry)/t.entry*100).toFixed(2):'',t.reason||'',t.review||'']);
   return [hdr,...rows];
+}
+function buildTmData(){
+  const hdr=['日期','類型','張數','成交價（元）','金額（元）','損益（元）','損損益率（%）','資金去向','備註'];
+  return [hdr,...st.tmTrades.map(t=>[t.date,t.type,t.qty,t.price,Math.round(t.amt),t.pnl||'',t.pnlRate||'',t.capFlow,t.note||''])];
 }
 function buildEventData(){
   const hdr=['日期','事件描述','影響','我的決策'];
@@ -1178,6 +1541,12 @@ function importExcel(evt){
         st.waveTrades=rows.filter(r=>r['進場日期']&&r['進場價']).map((r,i)=>({id:Date.now()+i+1000,date:String(r['進場日期']),stock:r['股票']||'春源 (2010)',qty:parseInt(r['張數'])||1,entry:parseFloat(r['進場價'])||0,stop:parseFloat(r['停損價'])||0,target:parseFloat(r['停利價'])||0,exitDate:String(r['出場日期']||''),exit:r['出場價']?parseFloat(r['出場價']):null,reason:r['進場理由']||'',review:r['出場檢討']||''}));
         S.set('waveTrades',st.waveTrades); imported++;
       }
+      // TM trades
+      if(wb.SheetNames.includes('台泥買賣記錄')){
+        const rows=XLSX.utils.sheet_to_json(wb.Sheets['台泥買賣記錄'],{defval:''});
+        st.tmTrades=rows.filter(r=>r['日期']&&r['成交價（元）']).map((r,i)=>({id:Date.now()+i+2000,date:String(r['日期']),type:r['類型']||'sell',qty:parseInt(r['張數'])||1,price:parseFloat(r['成交價（元）'])||0,amt:parseFloat(r['金額（元）'])||0,pnl:r['損益（元）']?parseFloat(r['損益（元）']):null,pnlRate:r['損損益率（%）']?String(r['損損益率（%）']):null,capFlow:r['資金去向']||'hold',note:r['備註']||''}));
+        S.set('tmTrades',st.tmTrades); imported++;
+      }
       // Monthly
       if(wb.SheetNames.includes('月度記錄')){
         const rows=XLSX.utils.sheet_to_json(wb.Sheets['月度記錄'],{defval:''});
@@ -1195,7 +1564,7 @@ function importExcel(evt){
 }
 
 function exportJSON(){
-  const data={version:'1.0',exported:new Date().toISOString(),springTrades:st.springTrades,waveTrades:st.waveTrades,events:st.events,news:st.news,monthly:st.monthly,waveCapital:st.waveCapital};
+  const data={version:'1.0',exported:new Date().toISOString(),springTrades:st.springTrades,waveTrades:st.waveTrades,tmTrades:st.tmTrades,tmShares:st.tmShares,tmAvg:st.tmAvg,events:st.events,monthly:st.monthly,waveCapital:st.waveCapital};
   const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='投資記錄備份_'+getDateStr()+'.json';a.click();
   showToast('✅ JSON備份已下載','green');
@@ -1213,6 +1582,9 @@ function importJSON(evt){
       if(data.news){st.news=data.news;S.set('news',st.news);}
       if(data.monthly){st.monthly=data.monthly;S.set('monthly',st.monthly);}
       if(data.waveCapital){st.waveCapital=data.waveCapital;S.set('waveCapital',st.waveCapital);}
+      if(data.tmTrades){st.tmTrades=data.tmTrades;S.set('tmTrades',st.tmTrades);}
+      if(data.tmShares!==undefined){st.tmShares=data.tmShares;S.set('tmShares',st.tmShares);}
+      if(data.tmAvg){st.tmAvg=data.tmAvg;S.set('tmAvg',st.tmAvg);}
       refreshDash();renderDataStats();
       showToast('✅ JSON備份已還原','green');
     }catch(err){showToast('❌ 還原失敗：'+err.message,'red');}
