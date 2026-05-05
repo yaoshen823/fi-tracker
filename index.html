@@ -1,560 +1,1272 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-TW">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>TOEIC Study Tracker v10.6.7g</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;700&display=swap" rel="stylesheet" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>財務自主投資追蹤系統 v3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 :root{
-  --bg:#f8fbf8;--card:#fff;--text:#223;
-  --pri:#2e7d32;--pri2:#43a047;--sun:#fff9e5;--sunText:#6a512a;
-  --bar:#43a047;--barBg:#dcedc8;--btn:#43a047;--btnText:#fff;
-  --accent:#a5d6a7;
+  --navy:#1F3864;--blue:#2E75B6;--ltblue:#DCE6F1;
+  --green:#1E6B3C;--ltgreen:#E2EFDA;
+  --amber:#7F6000;--ltamber:#FFF2CC;
+  --red:#C00000;--ltred:#FDDEDE;
+  --purple:#5B2C8D;--ltpurple:#EAD9F7;
+  --bg:#0A0E1A;--bg2:#111827;--bg3:#1a2035;--card:#1e2a3a;
+  --border:rgba(255,255,255,.08);--text:#e8edf5;--text2:#8a95a8;
+  --a1:#4A9EFF;--a2:#00D4AA;--a3:#FFB344;--a4:#FF6B6B;--a5:#B57BFF;
 }
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);
-  font-family:"Noto Sans TC",sans-serif;font-size:16.5px;line-height:1.7;}
-header{
-  background:linear-gradient(135deg,#c8f3c8,#e7fbe7);
-  padding:26px 22px;text-align:center;position:sticky;top:0;z-index:10;
-}
-h1{margin:0;font-size:28px;color:var(--pri)}
-h2{margin:6px 0 0;font-size:16px;color:var(--pri2)}
-h3{font-size:19px;font-weight:700;color:var(--pri);margin:0 0 8px}
-main{max-width:980px;margin:18px auto;padding:0 14px 110px}
-.card{background:#fff;border-radius:14px;box-shadow:0 2px 6px rgba(0,0,0,.08);padding:18px;margin:12px 0}
-button{background:var(--btn);color:var(--btnText);border:none;padding:10px 16px;border-radius:8px;cursor:pointer;font-weight:600;font-size:15px}
-button:hover{filter:brightness(.96)}
-input[type="date"],input[type="number"]{
-  border:1.5px solid var(--accent);border-radius:8px;padding:6px 10px;font-size:15px;background:#fdfdfd;transition:border-color .2s,box-shadow .2s;
-}
-input[type="date"]:focus,input[type="number"]:focus{outline:none;border-color:var(--pri2);box-shadow:0 0 0 2px rgba(67,160,71,.15)}
-.weekNav:disabled{opacity:.45;cursor:not-allowed}
-.tip{font-size:14px;color:#555;margin:8px 0 0 4px;background:#f6f9f6;padding:6px 10px;border-radius:8px}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(74,158,255,.03)1px,transparent 1px),linear-gradient(90deg,rgba(74,158,255,.03)1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
+.app{position:relative;z-index:1;}
 
-/* ===== 橫向滑動週卡（允許上下滾動） ===== */
-#weekSlider{
-  display:flex;flex-direction:row;gap:16px;
-  overflow-x:auto;overflow-y:visible;
-  scroll-snap-type:x proximity;
-  -webkit-overflow-scrolling:touch;scroll-behavior:smooth;
-  overscroll-behavior-inline:contain;touch-action:pan-x pan-y;
-  padding:10px 8px 20px;
-}
-#weekSlider::-webkit-scrollbar{height:8px}
-#weekSlider::-webkit-scrollbar-thumb{background:#cfe8d2;border-radius:6px}
-.weekCard{
-  flex:0 0 90%;max-width:720px;scroll-snap-align:start;
-  background:var(--card);border-radius:16px;box-shadow:0 2px 8px rgba(0,0,0,.08);
-  padding:18px 22px;font-size:15.5px;transition:transform .2s, box-shadow .3s;
-}
-.weekCard:hover{transform:translateY(-2px);box-shadow:0 4px 10px rgba(0,0,0,.1)}
-@media(min-width:900px){.weekCard{flex:0 0 70%}}
+/* ── HEADER ── */
+header{background:linear-gradient(135deg,#0d1525,#1a2540);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:60px;position:sticky;top:0;z-index:100;}
+.logo{display:flex;align-items:center;gap:10px;font-family:'Playfair Display',serif;font-size:17px;}
+.logo-icon{width:34px;height:34px;background:linear-gradient(135deg,var(--a1),var(--a2));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;}
+.hdr-right{display:flex;align-items:center;gap:10px;}
+.price-status{font-size:11px;font-family:'JetBrains Mono',monospace;padding:4px 10px;border-radius:6px;border:1px solid;}
+.status-live{color:var(--a2);border-color:rgba(0,212,170,.3);background:rgba(0,212,170,.1);}
+.status-manual{color:var(--a3);border-color:rgba(255,179,68,.3);background:rgba(255,179,68,.1);}
+.status-error{color:var(--a4);border-color:rgba(255,107,107,.3);background:rgba(255,107,107,.1);}
+.btn{padding:6px 14px;border-radius:8px;cursor:pointer;font-size:12px;font-family:'Noto Sans TC',sans-serif;border:1px solid;display:flex;align-items:center;gap:5px;transition:all .2s;}
+.btn-blue{background:rgba(74,158,255,.15);border-color:rgba(74,158,255,.3);color:var(--a1);}
+.btn-blue:hover{background:rgba(74,158,255,.25);}
+.btn-green{background:rgba(0,212,170,.15);border-color:rgba(0,212,170,.3);color:var(--a2);}
+.btn-green:hover{background:rgba(0,212,170,.25);}
+.btn-amber{background:rgba(255,179,68,.15);border-color:rgba(255,179,68,.3);color:var(--a3);}
+.btn-amber:hover{background:rgba(255,179,68,.25);}
+.spin{display:inline-block;}
+.spinning{animation:spin 1s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
 
-/* 週卡頂部即時進度條 */
-.weekProgressWrap{
-  background:#e8f5e9;height:6px;border-radius:6px;overflow:hidden;margin-bottom:10px;
-}
-.weekProgressBar{
-  background:linear-gradient(90deg,#66bb6a,#43a047);
-  height:100%;width:0%;transition:width .4s ease;
-}
-.weekHeader{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #e0f2e9;padding-bottom:8px;margin-bottom:12px}
-.weekHeader .weekTitle{font-weight:700;color:#2e7d32;background:#eaf6ea;padding:4px 10px;border-radius:6px}
+/* ── NAV ── */
+nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px;display:flex;gap:0;overflow-x:auto;}
+.nav-tab{padding:13px 18px;cursor:pointer;color:var(--text2);font-size:13px;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;display:flex;align-items:center;gap:5px;}
+.nav-tab:hover{color:var(--text);}
+.nav-tab.active{color:var(--a1);border-bottom-color:var(--a1);}
 
-/* 每日行（極簡預覽：只說明有/無複習） */
-.dayRow{
-  display:flex;align-items:center;gap:12px;padding:14px 12px;border-radius:10px;margin-bottom:8px;
-  border:1px dashed #ccc;cursor:pointer;transition:background .25s;
-}
-.dayRow:hover{background:#f5faf5}
-.dayRow.sun{background:var(--sun);border:1px solid #f7e0a3;color:var(--sunText);border-left:4px solid #e0b65f}
-.dayRow.done{
-  background:#e6f5ea;border:1.5px solid #9ed69c;position:relative;padding-left:40px;
-  transition:background .25s ease, border-color .25s ease;
-}
-.dayRow.done::before{content:"✅";position:absolute;left:14px;font-size:18px;color:#2e7d32;transform:scale(.95)}
-.dayName{width:60px;font-weight:700;color:var(--pri)}
-.taskInfo{flex:1;min-width:0;font-size:15px;color:#333}
+/* ── LAYOUT ── */
+.content{padding:20px 24px;max-width:1400px;margin:0 auto;}
+.page{display:none;animation:fadeIn .3s ease;}
+.page.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
 
-/* 有/無複習導引條（直覺判斷） */
-.dayRow.hasRev{border-left:4px solid #81c784}
-.dayRow.noRev{border-left:4px solid #e0e0e0}
+/* ── CARD ── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:16px;}
+.card-hdr{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.card-title{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.08em;}
+.card-body{padding:18px;}
 
-/* 🔍 展開按鈕更明顯但不突兀 */
-.revToggle{
-  font-size:15px;color:#2e7d32;background:#eaf5ea;border:1px solid #b7deb7;
-  border-radius:6px;padding:2px 8px;cursor:pointer;user-select:none
+/* ── STOCK CARD ── */
+.stock-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s;margin-bottom:0;}
+.stock-card:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.4);}
+.stock-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.sc-spring::before{background:linear-gradient(90deg,var(--a2),#00a382);}
+.sc-taiment::before{background:linear-gradient(90deg,var(--a4),#c94444);}
+.sc-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;}
+.sc-name{font-size:15px;font-weight:700;}
+.sc-code{font-size:10px;color:var(--text2);font-family:'JetBrains Mono',monospace;margin-top:2px;}
+.sc-badge{padding:3px 9px;border-radius:20px;font-size:10px;font-weight:600;}
+.badge-hold{background:rgba(0,212,170,.15);color:var(--a2);border:1px solid rgba(0,212,170,.3);}
+.badge-watch{background:rgba(255,107,107,.15);color:var(--a4);border:1px solid rgba(255,107,107,.3);}
+.sc-price-row{display:flex;align-items:flex-end;gap:10px;margin-bottom:6px;}
+.sc-price{font-family:'JetBrains Mono',monospace;font-size:30px;font-weight:600;line-height:1;cursor:pointer;}
+.sc-price:hover{opacity:.8;}
+.price-chg{font-family:'JetBrains Mono',monospace;font-size:12px;padding:3px 7px;border-radius:5px;margin-bottom:2px;}
+.up{background:rgba(0,212,170,.15);color:var(--a2);}
+.dn{background:rgba(255,107,107,.15);color:var(--a4);}
+.flat{background:rgba(138,149,168,.15);color:var(--text2);}
+.sc-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:14px;}
+.met{text-align:center;background:rgba(255,255,255,.04);border-radius:8px;padding:8px;}
+.met-l{font-size:9px;color:var(--text2);margin-bottom:3px;text-transform:uppercase;}
+.met-v{font-size:12px;font-weight:600;font-family:'JetBrains Mono',monospace;}
+.ybar-wrap{margin-top:12px;}
+.ybar-label{display:flex;justify-content:space-between;font-size:9px;color:var(--text2);margin-bottom:4px;}
+.ybar-track{height:8px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden;}
+.ybar-fill{height:100%;border-radius:4px;transition:width 1s ease;}
+.ybar-spring{background:linear-gradient(90deg,var(--a2),#00a382);}
+.ybar-taiment{background:linear-gradient(90deg,var(--a4),#c94444);}
+
+/* ── BIG NUMBERS ── */
+.big-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 18px;}
+.big-l{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;}
+.big-v{font-size:22px;font-weight:700;font-family:'JetBrains Mono',monospace;}
+.big-s{font-size:10px;color:var(--text2);margin-top:3px;}
+.c-blue .big-v{color:var(--a1);}
+.c-green .big-v{color:var(--a2);}
+.c-amber .big-v{color:var(--a3);}
+.c-red .big-v{color:var(--a4);}
+
+/* ── ALERTS ── */
+.alert{padding:10px 14px;border-radius:9px;margin-bottom:12px;font-size:13px;display:flex;align-items:flex-start;gap:9px;}
+.al-yield{background:rgba(0,212,170,.1);border:1px solid rgba(0,212,170,.2);color:#b8ffe9;}
+.al-warn{background:rgba(255,179,68,.1);border:1px solid rgba(255,179,68,.2);color:#ffe0a8;}
+.al-info{background:rgba(74,158,255,.1);border:1px solid rgba(74,158,255,.2);color:#c4dcff;}
+.al-danger{background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.2);color:#ffc4c4;}
+.al-icon{font-size:15px;flex-shrink:0;margin-top:1px;}
+
+/* ── PRICE SOURCE INFO ── */
+.price-info-bar{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+.pib-text{font-size:12px;color:var(--text2);}
+.pib-text strong{color:var(--text);}
+
+/* ── NEWS ── */
+.news-item{padding:12px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s;}
+.news-item:hover{background:rgba(255,255,255,.03);}
+.news-item:last-child{border-bottom:none;}
+.ni-meta{display:flex;align-items:center;gap:8px;margin-bottom:5px;}
+.ni-tag{font-size:9px;padding:2px 6px;border-radius:3px;font-weight:600;}
+.tag-pos{background:rgba(0,212,170,.15);color:var(--a2);}
+.tag-neg{background:rgba(255,107,107,.15);color:var(--a4);}
+.tag-neu{background:rgba(74,158,255,.15);color:var(--a1);}
+.tag-war{background:rgba(255,179,68,.15);color:var(--a3);}
+.ni-time{font-size:10px;color:var(--text2);font-family:'JetBrains Mono',monospace;}
+.ni-hl{font-size:13px;line-height:1.5;}
+.ni-src{font-size:11px;color:var(--text2);margin-top:3px;}
+.news-list{max-height:300px;overflow-y:auto;}
+.news-list::-webkit-scrollbar{width:3px;}
+.news-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px;}
+
+/* ── FORMS ── */
+.form-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;}
+.fg label{font-size:10px;color:var(--text2);display:block;margin-bottom:5px;text-transform:uppercase;}
+.fg input,.fg select,.fg textarea{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--text);border-radius:7px;padding:7px 10px;font-size:13px;font-family:'Noto Sans TC',sans-serif;outline:none;transition:border-color .2s;}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--a1);background:rgba(74,158,255,.08);}
+.fg select option{background:#1e2a3a;}
+.fg textarea{resize:vertical;min-height:60px;}
+.btn-primary{background:linear-gradient(135deg,var(--a1),#2b6ef5);color:white;border:none;padding:8px 18px;border-radius:7px;cursor:pointer;font-size:12px;font-family:'Noto Sans TC',sans-serif;font-weight:600;transition:opacity .2s;width:100%;}
+.btn-primary:hover{opacity:.9;}
+.btn-danger{background:rgba(255,107,107,.15);color:var(--a4);border:1px solid rgba(255,107,107,.3);padding:4px 10px;border-radius:5px;cursor:pointer;font-size:11px;font-family:'Noto Sans TC',sans-serif;transition:all .2s;}
+.btn-danger:hover{background:rgba(255,107,107,.25);}
+
+/* ── TABLE ── */
+.tbl-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+th{background:rgba(255,255,255,.04);padding:9px 12px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--text2);border-bottom:1px solid var(--border);white-space:nowrap;}
+td{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle;}
+tr:hover td{background:rgba(255,255,255,.02);}
+.mono{font-family:'JetBrains Mono',monospace;}
+.green{color:var(--a2);}
+.red{color:var(--a4);}
+.blue{color:var(--a1);}
+.amber{color:var(--a3);}
+
+/* ── TIMELINE ── */
+.tl-item{display:flex;gap:14px;padding:12px 0;border-bottom:1px solid var(--border);}
+.tl-item:last-child{border-bottom:none;}
+.tl-yr{width:90px;flex-shrink:0;}
+.tl-year-text{font-size:11px;font-weight:700;font-family:'JetBrains Mono',monospace;}
+.tl-phase{font-size:9px;color:var(--text2);}
+.tl-dot-col{display:flex;flex-direction:column;align-items:center;padding-top:3px;}
+.tl-dot{width:11px;height:11px;border-radius:50%;border:2px solid;flex-shrink:0;}
+.tl-dot-done{background:var(--a2);border-color:var(--a2);}
+.tl-dot-active{background:var(--a1);border-color:var(--a1);animation:pulse 2s infinite;}
+.tl-dot-future{background:transparent;border-color:rgba(255,255,255,.2);}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.tl-line{flex:1;width:1px;background:rgba(255,255,255,.08);margin:3px 0;}
+.tl-content{flex:1;}
+.tl-title{font-size:13px;font-weight:600;margin-bottom:3px;}
+.tl-detail{font-size:11px;color:var(--text2);line-height:1.5;}
+.tl-badges{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px;}
+.tl-badge{font-size:9px;padding:2px 7px;border-radius:3px;background:rgba(74,158,255,.1);color:var(--a1);border:1px solid rgba(74,158,255,.2);}
+
+/* ── CHECKLIST ── */
+.cl-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px;}
+.cl-item:last-child{border-bottom:none;}
+.cl-box{width:17px;height:17px;border-radius:4px;border:2px solid rgba(255,255,255,.2);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.cl-box.ck{background:var(--a2);border-color:var(--a2);}
+.cl-box.ck::after{content:'✓';font-size:10px;color:white;font-weight:700;}
+
+/* ── EXPORT/IMPORT ── */
+.io-section{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:11px;padding:16px;margin-bottom:16px;}
+.io-title{font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;}
+.io-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;}
+.io-btn{background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:9px;padding:12px 14px;cursor:pointer;transition:all .2s;text-align:left;}
+.io-btn:hover{background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.15);}
+.io-btn-icon{font-size:20px;margin-bottom:6px;}
+.io-btn-title{font-size:12px;font-weight:600;margin-bottom:2px;}
+.io-btn-sub{font-size:10px;color:var(--text2);}
+.io-btn.export{border-color:rgba(0,212,170,.3);}
+.io-btn.export:hover{background:rgba(0,212,170,.08);}
+.io-btn.import{border-color:rgba(74,158,255,.3);}
+.io-btn.import:hover{background:rgba(74,158,255,.08);}
+#importFileInput{display:none;}
+
+/* ── HOLDINGS SUMMARY ── */
+.hs-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;}
+.hs-item{background:rgba(255,255,255,.04);border-radius:9px;padding:12px;text-align:center;}
+.hs-l{font-size:9px;color:var(--text2);margin-bottom:5px;text-transform:uppercase;}
+.hs-v{font-size:18px;font-weight:700;font-family:'JetBrains Mono',monospace;}
+
+/* ── WAVE STATS ── */
+.ws-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;}
+.ws-card{background:rgba(255,255,255,.04);border-radius:9px;padding:12px;}
+.ws-l{font-size:9px;color:var(--text2);margin-bottom:5px;text-transform:uppercase;}
+.ws-v{font-size:17px;font-weight:700;font-family:'JetBrains Mono',monospace;}
+
+@media(max-width:768px){
+  .grid2,.grid4,.hs-grid,.ws-grid{grid-template-columns:1fr 1fr;}
+  .grid3{grid-template-columns:1fr;}
+  .content{padding:14px;}
 }
-.revToggle:hover{background:#dff0df}
-
-/* 展開後才顯示詳細複習內容 */
-.revDetail{
-  margin:10px 0 8px 70px;background:#f4fbf4;border:1px solid #dcefdc;border-radius:8px;
-  padding:0 8px;font-size:15px;color:#2b3d2b;display:none;max-height:0;transition:max-height .3s ease, padding .2s ease;
-}
-.revDetail.show{display:block;max-height:320px;padding:10px 12px}
-
-/* 浮動進度條（單行） */
-#floatingBar{
-  position:fixed;bottom:0;left:0;right:0;z-index:50;backdrop-filter:blur(10px);
-  background:rgba(240,248,242,.9);border-top:2px solid #c8e6c9;padding:12px 18px;
-  display:flex;align-items:center;justify-content:space-between;gap:14px;white-space:nowrap;font-size:15px;
-}
-#floatingBar .barWrap{flex:1 1 auto;margin:0 10px}
-#floatingBar .barWrap .progress{height:12px;background:var(--barBg);border-radius:10px;overflow:hidden}
-#floatingBar .barWrap .progress .bar{height:12px;background:var(--bar);width:0%;transition:width .5s}
-
-/* 月平均卡 */
-#monthGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-top:12px}
-.monthCard{border-radius:10px;text-align:center;padding:10px 6px;background:#f5faf5;border:1px solid #c8e6c9;transition:transform .15s,background .2s}
-.monthCard:hover{transform:translateY(-3px);background:#edf7ed}
-.monthName{font-weight:700;color:#2e7d32}
-.monthRate{font-size:20px;font-weight:700;color:#388e3c}
-.monthBadge{font-size:22px;margin-top:4px}
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:3px;}
 </style>
 </head>
 <body>
+<div class="app">
 
 <header>
-  <h1>TOEIC Study Tracker</h1>
+  <div class="logo">
+    <div class="logo-icon">📈</div>
+    <span>財務自主投資系統</span>
+  </div>
+  <div class="hdr-right">
+    <span id="priceStatus" class="price-status status-manual">手動模式</span>
+    <span id="lastUpdate" style="font-size:10px;color:var(--text2);font-family:'JetBrains Mono',monospace;"></span>
+    <button class="btn btn-blue" onclick="fetchPrices()">
+      <span class="spin" id="spinIcon">↻</span> 更新股價
+    </button>
+  </div>
 </header>
 
-<main>
-  <section class="card">
-    <h3>🎯 設定你的學習計畫</h3>
-    <p>請選擇開始日期與每日單字量，按「開始生成」建立 180 天課表。</p>
-    <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;
-                background:#f7fbf7;border:1px solid #c8e6c9;border-radius:10px;
-                padding:10px 12px;">
-      <label>📅 開始日期 <input type="date" id="startDate" /></label>
-      <label>📘 每日單字量 <input type="number" id="dailyWords" min="5" max="30" value="10" style="width:90px" /></label>
-      <button id="genBtn">開始生成</button>
-    </div>
-    <div class="tip">💡 重新設定會覆蓋先前規劃（可先匯出備份）。</div>
-  </section>
+<nav>
+  <div class="nav-tab active" onclick="showPage('dashboard',this)">⬛ 總覽</div>
+  <div class="nav-tab" onclick="showPage('spring',this)">🌱 春源</div>
+  <div class="nav-tab" onclick="showPage('taiment',this)">🏛️ 台泥</div>
+  <div class="nav-tab" onclick="showPage('wave',this)">⚡ 波段</div>
+  
+  <div class="nav-tab" onclick="showPage('timeline',this)">🗺️ 時間線</div>
+  <div class="nav-tab" onclick="showPage('checklist',this)">✅ 月度清單</div>
+  <div class="nav-tab" onclick="showPage('io',this)">📦 匯入匯出</div>
+</nav>
 
-  <section class="card">
-    <h3>🔔 今日任務摘要</h3>
-    <div id="summaryList"><p>請先建立課表。</p></div>
-    <div style="margin-top:8px;font-size:15px">🧠 記憶穩定度（MSI）：<b id="msiValue">--%</b></div>
-    <div class="tip">📌 依完成率與延遲複習自動更新。</div>
-  </section>
+<div class="content">
 
-  <section class="card">
-    <h3>📅 每週課表</h3>
-    <div class="tip" style="margin-bottom:12px;border:1px solid #c8e6c9;background:#f5faf5;padding:10px 12px;border-radius:8px;">
-      💡 <b>操作說明：</b>左右滑動切換週卡，或用「← / →」按鈕切換。點擊整行可標示「已完成」，點 🔍 展開查看當日需複習清單（週日僅複習本週內容）。
-    </div>
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-      <button id="prevWeek" class="weekNav">← 上一週</button>
-      <button id="nextWeek" class="weekNav">下一週 →</button>
-    </div>
-    <div id="weekSlider"></div>
-  </section>
+<!-- ══ DASHBOARD ══ -->
+<div class="page active" id="page-dashboard">
 
-  <section class="card">
-    <h3>📊 統計與每月進度</h3>
-    <div>✅ 累積單字：<span id="kAccum">0</span></div>
-    <div>🎯 預計總量：<span id="kExpect">0</span></div>
-    <div class="progress" style="height:12px;background:#dcedc8;border-radius:20px;overflow:hidden">
-      <div class="bar" id="overallBar" style="height:12px;background:#43a047;width:0%"></div>
+  <div class="price-info-bar">
+    <span class="pib-text" id="priceSourceText">
+      <strong>股價來源：</strong>台灣證券交易所 OpenAPI（每次點擊「更新股價」自動抓取當日收盤價）
+    </span>
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-blue" onclick="fetchPrices()">↻ 抓取最新股價</button>
+      <button class="btn btn-amber" onclick="manualPriceInput()">✎ 手動輸入</button>
     </div>
-    <div style="text-align:right"><span id="overallPct">0%</span></div>
-    <canvas id="weekChart"></canvas>
-    <h4 style="margin-top:18px;font-size:17px;color:#2e7d32;">📆 每月平均進度</h4>
-    <div id="monthGrid"></div>
-    <div class="tip">🏅 每月顯示平均完成率與勳章。</div>
-  </section>
+  </div>
 
-  <section class="card" style="text-align:center;">
-    <h3>💾 匯出與匯入進度</h3>
-    <p>可備份學習紀錄或於其他裝置匯入後繼續。</p>
-    <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:8px;">
-      <button id="exportBtn">📤 匯出進度</button>
-      <button id="importBtn">📥 匯入進度</button>
-      <input type="file" id="importFile" accept="application/json" style="display:none" />
+  <div id="dashAlerts"></div>
+
+  <div class="grid2" style="margin-bottom:16px;">
+    <div class="stock-card sc-spring">
+      <div class="sc-top">
+        <div><div class="sc-name">春源鋼鐵</div><div class="sc-code">2010 · TWSE</div></div>
+        <span class="sc-badge badge-hold" id="springSharesBadge">持有 42張</span>
+      </div>
+      <div class="sc-price-row">
+        <div class="sc-price" id="springPrice" onclick="manualPriceInput('spring')" title="點擊手動更新">24.80</div>
+        <div class="price-chg flat" id="springChg">—</div>
+      </div>
+      <div class="sc-metrics">
+        <div class="met"><div class="met-l">殖利率</div><div class="met-v green" id="springYield">8.06%</div></div>
+        <div class="met"><div class="met-l">均價</div><div class="met-v" id="springAvgDisplay">21.99</div></div>
+        <div class="met"><div class="met-l">損益率</div><div class="met-v green" id="springPnlRate">+12.8%</div></div>
+      </div>
+      <div class="ybar-wrap">
+        <div class="ybar-label"><span>暫停&lt;5%</span><span style="color:var(--a2)">正常6-8%</span><span>甜蜜&gt;8.3%</span></div>
+        <div class="ybar-track"><div class="ybar-fill ybar-spring" id="springYBar" style="width:60%"></div></div>
+      </div>
     </div>
-  </section>
-</main>
 
-<div id="floatingBar">
-  <span id="floatMSI">MSI：--%</span>
-  <div class="barWrap"><div class="progress"><div class="bar" id="floatBar"></div></div></div>
-  <span id="floatPct">0%</span>
+    <div class="stock-card sc-taiment">
+      <div class="sc-top">
+        <div><div class="sc-name">台灣水泥</div><div class="sc-code">1101 · TWSE</div></div>
+        <span class="sc-badge badge-watch">套牢 25張</span>
+      </div>
+      <div class="sc-price-row">
+        <div class="sc-price" id="taimentPrice" onclick="manualPriceInput('taiment')" title="點擊手動更新">24.15</div>
+        <div class="price-chg flat" id="taimentChg">—</div>
+      </div>
+      <div class="sc-metrics">
+        <div class="met"><div class="met-l">殖利率</div><div class="met-v amber" id="taimentYield">3.31%</div></div>
+        <div class="met"><div class="met-l">均價</div><div class="met-v">35.08</div></div>
+        <div class="met"><div class="met-l">損益率</div><div class="met-v red" id="taimentPnlRate">-31.2%</div></div>
+      </div>
+      <div class="ybar-wrap">
+        <div class="ybar-label"><span>22底線</span><span id="taimentPosLabel">現在↑</span><span>35解套</span></div>
+        <div class="ybar-track"><div class="ybar-fill ybar-taiment" id="taimentYBar" style="width:16%"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid4" style="margin-bottom:16px;">
+    <div class="big-card c-blue"><div class="big-l">總市值</div><div class="big-v" id="totalMV">—</div><div class="big-s">春源＋台泥</div></div>
+    <div class="big-card c-green"><div class="big-l">年度股利</div><div class="big-v" id="totalDiv">10.4萬</div><div class="big-s">月均 8,667元</div></div>
+    <div class="big-card c-amber"><div class="big-l">波段本金</div><div class="big-v" id="wCapDisp">12.1萬</div><div class="big-s">警戒線：8萬</div></div>
+    <div class="big-card c-red"><div class="big-l">帳面損益</div><div class="big-v" id="totalPnl">—</div><div class="big-s">春源獲利＋台泥浮虧</div></div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="card-hdr">
+        <span class="card-title">春源操作決策摘要</span>
+        <span id="springDecisionBadge" style="font-size:11px;"></span>
+      </div>
+      <div class="card-body" id="springDecisionPanel"></div>
+    </div>
+    <div class="card">
+      <div class="card-hdr">
+        <span class="card-title">台泥狀況摘要</span>
+      </div>
+      <div class="card-body" id="taimentDecisionPanel"></div>
+    </div>
+  </div>
 </div>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+<!-- ══ SPRING ══ -->
+<div class="page" id="page-spring">
+  <div class="hs-grid">
+    <div class="hs-item"><div class="hs-l">持有張數</div><div class="hs-v green" id="spShares">42</div></div>
+    <div class="hs-item"><div class="hs-l">加權均價</div><div class="hs-v blue" id="spAvg">21.99</div></div>
+    <div class="hs-item"><div class="hs-l">距100張</div><div class="hs-v amber" id="spRemain">58張</div></div>
+    <div class="hs-item"><div class="hs-l">帳面損益</div><div class="hs-v" id="spPnlAmt">—</div></div>
+    <div class="hs-item"><div class="hs-l">年度股利</div><div class="hs-v green" id="spDiv">—</div></div>
+    <div class="hs-item"><div class="hs-l">進度</div><div class="hs-v blue" id="spProgress">42%</div></div>
+  </div>
+
+  <div class="card" style="margin-bottom:16px;">
+    <div class="card-body" style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+      <div>
+        <div style="font-size:10px;color:var(--text2);margin-bottom:4px;text-transform:uppercase;">目前殖利率決策</div>
+        <div style="font-size:22px;font-weight:700;" id="yldDecision">計算中...</div>
+      </div>
+      <div style="flex:1;min-width:200px;">
+        <div style="font-size:12px;color:var(--text2);" id="yldAction">—</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-hdr"><span class="card-title">新增買入記錄</span></div>
+    <div class="card-body">
+      <div class="form-grid">
+        <div class="fg"><label>日期</label><input type="date" id="spDate"></div>
+        <div class="fg"><label>張數</label><input type="number" id="spQty" min="1" placeholder="1"></div>
+        <div class="fg"><label>買入價（元）</label><input type="number" id="spBuy" step="0.01" placeholder="24.80"></div>
+        <div class="fg"><label>資金來源</label>
+          <select id="spSrc"><option>每月定投</option><option>年終獎金</option><option>波段獲利分配</option><option>春源股利再投入</option><option>台泥股利再投入</option></select>
+        </div>
+        <div class="fg"><label>備註</label><input type="text" id="spNote" placeholder="市場判斷..."></div>
+        <div class="fg" style="align-self:flex-end;"><label>&nbsp;</label><button class="btn-primary" onclick="addSpring()">記錄買入</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-hdr">
+      <span class="card-title">春源買入記錄</span>
+      <span id="spCount" style="font-size:11px;color:var(--text2)">0筆</span>
+    </div>
+    <div class="tbl-wrap">
+      <table><thead><tr><th>日期</th><th>張數</th><th>買入價</th><th>投入金額</th><th>殖利率</th><th>資金來源</th><th>備註</th><th></th></tr></thead>
+      <tbody id="spTbody"></tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TAIMENT ══ -->
+<div class="page" id="page-taiment">
+  <div id="tmAlerts" style="margin-bottom:14px;"></div>
+  <div class="hs-grid">
+    <div class="hs-item"><div class="hs-l">持有張數</div><div class="hs-v red">25</div></div>
+    <div class="hs-item"><div class="hs-l">成交均價</div><div class="hs-v amber">35.08</div></div>
+    <div class="hs-item"><div class="hs-l">帳面虧損</div><div class="hs-v red" id="tmLoss">—</div></div>
+    <div class="hs-item"><div class="hs-l">回本需漲</div><div class="hs-v red" id="tmRecov">—</div></div>
+    <div class="hs-item"><div class="hs-l">年度股利</div><div class="hs-v amber">20,000元</div></div>
+    <div class="hs-item"><div class="hs-l">26元委託</div><div class="hs-v blue">掛單中</div></div>
+  </div>
+
+  <div class="card" style="margin-bottom:16px;">
+    <div class="card-hdr"><span class="card-title">減碼路線圖</span></div>
+    <div class="tbl-wrap">
+      <table><thead><tr><th>價格目標</th><th>行動</th><th>賣後持有</th><th>資金去向</th><th>狀態</th></tr></thead>
+      <tbody>
+        <tr><td class="mono amber">26–27元</td><td>第一次減碼 5張</td><td>20張</td><td>5成春源＋5成波段</td><td><span class="amber">⏳ 等待中</span></td></tr>
+        <tr><td class="mono">30元以上</td><td>第二次減碼 5張</td><td>15張</td><td>5成春源＋5成波段</td><td><span style="color:var(--text2)">— 未啟動</span></td></tr>
+        <tr><td class="mono">35元（解套）</td><td>視情況全出</td><td>0張</td><td>全數買春源</td><td><span style="color:var(--text2)">— 未啟動</span></td></tr>
+        <tr><td class="mono red">跌破22元</td><td>重新評估換股</td><td>視情況</td><td>若換股全買春源</td><td><span style="color:var(--text2)">— 監控中</span></td></tr>
+      </tbody></table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-hdr">
+      <span class="card-title">重大事件記錄</span>
+      <button class="btn btn-blue" onclick="toggleEvForm()">＋ 新增事件</button>
+    </div>
+    <div id="evForm" style="display:none;padding:14px;border-bottom:1px solid var(--border);">
+      <div class="form-grid">
+        <div class="fg"><label>日期</label><input type="date" id="evDate"></div>
+        <div class="fg"><label>事件描述</label><input type="text" id="evText" placeholder="事件..."></div>
+        <div class="fg"><label>影響</label>
+          <select id="evImpact"><option value="neutral">中性</option><option value="positive">正面</option><option value="negative">負面</option><option value="warning">需關注</option></select>
+        </div>
+        <div class="fg"><label>我的決策</label><input type="text" id="evAction" placeholder="維持/調整..."></div>
+        <div class="fg" style="align-self:flex-end;"><label>&nbsp;</label><button class="btn-primary" onclick="addEvent()">記錄</button></div>
+      </div>
+    </div>
+    <div class="tbl-wrap">
+      <table><thead><tr><th>日期</th><th>事件</th><th>影響</th><th>決策</th><th></th></tr></thead>
+      <tbody id="evTbody"></tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- ══ WAVE ══ -->
+<div class="page" id="page-wave">
+  <div class="ws-grid">
+    <div class="ws-card"><div class="ws-l">波段本金</div><div class="ws-v blue" id="wCapFull">121,000</div></div>
+    <div class="ws-card"><div class="ws-l">操作次數</div><div class="ws-v" id="wCnt">0</div></div>
+    <div class="ws-card"><div class="ws-l">勝率</div><div class="ws-v green" id="wWin">—</div></div>
+    <div class="ws-card"><div class="ws-l">累計淨損益</div><div class="ws-v" id="wNet">0</div></div>
+  </div>
+
+  <div class="alert al-info" style="margin-bottom:14px;">
+    <span class="al-icon">📋</span>
+    <div><strong>進場前三確認：</strong>① 大盤站穩月線　② 個股量縮整理　③ 有明確支撐點<br>
+    <strong>停利：+3至+5%　停損：-2至-3%　到價即出，不改單</strong></div>
+  </div>
+
+  <div class="card">
+    <div class="card-hdr"><span class="card-title">新增波段操作</span></div>
+    <div class="card-body">
+      <div class="form-grid">
+        <div class="fg"><label>進場日期</label><input type="date" id="wDate"></div>
+        <div class="fg"><label>股票</label><select id="wStock"><option>春源 (2010)</option><option>台泥 (1101)</option><option>其他</option></select></div>
+        <div class="fg"><label>張數</label><input type="number" id="wQty" min="1" placeholder="1"></div>
+        <div class="fg"><label>進場價</label><input type="number" id="wEntry" step="0.01" placeholder="24.80"></div>
+        <div class="fg"><label>停損價（自動-2.5%）</label><input type="number" id="wStop" step="0.01"></div>
+        <div class="fg"><label>停利價（自動+4%）</label><input type="number" id="wTarget" step="0.01"></div>
+        <div class="fg"><label>出場日期</label><input type="date" id="wExitDate"></div>
+        <div class="fg"><label>出場價（空白=持倉中）</label><input type="number" id="wExit" step="0.01"></div>
+        <div class="fg"><label>進場理由</label><input type="text" id="wReason" placeholder="量縮整理..."></div>
+        <div class="fg"><label>出場檢討</label><input type="text" id="wReview"></div>
+        <div class="fg" style="align-self:flex-end;"><label>&nbsp;</label><button class="btn-primary" onclick="addWave()">記錄操作</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-hdr"><span class="card-title">波段操作記錄</span></div>
+    <div class="tbl-wrap">
+      <table><thead><tr><th>進場日</th><th>股票</th><th>張數</th><th>進場價</th><th>停損</th><th>停利</th><th>出場價</th><th>損益(元)</th><th>損益率</th><th>進場理由</th><th></th></tr></thead>
+      <tbody id="wTbody"></tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TIMELINE ══ -->
+<div class="page" id="page-timeline">
+  <div class="alert al-info" style="margin-bottom:14px;">
+    <span class="al-icon">🗺️</span>
+    <div><strong>25年完整計畫時間線　</strong>目前位置：<strong>2026年5月 — 啟動期 🚀</strong></div>
+  </div>
+  <div class="card"><div class="card-body" style="padding:8px 16px;" id="tlContainer"></div></div>
+</div>
+
+<!-- ══ CHECKLIST ══ -->
+<div class="page" id="page-checklist">
+  <div class="grid2">
+    <div class="card">
+      <div class="card-hdr"><span class="card-title">📋 每月必做（月初）</span></div>
+      <div class="card-body">
+        <ul id="monthlyList" style="list-style:none;">
+          <li class="cl-item"><div class="cl-box" onclick="toggleCk(this)"></div>確認每月1萬元定投已執行</li>
+          <li class="cl-item"><div class="cl-box" onclick="toggleCk(this)"></div>更新春源股價，確認殖利率決策區間</li>
+          <li class="cl-item"><div class="cl-box" onclick="toggleCk(this)"></div>大盤是否站穩月線（波段操作前提）</li>
+          <li class="cl-item"><div class="cl-box" onclick="toggleCk(this)"></div>波段本金餘額是否高於8萬警戒線</li>
+          <li class="cl-item"><div class="cl-box" onclick="toggleCk(this)"></div>台泥近況：有無重大消息需記錄</li>
+          <li class="cl-item"><div class="cl-box" onclick="toggleCk(this)"></div>上個月波段損益計算並更新</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><span class="card-title">📊 每季必做</span></div>
+      <div class="card-body">
+        <ul style="list-style:none;">
+          <li class="cl-item"><div class="cl-box" onclick="toggleCk(this)"></div>春源季度EPS：是否維持正成長？</li>
+          <li class="cl-item"><div class="cl-box" onclick="toggleCk(this)"></div>春源鋼構在手訂單能見度是否充足？</li>
+          <li class="cl-item"><div class="cl-box" onclick="toggleCk(this)"></div>台泥季度EPS：是否逐漸回升至正數？</li>
+          <li class="cl-item"><div class="cl-box" onclick="toggleCk(this)"></div>春源張數是否符合里程碑進度±10張？</li>
+          <li class="cl-item"><div class="cl-box" onclick="toggleCk(this)"></div>波段季度總損益是否為正數？</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><span class="card-title">📝 月度快記</span></div>
+      <div class="card-body">
+        <div class="form-grid">
+          <div class="fg"><label>春源股價</label><input type="number" id="mSp" step="0.01" placeholder="24.80"></div>
+          <div class="fg"><label>台泥股價</label><input type="number" id="mTm" step="0.01" placeholder="24.15"></div>
+          <div class="fg"><label>春源張數</label><input type="number" id="mShares" placeholder="42"></div>
+          <div class="fg"><label>本月波段損益</label><input type="number" id="mWave" placeholder="0"></div>
+          <div class="fg" style="grid-column:1/-1;"><label>本月重要事件</label><input type="text" id="mNote" placeholder="本月最重要的一件事..."></div>
+          <div class="fg"><label>&nbsp;</label><button class="btn-primary" onclick="saveMonthly()">儲存本月記錄</button></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><span class="card-title">🔴 三大紀律提醒</span></div>
+      <div class="card-body">
+        <div class="alert al-danger" style="margin-bottom:10px;"><span class="al-icon">🔴</span><div><strong>停損紀律：</strong>波段跌-2至3%必出，不凹，不等，不改單。</div></div>
+        <div class="alert al-info" style="margin-bottom:10px;"><span class="al-icon">🔵</span><div><strong>每月定投：</strong>帳面虧損時最想停止，偏偏那時才是最應該繼續的時候。</div></div>
+        <div class="alert al-yield"><span class="al-icon">🟢</span><div><strong>夫妻同向：</strong>一人動搖時，另一人是計畫的守護者。</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-hdr"><span class="card-title">月度記錄歷史</span></div>
+    <div class="tbl-wrap">
+      <table><thead><tr><th>年月</th><th>春源股價</th><th>春源張數</th><th>台泥股價</th><th>波段損益</th><th>重要事件</th></tr></thead>
+      <tbody id="mHistory"></tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- ══ IMPORT/EXPORT ══ -->
+<div class="page" id="page-io">
+  <div class="alert al-info" style="margin-bottom:16px;">
+    <span class="al-icon">📦</span>
+    <div>
+      <strong>匯入/匯出說明</strong><br>
+      匯出：將所有記錄（春源買入、波段操作、台泥事件、新聞、月度記錄）輸出為Excel檔案，可用Excel開啟編輯。<br>
+      匯入：選擇之前匯出的Excel檔案，還原所有記錄。<strong>注意：匯入會覆蓋現有資料。</strong>
+    </div>
+  </div>
+
+  <div class="io-section">
+    <div class="io-title">📤 匯出資料</div>
+    <div class="io-grid">
+      <div class="io-btn export" onclick="exportAll()">
+        <div class="io-btn-icon">📊</div>
+        <div class="io-btn-title" style="color:var(--a2)">匯出完整記錄</div>
+        <div class="io-btn-sub">所有資料→單一Excel檔（多頁）</div>
+      </div>
+      <div class="io-btn export" onclick="exportSheet('spring')">
+        <div class="io-btn-icon">🌱</div>
+        <div class="io-btn-title" style="color:var(--a2)">匯出春源買入記錄</div>
+        <div class="io-btn-sub">春源交易明細→Excel</div>
+      </div>
+      <div class="io-btn export" onclick="exportSheet('wave')">
+        <div class="io-btn-icon">⚡</div>
+        <div class="io-btn-title" style="color:var(--a2)">匯出波段操作記錄</div>
+        <div class="io-btn-sub">波段交易明細→Excel</div>
+      </div>
+      <div class="io-btn export" onclick="exportSheet('monthly')">
+        <div class="io-btn-icon">📅</div>
+        <div class="io-btn-title" style="color:var(--a2)">匯出月度記錄</div>
+        <div class="io-btn-sub">每月追蹤數據→Excel</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="io-section">
+    <div class="io-title">📥 匯入資料</div>
+    <div class="io-grid">
+      <div class="io-btn import" onclick="document.getElementById('importFileInput').click()">
+        <div class="io-btn-icon">📂</div>
+        <div class="io-btn-title" style="color:var(--a1)">從Excel匯入</div>
+        <div class="io-btn-sub">選擇之前匯出的Excel檔案還原記錄</div>
+      </div>
+      <div class="io-btn" onclick="exportJSON()">
+        <div class="io-btn-icon">💾</div>
+        <div class="io-btn-title" style="color:var(--text)">備份原始資料（JSON）</div>
+        <div class="io-btn-sub">完整備份→JSON檔，適合跨裝置</div>
+      </div>
+      <div class="io-btn" onclick="document.getElementById('importJSONInput').click()">
+        <div class="io-btn-icon">🔄</div>
+        <div class="io-btn-title" style="color:var(--text)">從JSON還原</div>
+        <div class="io-btn-sub">選擇JSON備份檔案還原</div>
+      </div>
+      <div class="io-btn" onclick="clearAll()">
+        <div class="io-btn-icon">🗑️</div>
+        <div class="io-btn-title" style="color:var(--a4)">清除所有記錄</div>
+        <div class="io-btn-sub">⚠️ 不可復原，請先備份</div>
+      </div>
+    </div>
+    <input type="file" id="importFileInput" accept=".xlsx,.xls" onchange="importExcel(event)">
+    <input type="file" id="importJSONInput" accept=".json" onchange="importJSON(event)" style="display:none">
+  </div>
+
+  <div class="card">
+    <div class="card-hdr"><span class="card-title">資料統計</span></div>
+    <div class="card-body">
+      <div class="grid4" id="dataStats"></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /content -->
+</div><!-- /app -->
+
 <script>
-(()=>{
-const NS="toeic-v10.6.7g";
-const TOTAL_DAYS=180;
-const $=q=>document.querySelector(q);
-let config={startDate:null,dailyCount:10};
-let studyLog={};
-let _chart=null;
-let currentWeek=0, weeksCount=0;
+// ════════════════════════════════════════
+// STORAGE
+// ════════════════════════════════════════
+const S={
+  get(k){try{return JSON.parse(localStorage.getItem(k))||null;}catch(e){return null;}},
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+};
 
-/* 日期工具 */
-const idxDate=i=>{const d=new Date(config.startDate);d.setDate(d.getDate()+i);return d;}
-const fmtDate=d=>`${d.getMonth()+1}/${d.getDate()}`;
-const isSunIdx=i=>idxDate(i).getDay()===0;
-const todayIdx=()=>{if(!config.startDate)return null;const s=new Date(config.startDate),t=new Date();s.setHours(0,0,0,0);t.setHours(0,0,0,0);return Math.floor((t-s)/86400000);};
+// ════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════
+let st={
+  sp: S.get('sp')||24.80,
+  tm: S.get('tm')||24.15,
+  spPrev: S.get('spPrev')||null,
+  tmPrev: S.get('tmPrev')||null,
+  priceMode: S.get('priceMode')||'manual',
+  springTrades: S.get('springTrades')||[],
+  waveTrades: S.get('waveTrades')||[],
+  events: S.get('events')||[
+    {id:1,date:'2026-05-04',text:'台泥宣布歐洲子公司赴歐IPO，三大投行協助評估',impact:'warning',action:'維持26元委託至6月底，追蹤IPO進度'},
+    {id:2,date:'2026-05-02',text:'辜仲諒持股達6.42%，成台泥單一最大股東',impact:'positive',action:'視為中期催化劑，維持計畫'},
+  ],
+  monthly: S.get('monthly')||[],
+  waveCapital: S.get('waveCapital')||121000,
+};
 
-/* 建立初始紀錄 */
-function buildInitialLog(){
-  studyLog={};
-  for(let i=0;i<TOTAL_DAYS;i++){
-    studyLog["day_"+i]={learned:false,reviews:[]};
-    if(!isSunIdx(i)){
-      [1,3,7,14].forEach(off=>{
-        const due=i+off;
-        if(due<TOTAL_DAYS)studyLog["day_"+i].reviews.push({due,completed:false,delay:0});
-      });
-    }
-  }
-}
-
-/* 自動延後未複習的任務 */
-function adaptiveDefer(){
-  const t=todayIdx();if(t==null)return;
-  const isSun=(new Date()).getDay()===0;if(isSun)return;
-  Object.values(studyLog).forEach(e=>e.reviews.forEach(r=>{
-    if(!r.completed&&r.due<t){r.due=t+1;r.delay=(r.delay||0)+1;}
-  }));
-}
-
-/* 計算該日待複習任務 */
-function dueListFor(idx,withSources=false){
-  const b={"+1":[],"+3":[],"+7":[],"+14":[]};
-  const sun=idxDate(idx).getDay()===0;let ws,we;if(sun){we=idx-1;ws=idx-6;}
-  for(let s=0;s<TOTAL_DAYS;s++){
-    const e=studyLog["day_"+s];if(!e||!e.learned)continue;
-    e.reviews.forEach(r=>{
-      if(r.completed)return;
-      if(sun){
-        if(s>=ws&&s<=we&&r.due<=idx){
-          const off=r.due-s;
-          if(off>=14)b["+14"].push(s);else if(off>=7)b["+7"].push(s);
-          else if(off>=3)b["+3"].push(s);else b["+1"].push(s);
-        }
-      }else if(r.due===idx){
-        const off=r.due-s;
-        if(off>=14)b["+14"].push(s);else if(off>=7)b["+7"].push(s);
-        else if(off>=3)b["+3"].push(s);else b["+1"].push(s);
-      }
-    });
-  }
-  if(withSources){
-    const src=[];Object.values(b).forEach(arr=>src.push(...arr));
-    return{tags:Object.keys(b).filter(k=>b[k].length),sources:src};
-  }
-  const tags=[];if(b["+1"].length)tags.push("D+1");if(b["+3"].length)tags.push("D+3");if(b["+7"].length)tags.push("D+7");if(b["+14"].length)tags.push("D+14");
-  return tags.length?tags.join("、"):"－";
-}
-
-/* 點整行標記完成 */
-function markDayDone(i,done){
-  if(!isSunIdx(i))studyLog["day_"+i].learned=!!done;
-  Object.values(studyLog).forEach(e=>e.reviews.forEach(r=>{
-    if(r.due===i)r.completed=!!done;
-  }));
-  localStorage.setItem(NS+":studyLog",JSON.stringify(studyLog));
-  updateAll(); // ← 即時刷新日卡與複習狀態
-}
-
-/* 生成每週卡片 */
-function createWeekCard(W){
-  const wsIdx=W*7,weIdx=Math.min(W*7+6,TOTAL_DAYS-1);
-  const ws=idxDate(wsIdx),we=idxDate(weIdx);
-  const card=document.createElement("div");
-  card.className="weekCard";card.id="wkCard-"+(W+1);
-
-  // 頂部進度條
-  const progWrap=document.createElement("div");
-  progWrap.className="weekProgressWrap";
-  const progBar=document.createElement("div");
-  progBar.className="weekProgressBar";
-  progWrap.append(progBar);
-  card.append(progWrap);
-
-  card.innerHTML+=`<div class="weekHeader">
-    <span class="weekTitle">W${W+1}（${fmtDate(ws)}–${fmtDate(we)}）</span>
-    <span class="weekRate" id="wp-${W+1}">0%</span>
-  </div>`;
-
-  const list=document.createElement("div");
-  const dayNames=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-  for(let d=0;d<7;d++){
-    const i=W*7+d;if(i>=TOTAL_DAYS)break;
-    const sun=isSunIdx(i);
-    const row=document.createElement("div");
-    row.className="dayRow"+(sun?" sun":"");
-    row.dataset.idx=i;
-
-    const name=document.createElement("span");
-    name.className="dayName";
-    name.textContent=dayNames[idxDate(i).getDay()]+(sun?" ☀️":"");
-
-    const info=document.createElement("span");
-    info.className="taskInfo";
-    const learnTxt = sun ? "—" : `學 ${config.dailyCount} 字`;
-    const hasRev = dueListFor(i) !== "－";
-    info.innerHTML = `${learnTxt}　${sun ? "📖 本週複習日" : (hasRev ? "📖 有複習任務" : "💤 無複習")}`;
-    row.classList.toggle("hasRev", hasRev);
-    row.classList.toggle("noRev", !hasRev);
-
-    const toggle=document.createElement("span");
-    toggle.className="revToggle"; toggle.textContent="🔍";
-    const detail=document.createElement("div"); detail.className="revDetail";
-
-    toggle.addEventListener("click",(e)=>{
-      e.stopPropagation();
-      const opened=card.querySelectorAll(".revDetail.show");
-      opened.forEach(el=>{if(el!==detail){el.classList.remove("show");el.style.maxHeight="0px";el.textContent="";}});
-      if(detail.classList.contains("show")){
-        detail.classList.remove("show");detail.style.maxHeight="0px";detail.textContent="";
-      }else{
-        const{sources}=dueListFor(i,true);
-        detail.textContent=sources.length
-          ? ("📚 需複習："+sources.map(x=>`Day ${x+1}（${fmtDate(idxDate(x))}）`).join("、"))
-          : "📚 今日無需複習。";
-        detail.classList.add("show");
-        requestAnimationFrame(()=>{detail.style.maxHeight=detail.scrollHeight+"px";});
-      }
-    });
-
-    const k=NS+":chk:"+i;
-    const checked=(localStorage.getItem(k)==="1");
-    if(checked)row.classList.add("done");
-    row.addEventListener("click",()=>{
-      const now=row.classList.toggle("done");
-      localStorage.setItem(k,now?"1":"0");
-      markDayDone(i,now);
-    });
-
-    row.append(name,info,toggle);
-    list.append(row,detail);
-  }
-  card.append(list);
-  return card;
-}
-  /* ========= 渲染所有週卡 & 定位 ========= */
-function renderWeeks(){
-  const s=$("#weekSlider"); s.innerHTML="";
-  weeksCount=Math.ceil(TOTAL_DAYS/7);
-  for(let W=0;W<weeksCount;W++) s.append(createWeekCard(W));
-  const t=todayIdx();
-  currentWeek=(t!=null&&t>=0&&t<TOTAL_DAYS)?Math.floor(t/7):0;
-  goToWeek(currentWeek,false);
-  updateAll();
-}
-
-/* ========= 週切換 ========= */
-function goToWeek(w,smooth=true){
-  currentWeek=Math.max(0,Math.min(weeksCount-1,w));
-  const c=$("#wkCard-"+(currentWeek+1));
-  if(c)c.scrollIntoView({behavior:smooth?"smooth":"auto",block:"nearest",inline:"start"});
-  const p=$("#prevWeek"),n=$("#nextWeek");
-  if(p)p.disabled=currentWeek===0;
-  if(n)n.disabled=currentWeek===weeksCount-1;
-}
-
-/* ========= 今日摘要 & MSI ========= */
-function updateSummary(){
-  const t=todayIdx(),b=$("#summaryList");
-  if(t==null){b.innerHTML="<p>請先建立課表。</p>";return;}
-  const sun=isSunIdx(t),d=dueListFor(t);
-  b.innerHTML=`<p>📘 新學習：${sun?0:config.dailyCount} 字${sun?"（週日不新增）":""}</p>
-  <p>📖 ${sun?"本週":"今日"}複習：${d}</p>`;
-}
-function computeMSI(){
-  const t=todayIdx(); if(t==null) return 0;
-  let pending=0,delay=0,learned=0,learnable=0;
-  Object.values(studyLog).forEach(e=>e.reviews.forEach(r=>{
-    if(!r.completed&&r.due<=t){pending++;delay+=(r.delay||0);}
-  }));
-  for(let i=0;i<=Math.min(t,TOTAL_DAYS-1);i++){
-    if(!isSunIdx(i))learnable++;
-    if(studyLog["day_"+i]?.learned)learned++;
-  }
-  const comp=learnable?(learned/learnable*100):0;
-  return Math.max(0,Math.min(100,Math.round(100-(pending*4+delay*2)+comp*0.3)));
-}
-function updateMSI(){
-  const v=computeMSI();
-  $("#msiValue").textContent=v+"%";
-  $("#floatMSI").textContent="MSI："+v+"%";
-}
-
-/* ========= 圖表 & 每月卡 ========= */
-function drawChart(rates){
-  const ctx=$("#weekChart"); if(!ctx) return;
-  if(_chart) _chart.destroy();
-  _chart=new Chart(ctx,{type:"line",
-    data:{labels:rates.map((_,i)=>"W"+(i+1)),
-      datasets:[{label:"每週完成率",data:rates,borderColor:"#43a047",backgroundColor:"#a5d6a770",fill:true,tension:.25}]},
-    options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,max:100,ticks:{stepSize:20}}}}
-  });
-}
-function updateMonthlyCards(rates){
-  const g = $("#monthGrid"); 
-  if(!g) return; 
-  g.innerHTML = "";
-
-  for(let i = 0; i < 24; i += 4){ // 每四週為一月
-    const seg = rates.slice(i, i + 4);
-    const avg = Math.round(seg.reduce((a, b) => a + b, 0) / (seg.length || 1));
-    const badge = avg >= 90 ? "🏅" : avg >= 70 ? "🌿" : avg >= 50 ? "🕓" : "💤";
+// ════════════════════════════════════════
+// TWSE PRICE FETCH
+// ════════════════════════════════════════
+async function fetchPrices(){
+  const spin=document.getElementById('spinIcon');
+  spin.classList.add('spinning');
+  updateStatus('manual','取得中...');
+  try{
+    // TWSE OpenAPI: get today's closing prices for 2010 and 1101
+    const today=new Date();
+    const dateStr=today.getFullYear()+
+      String(today.getMonth()+1).padStart(2,'0')+
+      String(today.getDate()).padStart(2,'0');
     
-    const c = document.createElement("div");
-    c.className = "monthCard";
-    c.innerHTML = `
-      <div class="monthName">第 ${i / 4 + 1} 個月</div>
-      <div class="monthRate">${isNaN(avg) ? 0 : avg}%</div>
-      <div class="monthBadge">${badge}</div>
-    `;
-    g.append(c);
-  }
-}
-
-/* ========= 匯出／匯入 ========= */
-function exportProgress(){
-  const data={};
-  for(let i=0;i<localStorage.length;i++){
-    const k=localStorage.key(i);
-    if(k&&k.startsWith(NS+":")) data[k]=localStorage.getItem(k);
-  }
-  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
-  const a=document.createElement("a");
-  a.href=URL.createObjectURL(blob);
-  a.download=`toeic_backup_${new Date().toISOString().slice(0,10)}.json`;
-  document.body.appendChild(a); a.click();
-  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},1200);
-}
-function importProgress(f){
-  const r=new FileReader();
-  r.onload=e=>{
-    try{
-      const d=JSON.parse(e.target.result); let c=0;
-      Object.keys(d).forEach(k=>{ if(k.startsWith(NS+":")){ localStorage.setItem(k,d[k]); c++; }});
-      alert(`✅ 匯入成功（${c} 筆），將重新載入。`); location.reload();
-    }catch(err){ alert("❌ 匯入失敗："+err.message); }
-  };
-  r.readAsText(f,"utf-8");
-}
-
-/* ========= 更新全部（含「有/無複習」即時刷新） ========= */
-function updateAll(){
-  adaptiveDefer();
-  localStorage.setItem(NS+":studyLog",JSON.stringify(studyLog));
-
-  // 週完成率、頂部進度條
-  const weekRates=[];
-  for(let W=0;W<weeksCount;W++){
-    let c=0,t=0;
-    for(let d=0;d<7;d++){
-      const i=W*7+d; if(i>=TOTAL_DAYS) break;
-      if(!isSunIdx(i)){ t++; if(localStorage.getItem(NS+":chk:"+i)==="1") c++; }
+    // Try TWSE OpenAPI (no auth needed, CORS allowed from browser)
+    const [r1,r2]=await Promise.all([
+      fetchTWSE('2010',dateStr),
+      fetchTWSE('1101',dateStr)
+    ]);
+    
+    if(r1||r2){
+      if(r1){
+        st.spPrev=st.sp;
+        st.sp=r1;
+        S.set('spPrev',st.spPrev);
+        S.set('sp',st.sp);
+      }
+      if(r2){
+        st.tmPrev=st.tm;
+        st.tm=r2;
+        S.set('tmPrev',st.tmPrev);
+        S.set('tm',st.tm);
+      }
+      st.priceMode='live';
+      S.set('priceMode','live');
+      updateStatus('live','即時收盤價');
+      refreshDash();
+      showToast('✅ 股價已更新（TWSE收盤價）','green');
+    } else {
+      throw new Error('無法取得資料');
     }
-    const rate=Math.round((c/(t||1))*100);
-    weekRates.push(rate);
-    const sp=$("#wp-"+(W+1)); if(sp) sp.textContent=rate+"%";
-    const bar=document.querySelector(`#wkCard-${W+1} .weekProgressBar`);
-    if(bar) bar.style.width=rate+"%";
+  } catch(e){
+    console.warn('TWSE fetch failed:',e);
+    updateStatus('error','API無法連線，請手動輸入');
+    showToast('⚠️ 無法自動取得股價，請使用手動輸入','amber');
+  } finally{
+    spin.classList.remove('spinning');
+    updateLastTime();
   }
+}
 
-  // 總進度、浮動條
-  let learned=0;
-  for(let i=0;i<TOTAL_DAYS;i++)
-    if(localStorage.getItem(NS+":chk:"+i)==="1" && !isSunIdx(i))
-      learned+=config.dailyCount;
-  const total=TOTAL_DAYS*config.dailyCount;
-  const pct=Math.round((learned/(total||1))*100);
-  $("#kAccum").textContent=learned; $("#kExpect").textContent=total;
-  $("#overallBar").style.width=pct+"%"; $("#overallPct").textContent=pct+"%";
-  $("#floatBar").style.width=pct+"%"; $("#floatPct").textContent=pct+"%";
+async function fetchTWSE(stockNo, dateStr){
+  // TWSE 個股日成交資訊 API
+  const url=`https://www.twse.com.tw/exchangeReport/STOCK_DAY?response=json&date=${dateStr}&stockNo=${stockNo}`;
+  try{
+    const res=await fetch(url,{mode:'cors'});
+    const data=await res.json();
+    if(data.stat==='OK'&&data.data&&data.data.length>0){
+      // Last row = most recent trading day, col[6] = closing price
+      const lastRow=data.data[data.data.length-1];
+      const closePrice=parseFloat(lastRow[6].replace(/,/g,''));
+      if(!isNaN(closePrice)&&closePrice>0) return closePrice;
+    }
+    return null;
+  }catch(e){
+    return null;
+  }
+}
 
-  // 今日摘要與 MSI
-  updateSummary(); updateMSI();
+function manualPriceInput(which){
+  if(which==='spring'||!which){
+    const v=prompt('請輸入春源 (2010) 最新股價：',st.sp);
+    if(v!==null&&!isNaN(parseFloat(v))&&parseFloat(v)>0){
+      st.spPrev=st.sp; st.sp=parseFloat(v);
+      S.set('spPrev',st.spPrev); S.set('sp',st.sp);
+    }
+  }
+  if(which==='taiment'||!which){
+    const v=prompt('請輸入台泥 (1101) 最新股價：',st.tm);
+    if(v!==null&&!isNaN(parseFloat(v))&&parseFloat(v)>0){
+      st.tmPrev=st.tm; st.tm=parseFloat(v);
+      S.set('tmPrev',st.tmPrev); S.set('tm',st.tm);
+    }
+  }
+  st.priceMode='manual'; S.set('priceMode','manual');
+  updateStatus('manual','手動模式');
+  refreshDash(); updateLastTime();
+}
 
-  // 🔁 重新檢查每個日卡的「有/無複習」狀態（即時刷新）
-  document.querySelectorAll(".dayRow").forEach(row=>{
-    const i=parseInt(row.dataset.idx); if(isNaN(i)) return;
-    const info=row.querySelector(".taskInfo"); if(!info) return;
-    const sun=isSunIdx(i);
-    const revNow=dueListFor(i);
-    const hasRev=revNow!=="－";
-    info.innerHTML = `${sun ? "—" : `學 ${config.dailyCount} 字`}　${sun ? "📖 本週複習日" : (hasRev ? "📖 有複習任務" : "💤 無複習")}`;
-    row.classList.toggle("hasRev",hasRev);
-    row.classList.toggle("noRev",!hasRev);
+function updateStatus(mode,text){
+  const el=document.getElementById('priceStatus');
+  el.className='price-status status-'+mode;
+  el.textContent=text;
+}
+
+// ════════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════════
+function showPage(id,tab){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  if(tab) tab.classList.add('active');
+  if(id==='spring') renderSpring();
+  if(id==='taiment') renderTaiment();
+  if(id==='wave'){renderWave();updateWaveStats();}
+  if(id==='timeline') renderTimeline();
+  if(id==='checklist') renderMonthly();
+  if(id==='io') renderDataStats();
+}
+
+// ════════════════════════════════════════
+// CALCULATIONS
+// ════════════════════════════════════════
+function calcShares(){return 42+st.springTrades.reduce((s,t)=>s+t.qty,0);}
+function calcAvg(){
+  if(!st.springTrades.length) return 21.99;
+  const base=21.99*42*1000;
+  const add=st.springTrades.reduce((s,t)=>s+t.price*t.qty*1000,0);
+  return (base+add)/((calcShares())*1000);
+}
+
+// ════════════════════════════════════════
+// DASHBOARD REFRESH
+// ════════════════════════════════════════
+function refreshDash(){
+  const sp=st.sp, tm=st.tm;
+  const spPrev=st.spPrev||sp, tmPrev=st.tmPrev||tm;
+  
+  // Prices
+  document.getElementById('springPrice').textContent=sp.toFixed(2);
+  document.getElementById('taimentPrice').textContent=tm.toFixed(2);
+  
+  // Changes
+  const spD=sp-spPrev, tmD=tm-tmPrev;
+  const spChgEl=document.getElementById('springChg');
+  spChgEl.textContent=(spD>=0?'+':'')+spD.toFixed(2)+'（'+(spD>=0?'+':'')+((spD/spPrev)*100).toFixed(2)+'%）';
+  spChgEl.className='price-chg '+(spD>0?'up':spD<0?'dn':'flat');
+  const tmChgEl=document.getElementById('taimentChg');
+  tmChgEl.textContent=(tmD>=0?'+':'')+tmD.toFixed(2)+'（'+(tmD>=0?'+':'')+((tmD/tmPrev)*100).toFixed(2)+'%）';
+  tmChgEl.className='price-chg '+(tmD>0?'up':tmD<0?'dn':'flat');
+  
+  // Yield
+  const sy=(2.0/sp*100).toFixed(2);
+  document.getElementById('springYield').textContent=sy+'%';
+  document.getElementById('springYield').style.color=parseFloat(sy)>=8.3?'var(--a2)':parseFloat(sy)>=6?'var(--a3)':'var(--a4)';
+  document.getElementById('taimentYield').textContent=(0.8/tm*100).toFixed(2)+'%';
+  
+  // PnL rates
+  const shares=calcShares(), avg=calcAvg();
+  const spPnl=((sp-avg)/avg*100).toFixed(1);
+  const tmPnl=((tm-35.08)/35.08*100).toFixed(1);
+  const spEl=document.getElementById('springPnlRate');
+  spEl.textContent=(spPnl>=0?'+':'')+spPnl+'%';
+  spEl.className='met-v '+(spPnl>=0?'green':'red');
+  const tmEl=document.getElementById('taimentPnlRate');
+  tmEl.textContent=tmPnl+'%';
+  tmEl.className='met-v '+(tmPnl>=0?'green':'red');
+  
+  // Yield bar
+  const yPct=Math.min(100,Math.max(0,(parseFloat(sy)-5)/4*100));
+  document.getElementById('springYBar').style.width=yPct+'%';
+  const tPct=Math.max(0,Math.min(100,((tm-22)/(35.08-22))*100));
+  document.getElementById('taimentYBar').style.width=tPct+'%';
+  
+  // Badge
+  document.getElementById('springSharesBadge').textContent='持有 '+shares+'張';
+  
+  // Big numbers
+  const spMV=sp*shares*1000, tmMV=tm*25*1000;
+  document.getElementById('totalMV').textContent=((spMV+tmMV)/10000).toFixed(1)+'萬';
+  const spPnlAmt=(sp-avg)*shares*1000, tmPnlAmt=(tm-35.08)*25*1000;
+  const totalPnl=spPnlAmt+tmPnlAmt;
+  const tpEl=document.getElementById('totalPnl');
+  tpEl.textContent=(totalPnl>=0?'+':'')+Math.round(totalPnl/1000)+'K';
+  tpEl.style.color=totalPnl>=0?'var(--a2)':'var(--a4)';
+  document.getElementById('totalDiv').textContent=(shares*2000/10000).toFixed(1)+'萬';
+  document.getElementById('wCapDisp').textContent=(st.waveCapital/10000).toFixed(1)+'萬';
+  
+  // Avg display
+  document.getElementById('springAvgDisplay').textContent=avg.toFixed(2);
+  
+  // Alerts
+  genAlerts(sp,tm,parseFloat(sy));
+  renderDecisionPanels(sp,tm,parseFloat(sy));
+  
+}
+
+function genAlerts(sp,tm,sy){
+  const alerts=[];
+  if(sy>=8.3) alerts.push({t:'al-yield',i:'🟢',m:`春源殖利率 ${sy.toFixed(2)}% 進入甜蜜區（>8.3%），可加大買入力道！`});
+  else if(sy>=6) alerts.push({t:'al-info',i:'📊',m:`春源殖利率 ${sy.toFixed(2)}%，正常水位，按計畫每月定投。`});
+  else alerts.push({t:'al-warn',i:'⏸️',m:`春源殖利率 ${sy.toFixed(2)}% 偏低，暫停加碼，資金轉波段本金。`});
+  if(tm>=26) alerts.push({t:'al-yield',i:'💰',m:`台泥 ${tm.toFixed(2)} 元！已到第一減碼目標區間，考慮賣出5張！`});
+  else if(tm<=22) alerts.push({t:'al-danger',i:'🚨',m:'台泥跌破22元警戒線！請認真評估是否換股或停損。'});
+  if(st.waveCapital<80000) alerts.push({t:'al-danger',i:'⚡',m:'波段本金低於8萬警戒線，請縮手或暫停波段操作。'});
+  const h=alerts.map(a=>`<div class="alert ${a.t}"><span class="al-icon">${a.i}</span><div>${a.m}</div></div>`).join('');
+  document.getElementById('dashAlerts').innerHTML=h;
+}
+
+// ════════════════════════════════════════
+// SPRING TRADES
+// ════════════════════════════════════════
+function addSpring(){
+  const d={id:Date.now(),date:document.getElementById('spDate').value,qty:parseInt(document.getElementById('spQty').value),price:parseFloat(document.getElementById('spBuy').value),src:document.getElementById('spSrc').value,note:document.getElementById('spNote').value};
+  if(!d.date||!d.qty||!d.price){alert('請填寫日期、張數和買入價');return;}
+  st.springTrades.push(d); S.set('springTrades',st.springTrades);
+  renderSpring(); refreshDash();
+  ['spDate','spQty','spBuy','spNote'].forEach(i=>{document.getElementById(i).value='';});
+  showToast('✅ 春源買入記錄已新增','green');
+}
+function delSpring(id){st.springTrades=st.springTrades.filter(t=>t.id!==id);S.set('springTrades',st.springTrades);renderSpring();refreshDash();}
+
+function renderSpring(){
+  const sp=st.sp,shares=calcShares(),avg=calcAvg();
+  document.getElementById('spShares').textContent=shares;
+  document.getElementById('spAvg').textContent=avg.toFixed(2);
+  document.getElementById('spRemain').textContent=Math.max(0,100-shares)+'張';
+  document.getElementById('spProgress').textContent=Math.round(shares/100*100)+'%';
+  const pnlAmt=(sp-avg)*shares*1000;
+  const pnlEl=document.getElementById('spPnlAmt');
+  pnlEl.textContent=(pnlAmt>=0?'+':'')+Math.round(pnlAmt/1000)+'K元';
+  pnlEl.className='hs-v '+(pnlAmt>=0?'green':'red');
+  document.getElementById('spDiv').textContent=(shares*2000).toLocaleString()+'元';
+  document.getElementById('spCount').textContent=st.springTrades.length+'筆';
+  const sy=(2.0/sp*100);
+  const ydEl=document.getElementById('yldDecision'),yaEl=document.getElementById('yldAction');
+  if(sy>=8.3){ydEl.textContent='🟢 甜蜜區（'+sy.toFixed(2)+'%）';ydEl.style.color='var(--a2)';yaEl.textContent='殖利率>8.3%，全力加大買入！';}
+  else if(sy>=6){ydEl.textContent='🟡 正常水位（'+sy.toFixed(2)+'%）';ydEl.style.color='var(--a3)';yaEl.textContent='殖利率6-8.3%，按每月5,000元正常買入，不追高。';}
+  else{ydEl.textContent='🔴 暫停加碼（'+sy.toFixed(2)+'%）';ydEl.style.color='var(--a4)';yaEl.textContent='殖利率<6%，暫停加碼，資金轉波段本金。';}
+  document.getElementById('spTbody').innerHTML=st.springTrades.map(t=>`
+    <tr>
+      <td class="mono">${t.date}</td>
+      <td class="green" style="font-weight:600">${t.qty}張</td>
+      <td class="mono">${t.price.toFixed(2)}</td>
+      <td class="mono">${(t.qty*t.price*1000).toLocaleString()}</td>
+      <td class="green">${(2.0/t.price*100).toFixed(2)}%</td>
+      <td>${t.src}</td>
+      <td style="color:var(--text2);font-size:11px">${t.note||'—'}</td>
+      <td><button class="btn-danger" onclick="delSpring(${t.id})">刪除</button></td>
+    </tr>`).join('')||`<tr><td colspan="8" style="text-align:center;color:var(--text2);padding:16px">尚無記錄</td></tr>`;
+}
+
+// ════════════════════════════════════════
+// TAIMENT
+// ════════════════════════════════════════
+function renderTaiment(){
+  const tm=st.tm;
+  const loss=(tm-35.08)*25*1000;
+  const lEl=document.getElementById('tmLoss');
+  lEl.textContent=Math.abs(Math.round(loss/1000))+'K元';
+  lEl.style.color=loss>=0?'var(--a2)':'var(--a4)';
+  document.getElementById('tmRecov').textContent='+'+((35.08-tm)/tm*100).toFixed(1)+'%';
+  const alerts=[];
+  if(tm>=26) alerts.push({t:'al-yield',i:'💰',m:`現價 ${tm} 元已達第一減碼目標！考慮賣出5張，取回約 ${Math.round(tm*5*1000/10000)}萬元。`});
+  else if(tm<=22) alerts.push({t:'al-danger',i:'🚨',m:'跌破22元警戒線，請認真評估是否換股或停損。'});
+  else alerts.push({t:'al-info',i:'⏳',m:`現價 ${tm}元，距26元目標還需漲 ${((26-tm)/tm*100).toFixed(1)}%。繼續持有，每年領取股利20,000元。`});
+  document.getElementById('tmAlerts').innerHTML=alerts.map(a=>`<div class="alert ${a.t}"><span class="al-icon">${a.i}</span><div>${a.m}</div></div>`).join('');
+  renderEvents();
+}
+
+function toggleEvForm(){const f=document.getElementById('evForm');f.style.display=f.style.display==='none'?'block':'none';}
+function addEvent(){
+  const d={id:Date.now(),date:document.getElementById('evDate').value,text:document.getElementById('evText').value,impact:document.getElementById('evImpact').value,action:document.getElementById('evAction').value};
+  if(!d.date||!d.text){alert('請填寫日期和事件');return;}
+  st.events.unshift(d);S.set('events',st.events);renderEvents();
+  ['evDate','evText','evAction'].forEach(i=>{document.getElementById(i).value='';});
+  toggleEvForm(); showToast('✅ 事件已記錄','green');
+}
+function delEvent(id){st.events=st.events.filter(e=>e.id!==id);S.set('events',st.events);renderEvents();}
+function renderEvents(){
+  const iMap={positive:'tag-pos',negative:'tag-neg',neutral:'tag-neu',warning:'tag-war'};
+  const lMap={positive:'正面',negative:'負面',neutral:'中性',warning:'需關注'};
+  document.getElementById('evTbody').innerHTML=st.events.map(e=>`
+    <tr>
+      <td class="mono">${e.date}</td><td>${e.text}</td>
+      <td><span class="ni-tag ${iMap[e.impact]||'tag-neu'}">${lMap[e.impact]||'中性'}</span></td>
+      <td style="font-size:11px;color:var(--text2)">${e.action||'—'}</td>
+      <td><button class="btn-danger" onclick="delEvent(${e.id})">刪除</button></td>
+    </tr>`).join('')||`<tr><td colspan="5" style="text-align:center;color:var(--text2);padding:16px">尚無記錄</td></tr>`;
+}
+
+// ════════════════════════════════════════
+// WAVE
+// ════════════════════════════════════════
+function addWave(){
+  const entry=parseFloat(document.getElementById('wEntry').value);
+  const t={id:Date.now(),date:document.getElementById('wDate').value,stock:document.getElementById('wStock').value,qty:parseInt(document.getElementById('wQty').value)||1,entry,stop:parseFloat(document.getElementById('wStop').value)||parseFloat((entry*0.975).toFixed(2)),target:parseFloat(document.getElementById('wTarget').value)||parseFloat((entry*1.04).toFixed(2)),exitDate:document.getElementById('wExitDate').value,exit:parseFloat(document.getElementById('wExit').value)||null,reason:document.getElementById('wReason').value,review:document.getElementById('wReview').value};
+  if(!t.date||!t.entry){alert('請填寫日期和進場價');return;}
+  st.waveTrades.push(t);S.set('waveTrades',st.waveTrades);
+  renderWave();updateWaveStats();
+  ['wDate','wQty','wEntry','wStop','wTarget','wExitDate','wExit','wReason','wReview'].forEach(i=>{document.getElementById(i).value='';});
+  showToast('✅ 波段操作已記錄','green');
+}
+function delWave(id){st.waveTrades=st.waveTrades.filter(t=>t.id!==id);S.set('waveTrades',st.waveTrades);renderWave();updateWaveStats();}
+function renderWave(){
+  document.getElementById('wTbody').innerHTML=st.waveTrades.map(t=>{
+    const pnl=t.exit?(t.exit-t.entry)*t.qty*1000:null;
+    const pr=t.exit?((t.exit-t.entry)/t.entry*100).toFixed(1):null;
+    return `<tr>
+      <td class="mono">${t.date}</td><td style="font-weight:600">${t.stock}</td><td>${t.qty}張</td>
+      <td class="mono">${t.entry.toFixed(2)}</td>
+      <td class="mono red">${t.stop.toFixed(2)}</td>
+      <td class="mono green">${t.target.toFixed(2)}</td>
+      <td class="mono">${t.exit?t.exit.toFixed(2):'持倉中'}</td>
+      <td class="mono ${pnl===null?'':(pnl>=0?'green':'red')}">${pnl!==null?(pnl>=0?'+':'')+Math.round(pnl):'—'}</td>
+      <td class="${pr===null?'':(parseFloat(pr)>=0?'green':'red')}">${pr!==null?(parseFloat(pr)>=0?'+':'')+pr+'%':'—'}</td>
+      <td style="font-size:11px;color:var(--text2)">${t.reason||'—'}</td>
+      <td><button class="btn-danger" onclick="delWave(${t.id})">刪除</button></td>
+    </tr>`;
+  }).join('')||`<tr><td colspan="11" style="text-align:center;color:var(--text2);padding:16px">尚無記錄</td></tr>`;
+}
+function updateWaveStats(){
+  const done=st.waveTrades.filter(t=>t.exit!==null);
+  const wins=done.filter(t=>(t.exit-t.entry)>0).length;
+  const net=done.reduce((s,t)=>s+(t.exit-t.entry)*t.qty*1000,0);
+  document.getElementById('wCnt').textContent=st.waveTrades.length;
+  document.getElementById('wWin').textContent=done.length?Math.round(wins/done.length*100)+'%':'—';
+  const nEl=document.getElementById('wNet');nEl.textContent=(net>=0?'+':'')+Math.round(net).toLocaleString();nEl.style.color=net>=0?'var(--a2)':'var(--a4)';
+  document.getElementById('wCapFull').textContent=st.waveCapital.toLocaleString();
+}
+
+// ════════════════════════════════════════
+// NEWS (MANUAL)
+// ════════════════════════════════════════
+  
+  
+
+
+// ════════════════════════════════════════
+// DECISION PANELS
+// ════════════════════════════════════════
+function renderDecisionPanels(sp,tm,sy){
+  const shares=calcShares(),avg=calcAvg();
+  const spPnl=((sp-avg)/avg*100).toFixed(1);
+  const spPnlAmt=Math.round((sp-avg)*shares*1000/1000);
+
+  // Spring decision panel
+  let spDecision='',spColor='';
+  if(sy>=8.3){spDecision='🟢 甜蜜區';spColor='var(--a2)';}
+  else if(sy>=6){spDecision='🟡 正常買入';spColor='var(--a3)';}
+  else{spDecision='🔴 暫停加碼';spColor='var(--a4)';}
+  document.getElementById('springDecisionBadge').innerHTML=`<span style="color:${spColor};font-weight:700">${spDecision}</span>`;
+
+  const spRows=[
+    ['持有張數',shares+'張','var(--a2)'],
+    ['加權均價',avg.toFixed(2)+' 元','var(--text)'],
+    ['帳面損益',(spPnl>=0?'+':'')+spPnl+'%  ('+(spPnlAmt>=0?'+':'')+spPnlAmt+'K元)',spPnlAmt>=0?'var(--a2)':'var(--a4)'],
+    ['年股利（估）',(shares*2000).toLocaleString()+' 元','var(--a3)'],
+    ['距100張目標',Math.max(0,100-shares)+'張','var(--a1)'],
+    ['操作建議',sy>=8.3?'全力加碼，難得甜蜜區':sy>=6?'按計畫每月5,000元定投':'暫停，資金轉波段本金','var(--text2)'],
+  ];
+  document.getElementById('springDecisionPanel').innerHTML=spRows.map(([l,v,c])=>`
+    <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);">
+      <span style="font-size:12px;color:var(--text2)">${l}</span>
+      <span style="font-size:13px;font-weight:600;font-family:'JetBrains Mono',monospace;color:${c}">${v}</span>
+    </div>`).join('');
+
+  // Taiment decision panel
+  const tmPnl=((tm-35.08)/35.08*100).toFixed(1);
+  const tmLoss=Math.round((tm-35.08)*25*1000/1000);
+  const recov=((35.08-tm)/tm*100).toFixed(1);
+  let tmStatus='',tmColor='';
+  if(tm>=26){tmStatus='💰 第一減碼目標！';tmColor='var(--a2)';}
+  else if(tm<=22){tmStatus='🚨 跌破警戒線';tmColor='var(--a4)';}
+  else{tmStatus='⏳ 持有等待中';tmColor='var(--a3)';}
+
+  const tmRows=[
+    ['持有張數','25張','var(--a4)'],
+    ['帳面損益',tmPnl+'%  ('+tmLoss+'K元)','var(--a4)'],
+    ['回本需漲幅','+'+recov+'%','var(--a4)'],
+    ['年度股利','20,000 元','var(--a3)'],
+    ['26元委託','掛單中（6月底截止）','var(--a1)'],
+    ['現況判斷',tmStatus,tmColor],
+  ];
+  document.getElementById('taimentDecisionPanel').innerHTML=tmRows.map(([l,v,c])=>`
+    <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);">
+      <span style="font-size:12px;color:var(--text2)">${l}</span>
+      <span style="font-size:13px;font-weight:600;font-family:'JetBrains Mono',monospace;color:${c}">${v}</span>
+    </div>`).join('');
+}
+
+// ════════════════════════════════════════
+// TIMELINE
+// ════════════════════════════════════════
+const TL=[
+  {y:'2026',ph:'啟動期',st:'active',t:'計畫正式啟動 🚀',d:'台泥掛委託、設定每月定投、建立操作記錄',ms:['台泥5張取得波段本金','每月1萬自動轉帳','春源首次定投@24.80']},
+  {y:'2027',ph:'打底期',st:'future',t:'春源衝刺至80張',d:'三條水管齊開，有條件定期定額持續買入',ms:['春源年股利突破16萬','波段本金達20萬','台泥EPS方向確認']},
+  {y:'2028 Q1',ph:'里程碑',st:'future',t:'春源達到100張 🎯',d:'存股第一引擎完成，月均股利達16,667元',ms:['開始研究第二存股','資金分配調整','年收益突破26萬']},
+  {y:'2029',ph:'加速期',st:'future',t:'雙存股引擎並行',d:'波段本金衝至30萬，第二存股建倉',ms:['春源約130張','第二存股30張','年收益突破35萬']},
+  {y:'2030',ph:'收成期',st:'future',t:'月均被動收入突破3萬元 💎',d:'三引擎全速，被動收入開始有感',ms:['春源約160張','月均>30,000元']},
+  {y:'2036',ph:'驗證點',st:'future',t:'10年計畫驗證完成 ✅',d:'系統經一個完整週期，啟動第二期',ms:['春源約240張','月均~61,000元','評估太太副軌']},
+  {y:'2046',ph:'退休期',st:'future',t:'60歲退休準備完成 🌅',d:'自建系統月均14萬，加雙份退撫月均18至22萬',ms:['春源約390張','月均~140,000元','享用模式啟動']},
+];
+function renderTimeline(){
+  document.getElementById('tlContainer').innerHTML=TL.map((t,i)=>`
+    <div class="tl-item">
+      <div class="tl-yr">
+        <div class="tl-year-text" style="color:${t.st==='active'?'var(--a1)':t.st==='done'?'var(--a2)':'var(--text2)'}">${t.y}</div>
+        <div class="tl-phase">${t.ph}</div>
+      </div>
+      <div class="tl-dot-col">
+        <div class="tl-dot tl-dot-${t.st}"></div>
+        ${i<TL.length-1?'<div class="tl-line"></div>':''}
+      </div>
+      <div class="tl-content">
+        <div class="tl-title">${t.t}</div>
+        <div class="tl-detail">${t.d}</div>
+        <div class="tl-badges">${t.ms.map(m=>`<span class="tl-badge">${m}</span>`).join('')}</div>
+      </div>
+    </div>`).join('');
+}
+
+// ════════════════════════════════════════
+// CHECKLIST & MONTHLY
+// ════════════════════════════════════════
+function toggleCk(el){el.classList.toggle('ck');}
+function saveMonthly(){
+  const now=new Date();
+  const ym=now.getFullYear()+'/'+(now.getMonth()+1).toString().padStart(2,'0');
+  const r={ym,sp:document.getElementById('mSp').value,shares:document.getElementById('mShares').value,tm:document.getElementById('mTm').value,wave:document.getElementById('mWave').value,note:document.getElementById('mNote').value};
+  st.monthly.unshift(r);S.set('monthly',st.monthly);renderMonthly();
+  showToast('✅ 本月記錄已儲存','green');
+}
+function renderMonthly(){
+  const tbody=document.getElementById('mHistory');
+  tbody.innerHTML=st.monthly.map(r=>{
+    const w=parseFloat(r.wave)||0;
+    return `<tr><td class="mono">${r.ym}</td><td class="mono">${r.sp||'—'}</td><td>${r.shares||'—'}張</td><td class="mono">${r.tm||'—'}</td><td class="mono ${w>=0?'green':'red'}">${w>=0?'+':''}${w.toLocaleString()}</td><td style="font-size:11px;color:var(--text2)">${r.note||'—'}</td></tr>`;
+  }).join('')||`<tr><td colspan="6" style="text-align:center;color:var(--text2);padding:16px">尚無月度記錄</td></tr>`;
+}
+
+// ════════════════════════════════════════
+// EXPORT / IMPORT (XLSX)
+// ════════════════════════════════════════
+function exportAll(){
+  const wb=XLSX.utils.book_new();
+  appendSheet(wb,'春源買入記錄',buildSpringData());
+  appendSheet(wb,'波段操作記錄',buildWaveData());
+  appendSheet(wb,'台泥事件記錄',buildEventData());
+  appendSheet(wb,'新聞記錄',buildNewsData());
+  appendSheet(wb,'月度記錄',buildMonthlyData());
+  appendSheet(wb,'摘要',buildSummaryData());
+  XLSX.writeFile(wb,'財務自主投資記錄_'+getDateStr()+'.xlsx');
+  showToast('✅ Excel已匯出','green');
+}
+function exportSheet(type){
+  const wb=XLSX.utils.book_new();
+  const map={spring:['春源買入記錄',buildSpringData()],wave:['波段操作記錄',buildWaveData()],monthly:['月度記錄',buildMonthlyData()]};
+  const [name,data]=map[type];
+  appendSheet(wb,name,data);
+  XLSX.writeFile(wb,name+'_'+getDateStr()+'.xlsx');
+  showToast('✅ '+name+' 已匯出','green');
+}
+function appendSheet(wb,name,data){
+  const ws=XLSX.utils.aoa_to_sheet(data);
+  // Style header row
+  const range=XLSX.utils.decode_range(ws['!ref']||'A1');
+  for(let c=range.s.c;c<=range.e.c;c++){
+    const addr=XLSX.utils.encode_cell({r:0,c});
+    if(ws[addr]) ws[addr].s={font:{bold:true},fill:{fgColor:{rgb:'1F3864'}},font:{color:{rgb:'FFFFFF'},bold:true}};
+  }
+  XLSX.utils.book_append_sheet(wb,ws,name);
+}
+
+function buildSpringData(){
+  const hdr=['日期','張數','買入價（元）','投入金額（元）','殖利率（%）','資金來源','備註'];
+  const rows=st.springTrades.map(t=>[t.date,t.qty,t.price,t.qty*t.price*1000,(2.0/t.price*100).toFixed(2),t.src,t.note||'']);
+  const avg=calcAvg(),shares=calcShares();
+  rows.push([]);
+  rows.push(['合計/均值','',avg.toFixed(2),'',''+'','','']);
+  rows.push(['累計張數（含原始42張）',shares+'張','','','','','']);
+  return [hdr,...rows];
+}
+function buildWaveData(){
+  const hdr=['進場日期','股票','張數','進場價','停損價','停利價','出場日期','出場價','損益（元）','損益率（%）','進場理由','出場檢討'];
+  const rows=st.waveTrades.map(t=>[t.date,t.stock,t.qty,t.entry,t.stop,t.target,t.exitDate||'',t.exit||'',t.exit?Math.round((t.exit-t.entry)*t.qty*1000):'',t.exit?((t.exit-t.entry)/t.entry*100).toFixed(2):'',t.reason||'',t.review||'']);
+  return [hdr,...rows];
+}
+function buildEventData(){
+  const hdr=['日期','事件描述','影響','我的決策'];
+  return [hdr,...st.events.map(e=>[e.date,e.text,e.impact,e.action||''])];
+}
+function buildNewsData(){
+  const hdr=['日期','標的','標籤','分類','新聞標題/摘要','來源'];
+  return [hdr,...st.news.map(n=>[n.date,n.stock,n.label,n.tag,n.headline,n.source||''])];
+}
+function buildMonthlyData(){
+  const hdr=['年月','春源股價','春源張數','台泥股價','波段損益（元）','重要事件'];
+  return [hdr,...st.monthly.map(r=>[r.ym,r.sp,r.shares,r.tm,r.wave,r.note||''])];
+}
+function buildSummaryData(){
+  const shares=calcShares(),avg=calcAvg();
+  return [
+    ['項目','數值'],
+    ['報告產出日期',new Date().toLocaleDateString('zh-TW')],
+    ['春源持有張數（含原始42張）',shares+'張'],
+    ['春源加權均價',avg.toFixed(2)+'元'],
+    ['春源目前股價',st.sp+'元'],
+    ['春源帳面損益率',((st.sp-avg)/avg*100).toFixed(2)+'%'],
+    ['台泥持有張數','25張'],
+    ['台泥成交均價','35.08元'],
+    ['台泥目前股價',st.tm+'元'],
+    ['台泥帳面損益率',((st.tm-35.08)/35.08*100).toFixed(2)+'%'],
+    ['波段本金',st.waveCapital.toLocaleString()+'元'],
+    ['波段操作次數',st.waveTrades.length+'次'],
+    ['波段已完成次數',st.waveTrades.filter(t=>t.exit).length+'次'],
+    ['年度春源股利（估）',(shares*2000).toLocaleString()+'元'],
+  ];
+}
+
+function importExcel(evt){
+  const f=evt.target.files[0];
+  if(!f) return;
+  if(!confirm('匯入將覆蓋現有的春源、波段、月度記錄，確定繼續？')) return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const wb=XLSX.read(e.target.result,{type:'array'});
+      let imported=0;
+      // Spring trades
+      if(wb.SheetNames.includes('春源買入記錄')){
+        const rows=XLSX.utils.sheet_to_json(wb.Sheets['春源買入記錄'],{defval:''});
+        st.springTrades=rows.filter(r=>r['日期']&&r['張數']&&r['買入價（元）']).map((r,i)=>({id:Date.now()+i,date:String(r['日期']),qty:parseInt(r['張數'])||1,price:parseFloat(r['買入價（元）'])||0,src:r['資金來源']||'每月定投',note:r['備註']||''}));
+        S.set('springTrades',st.springTrades); imported++;
+      }
+      // Wave trades
+      if(wb.SheetNames.includes('波段操作記錄')){
+        const rows=XLSX.utils.sheet_to_json(wb.Sheets['波段操作記錄'],{defval:''});
+        st.waveTrades=rows.filter(r=>r['進場日期']&&r['進場價']).map((r,i)=>({id:Date.now()+i+1000,date:String(r['進場日期']),stock:r['股票']||'春源 (2010)',qty:parseInt(r['張數'])||1,entry:parseFloat(r['進場價'])||0,stop:parseFloat(r['停損價'])||0,target:parseFloat(r['停利價'])||0,exitDate:String(r['出場日期']||''),exit:r['出場價']?parseFloat(r['出場價']):null,reason:r['進場理由']||'',review:r['出場檢討']||''}));
+        S.set('waveTrades',st.waveTrades); imported++;
+      }
+      // Monthly
+      if(wb.SheetNames.includes('月度記錄')){
+        const rows=XLSX.utils.sheet_to_json(wb.Sheets['月度記錄'],{defval:''});
+        st.monthly=rows.filter(r=>r['年月']).map(r=>({ym:String(r['年月']),sp:String(r['春源股價']||''),shares:String(r['春源張數']||''),tm:String(r['台泥股價']||''),wave:String(r['波段損益（元）']||'0'),note:r['重要事件']||''}));
+        S.set('monthly',st.monthly); imported++;
+      }
+      refreshDash();renderSpring();renderWave();renderMonthly();renderDataStats();
+      showToast('✅ 成功匯入 '+imported+' 個工作表','green');
+    }catch(err){
+      showToast('❌ 匯入失敗：'+err.message,'red');
+    }
+  };
+  reader.readAsArrayBuffer(f);
+  evt.target.value='';
+}
+
+function exportJSON(){
+  const data={version:'1.0',exported:new Date().toISOString(),springTrades:st.springTrades,waveTrades:st.waveTrades,events:st.events,news:st.news,monthly:st.monthly,waveCapital:st.waveCapital};
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='投資記錄備份_'+getDateStr()+'.json';a.click();
+  showToast('✅ JSON備份已下載','green');
+}
+function importJSON(evt){
+  const f=evt.target.files[0];if(!f)return;
+  if(!confirm('匯入JSON將覆蓋所有現有記錄，確定繼續？'))return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const data=JSON.parse(e.target.result);
+      if(data.springTrades){st.springTrades=data.springTrades;S.set('springTrades',st.springTrades);}
+      if(data.waveTrades){st.waveTrades=data.waveTrades;S.set('waveTrades',st.waveTrades);}
+      if(data.events){st.events=data.events;S.set('events',st.events);}
+      if(data.news){st.news=data.news;S.set('news',st.news);}
+      if(data.monthly){st.monthly=data.monthly;S.set('monthly',st.monthly);}
+      if(data.waveCapital){st.waveCapital=data.waveCapital;S.set('waveCapital',st.waveCapital);}
+      refreshDash();renderDataStats();
+      showToast('✅ JSON備份已還原','green');
+    }catch(err){showToast('❌ 還原失敗：'+err.message,'red');}
+  };
+  reader.readAsText(f);evt.target.value='';
+}
+function clearAll(){
+  if(!confirm('確定要清除所有記錄嗎？此操作不可復原！\n建議先備份後再清除。'))return;
+  if(!confirm('再次確認：真的要清除全部記錄？'))return;
+  ['springTrades','waveTrades','events','news','monthly'].forEach(k=>{S.set(k,[]);st[k]=[];});
+  refreshDash();renderDataStats();
+  showToast('✅ 所有記錄已清除','amber');
+}
+function renderDataStats(){
+  document.getElementById('dataStats').innerHTML=`
+    <div class="big-card c-green"><div class="big-l">春源買入</div><div class="big-v">${st.springTrades.length}</div><div class="big-s">筆記錄</div></div>
+    <div class="big-card c-blue"><div class="big-l">波段操作</div><div class="big-v">${st.waveTrades.length}</div><div class="big-s">筆記錄</div></div>
+    <div class="big-card c-amber"><div class="big-l">新聞記錄</div><div class="big-v">${st.news.length}</div><div class="big-s">筆記錄</div></div>
+    <div class="big-card c-red"><div class="big-l">月度記錄</div><div class="big-v">${st.monthly.length}</div><div class="big-s">筆記錄</div></div>`;
+}
+
+// ════════════════════════════════════════
+// UTILS
+// ════════════════════════════════════════
+function getDateStr(){const d=new Date();return d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0');}
+function updateLastTime(){const now=new Date();document.getElementById('lastUpdate').textContent='更新：'+now.toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});}
+
+let toastTimer;
+function showToast(msg,color){
+  let t=document.getElementById('toast');
+  if(!t){t=document.createElement('div');t.id='toast';t.style.cssText='position:fixed;bottom:24px;right:24px;padding:10px 18px;border-radius:9px;font-size:13px;font-family:"Noto Sans TC",sans-serif;z-index:9999;transition:opacity .3s;border:1px solid;';document.body.appendChild(t);}
+  const cMap={green:'background:rgba(0,212,170,.2);color:#b8ffe9;border-color:rgba(0,212,170,.3);',amber:'background:rgba(255,179,68,.2);color:#ffe0a8;border-color:rgba(255,179,68,.3);',red:'background:rgba(255,107,107,.2);color:#ffc4c4;border-color:rgba(255,107,107,.3);'};
+  t.style.cssText+=cMap[color]||cMap.green;t.textContent=msg;t.style.opacity='1';
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>{t.style.opacity='0';},2500);
+}
+
+// ════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════
+(function(){
+  const today=new Date().toISOString().split('T')[0];
+  ['spDate','wDate','evDate','nDate'].forEach(i=>{const el=document.getElementById(i);if(el)el.value=today;});
+  const wEntry=document.getElementById('wEntry');
+  if(wEntry) wEntry.addEventListener('input',()=>{
+    const v=parseFloat(wEntry.value);
+    if(!isNaN(v)){document.getElementById('wStop').value=(v*0.975).toFixed(2);document.getElementById('wTarget').value=(v*1.04).toFixed(2);}
   });
-
-  // 圖表 & 每月卡
-  drawChart(weekRates);
-  updateMonthlyCards(weekRates);
-}
-
-/* ========= 入口：生成課表 ========= */
-function generatePlan(){
-  const s=$("#startDate").value.trim(), n=$("#dailyWords").value.trim();
-  if(!s) return alert("請先選擇開始日期！");
-  if(!n||isNaN(n)||+n<=0) return alert("請輸入正確的每日單字量！");
-  config.startDate=new Date(s);
-  config.dailyCount=parseInt(n,10);
-  localStorage.setItem(NS+":config",JSON.stringify(config));
-  buildInitialLog();
-  localStorage.setItem(NS+":studyLog",JSON.stringify(studyLog));
-  renderWeeks();
-}
-
-/* ========= 初始化 ========= */
-window.addEventListener("DOMContentLoaded",()=>{
-  $("#genBtn").addEventListener("click",generatePlan);
-  $("#prevWeek").addEventListener("click",()=>goToWeek(currentWeek-1));
-  $("#nextWeek").addEventListener("click",()=>goToWeek(currentWeek+1));
-  $("#exportBtn").addEventListener("click",exportProgress);
-  $("#importBtn").addEventListener("click",()=>$("#importFile").click());
-  $("#importFile").addEventListener("change",e=>{const f=e.target.files[0]; if(f) importProgress(f);});
-
-  // 若已有設定 → 自動載入
-  const c=localStorage.getItem(NS+":config");
-  if(c){ try{
-      const cf=JSON.parse(c); config=cf;
-      if(cf.startDate) $("#startDate").value=new Date(cf.startDate).toISOString().slice(0,10);
-      if(cf.dailyCount) $("#dailyWords").value=cf.dailyCount;
-      const sl=localStorage.getItem(NS+":studyLog"); if(sl) studyLog=JSON.parse(sl);
-      renderWeeks();
-    }catch(e){ console.error("設定載入失敗",e); }
-  }
-
-  // 橫向滑動後校準 currentWeek（讓按鈕禁用狀態更精準）
-  const slider=document.getElementById("weekSlider");
-  if(slider){
-    let tId;
-    slider.addEventListener("scroll", ()=>{
-      clearTimeout(tId);
-      tId=setTimeout(()=>{
-        const cards=[...slider.querySelectorAll(".weekCard")];
-        let min=Infinity, idx=0;
-        cards.forEach((c,i)=>{
-          const x=Math.abs(c.getBoundingClientRect().left - slider.getBoundingClientRect().left);
-          if(x<min){min=x;idx=i;}
-        });
-        currentWeek=idx;
-        const p=$("#prevWeek"),n=$("#nextWeek");
-        if(p)p.disabled=currentWeek===0;
-        if(n)n.disabled=currentWeek===weeksCount-1;
-      }, 80);
-    }, {passive:true});
-  }
-});
+  updateStatus(st.priceMode==='live'?'live':'manual',st.priceMode==='live'?'即時收盤價':'手動模式');
+  refreshDash();
+  updateLastTime();
+  // Auto-fetch on load if it's a weekday and market hours
+  const now=new Date(),day=now.getDay(),hr=now.getHours();
+  if(day>=1&&day<=5&&hr>=9&&hr<=17) fetchPrices();
 })();
 </script>
-
-<footer style="background:#f1f8e9;padding:14px 20px;text-align:center;font-size:14.5px;color:#556;">
-  © 2025 TOEIC Study Tracker v2-release
-</footer>
-
 </body>
 </html>
