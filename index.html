@@ -1054,19 +1054,17 @@ function renderSpring(){
     const displaySh=lg>0?(zh>0?zh+'張'+lg+'股':lg+'股（零股）'):zh+'張';
     const invested=sh*t.price;
     const yld=(2.0/t.price*100).toFixed(2);
-    return \`<tr>
-      <td class="mono">\${t.date}</td>
-      <td class="green" style="font-weight:600">\${displaySh}</td>
-      <td class="mono">\${t.price.toFixed(2)}</td>
-      <td class="mono">\${Math.round(invested).toLocaleString()}</td>
-      <td class="green">\${yld}%</td>
-      <td>\${t.src}</td>
-      <td style="color:var(--text2);font-size:12px">\${t.note||'—'}</td>
-      <td><button class="btn-danger" onclick="delSpring(\${t.id})">刪除</button></td>
-    </tr>\`;
-  }).join('')||\`<tr><td colspan="8" style="text-align:center;color:var(--text2);padding:16px">尚無記錄，請新增第一筆買入</td></tr>\`;
-
-}
+    return `<tr>
+      <td class="mono">${t.date}</td>
+      <td class="green" style="font-weight:600">${displaySh}</td>
+      <td class="mono">${t.price.toFixed(2)}</td>
+      <td class="mono">${Math.round(invested).toLocaleString()}</td>
+      <td class="green">${yld}%</td>
+      <td>${t.src}</td>
+      <td style="color:var(--text2);font-size:12px">${t.note||'—'}</td>
+      <td><button class="btn-danger" onclick="delSpring(${t.id})">刪除</button></td>
+    </tr>`;
+  }).join('')||`<tr><td colspan="8" style="text-align:center;color:var(--text2);padding:16px">尚無記錄，請新增第一筆買入</td></tr>`}
 
 // ════════════════════════════════════════
 // TAIMENT
