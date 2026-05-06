@@ -374,10 +374,24 @@ tr:hover td{background:rgba(255,255,255,.02);}
   <div class="card">
     <div class="card-hdr"><span class="card-title">新增買入記錄</span></div>
     <div class="card-body">
+      <div style="background:rgba(74,158,255,.06);border:1px solid rgba(74,158,255,.2);border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:#c4dcff;line-height:1.6;">
+        💡 <strong>整張 vs 零股：</strong>整張請填 <code>1000</code> 股（1張）；零股可填任意股數，例如 <code>200</code> 股（0.2張）。系統統一以「股」計算，自動換算張數顯示。
+      </div>
+      <div style="background:rgba(74,158,255,.06);border:1px solid rgba(74,158,255,.2);border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:#c4dcff;line-height:1.6;">
+        💡 <strong>整張 vs 零股：</strong>整張請填 <strong>1000</strong> 股（即1張）；零股可填實際股數，例如 <strong>200</strong> 股（0.2張）。系統統一以「股」計算，自動換算張數顯示。
+      </div>
       <div class="form-grid">
         <div class="fg"><label>日期</label><input type="date" id="spDate"></div>
-        <div class="fg"><label>張數</label><input type="number" id="spQty" min="1" placeholder="1"></div>
-        <div class="fg"><label>買入價（元）</label><input type="number" id="spBuy" step="0.01" placeholder="24.80"></div>
+        <div class="fg">
+          <label>買入股數（1張=1000股）</label>
+          <input type="number" id="spQty" min="1" step="1" placeholder="例：1000整張 / 200零股" oninput="updateSpAmtPreview()">
+        </div>
+        <div class="fg"><label>買入價（元/股）</label><input type="number" id="spBuy" step="0.01" placeholder="24.80" oninput="updateSpAmtPreview()"></div>
+        <div class="fg"><label>預估投入金額</label><input type="text" id="spAmtPreview" readonly placeholder="自動計算" style="color:var(--a2);font-weight:600;cursor:default;background:rgba(0,212,170,.05);"></div>
+        <div class="fg">
+          <label>預估投入金額</label>
+          <input type="text" id="spAmtPreview" readonly placeholder="自動計算" style="color:var(--a2);font-weight:600;cursor:default;">
+        </div>
         <div class="fg"><label>資金來源</label>
           <select id="spSrc"><option>每月定投</option><option>年終獎金</option><option>波段獲利分配</option><option>春源股利再投入</option><option>台泥股利再投入</option></select>
         </div>
@@ -852,12 +866,29 @@ function showPage(id,tab){
 // ════════════════════════════════════════
 // CALCULATIONS
 // ════════════════════════════════════════
-function calcShares(){return 42+st.springTrades.reduce((s,t)=>s+t.qty,0);}
+function calcShares(){
+  // Returns total shares in 股 (42張 base = 42000股)
+  const baseShares=42000;
+  const addedShares=st.springTrades.reduce((s,t)=>s+(t.shares||t.qty*1000||0),0);
+  return baseShares+addedShares;
+}
+function calcSharesInZhang(){
+  // Returns display string like "42張" or "42張200股"
+  const totalShares=calcShares();
+  const zhang=Math.floor(totalShares/1000);
+  const linggu=totalShares%1000;
+  if(linggu===0) return zhang+'張';
+  return zhang+'張 '+linggu+'股';
+}
 function calcAvg(){
-  if(!st.springTrades.length) return 21.99;
-  const base=21.99*42*1000;
-  const add=st.springTrades.reduce((s,t)=>s+t.price*t.qty*1000,0);
-  return (base+add)/((calcShares())*1000);
+  const baseShares=42000, basePrice=21.99;
+  if(!st.springTrades.length) return basePrice;
+  const baseCost=basePrice*baseShares;
+  const addCost=st.springTrades.reduce((s,t)=>{
+    const sh=t.shares||(t.qty*1000)||0;
+    return s+t.price*sh;
+  },0);
+  return (baseCost+addCost)/calcShares();
 }
 
 // ════════════════════════════════════════
@@ -904,21 +935,22 @@ function refreshDash(){
   document.getElementById('taimentYBar').style.width=tPct+'%';
   
   // Badge
-  document.getElementById('springSharesBadge').textContent='持有 '+shares+'張';
+  const _totalSh=calcShares(),_zh=Math.floor(_totalSh/1000),_lg=_totalSh%1000;
+  document.getElementById('springSharesBadge').textContent='持有 '+(_lg>0?_zh+'張'+_lg+'股':_zh+'張');
   
   // Big numbers
-  const spMV=sp*shares*1000, tmMV=tm*25*1000;
+  const spMV=sp*calcShares(), tmMV=tm*25*1000;
   document.getElementById('totalMV').textContent=((spMV+tmMV)/10000).toFixed(1)+'萬';
-  const spPnlAmt=(sp-avg)*shares*1000, tmPnlAmt=(tm-35.08)*25*1000;
+  const spPnlAmt=(sp-avg)*calcShares(), tmPnlAmt=(tm-35.08)*25*1000;
   const totalPnl=spPnlAmt+tmPnlAmt;
   const tpEl=document.getElementById('totalPnl');
   tpEl.textContent=(totalPnl>=0?'+':'')+Math.round(totalPnl/1000)+'K';
   tpEl.style.color=totalPnl>=0?'var(--a2)':'var(--a4)';
-  document.getElementById('totalDiv').textContent=(shares*2000/10000).toFixed(1)+'萬';
-  document.getElementById('wCapDisp').textContent=(st.waveCapital/10000).toFixed(1)+'萬';
+  document.getElementById('totalDiv').textContent=(calcShares()*2/10000).toFixed(1)+'萬';
+  if(document.getElementById('wCapDisp'))document.getElementById('wCapDisp').textContent=(st.waveCapital/10000).toFixed(1)+'萬';
   
   // Avg display
-  document.getElementById('springAvgDisplay').textContent=avg.toFixed(2);
+  document.getElementById('springAvgDisplay').textContent=calcAvg().toFixed(2);
   
   // Alerts
   genAlerts(sp,tm,parseFloat(sy));
@@ -941,44 +973,99 @@ function genAlerts(sp,tm,sy){
 // ════════════════════════════════════════
 // SPRING TRADES
 // ════════════════════════════════════════
-function addSpring(){
-  const d={id:Date.now(),date:document.getElementById('spDate').value,qty:parseInt(document.getElementById('spQty').value),price:parseFloat(document.getElementById('spBuy').value),src:document.getElementById('spSrc').value,note:document.getElementById('spNote').value};
-  if(!d.date||!d.qty||!d.price){alert('請填寫日期、張數和買入價');return;}
-  st.springTrades.push(d); S.set('springTrades',st.springTrades);
-  renderSpring(); refreshDash();
-  ['spDate','spQty','spBuy','spNote'].forEach(i=>{document.getElementById(i).value='';});
-  showToast('✅ 春源買入記錄已新增','green');
+function updateSpAmtPreview(){
+  const qty=parseInt(document.getElementById('spQty').value)||0;
+  const price=parseFloat(document.getElementById('spBuy').value)||0;
+  const el=document.getElementById('spAmtPreview');
+  if(qty>0&&price>0){
+    const amt=qty*price;
+    const zhang=Math.floor(qty/1000);
+    const linggu=qty%1000;
+    const displayUnit = zhang>0
+      ? (linggu>0 ? zhang+'張'+linggu+'股' : zhang+'張')
+      : qty+'股（零股）';
+    el.value='NT$ '+Math.round(amt).toLocaleString()+' 元（'+displayUnit+'）';
+  } else {
+    el.value='';
+  }
 }
-function delSpring(id){st.springTrades=st.springTrades.filter(t=>t.id!==id);S.set('springTrades',st.springTrades);renderSpring();refreshDash();}
+
+function addSpring(){
+  const date=document.getElementById('spDate').value;
+  const shares=parseInt(document.getElementById('spQty').value);  // 單位：股
+  const price=parseFloat(document.getElementById('spBuy').value);
+  const src=document.getElementById('spSrc').value;
+  const note=document.getElementById('spNote').value;
+  if(!date){alert('請填寫日期');return;}
+  if(!shares||shares<=0){alert('請填寫買入股數（整張填1000，零股填實際股數）');return;}
+  if(!price||price<=0){alert('請填寫買入價格');return;}
+  const d={id:Date.now(),date,shares,price,src,note};
+  st.springTrades.push(d);
+  S.set('springTrades',st.springTrades);
+  renderSpring(); refreshDash();
+  document.getElementById('spDate').value='';
+  document.getElementById('spQty').value='';
+  document.getElementById('spBuy').value='';
+  document.getElementById('spNote').value='';
+  document.getElementById('spAmtPreview').value='';
+  showToast('✅ 春源買入記錄已新增 ('+shares+'股 @ '+price+'元)','green');
+}
+function delSpring(id){
+  st.springTrades=st.springTrades.filter(t=>t.id!==id);
+  S.set('springTrades',st.springTrades);
+  renderSpring(); refreshDash();
+  showToast('記錄已刪除','amber');
+}
 
 function renderSpring(){
-  const sp=st.sp,shares=calcShares(),avg=calcAvg();
-  document.getElementById('spShares').textContent=shares;
+  const sp=st.sp, totalShares=calcShares(), avg=calcAvg();
+  const zhang=Math.floor(totalShares/1000);
+  const linggu=totalShares%1000;
+  const displayShares=linggu>0?(zhang+'張'+linggu+'股'):zhang+'張';
+  const remainShares=Math.max(0,100000-totalShares); // 100張=100000股
+  const remainZhang=Math.floor(remainShares/1000);
+  const remainLinggu=remainShares%1000;
+  const displayRemain=remainLinggu>0?(remainZhang+'張'+remainLinggu+'股'):remainZhang+'張';
+
+  document.getElementById('spShares').textContent=displayShares;
   document.getElementById('spAvg').textContent=avg.toFixed(2);
-  document.getElementById('spRemain').textContent=Math.max(0,100-shares)+'張';
-  document.getElementById('spProgress').textContent=Math.round(shares/100*100)+'%';
-  const pnlAmt=(sp-avg)*shares*1000;
+  document.getElementById('spRemain').textContent=displayRemain;
+  document.getElementById('spProgress').textContent=Math.min(100,Math.round(totalShares/100000*100))+'%';
+
+  const pnlAmt=(sp-avg)*totalShares;
   const pnlEl=document.getElementById('spPnlAmt');
   pnlEl.textContent=(pnlAmt>=0?'+':'')+Math.round(pnlAmt/1000)+'K元';
   pnlEl.className='hs-v '+(pnlAmt>=0?'green':'red');
-  document.getElementById('spDiv').textContent=(shares*2000).toLocaleString()+'元';
+
+  const annualDiv=Math.round(totalShares*2.0);
+  document.getElementById('spDiv').textContent=annualDiv.toLocaleString()+'元';
   document.getElementById('spCount').textContent=st.springTrades.length+'筆';
+
   const sy=(2.0/sp*100);
   const ydEl=document.getElementById('yldDecision'),yaEl=document.getElementById('yldAction');
   if(sy>=8.3){ydEl.textContent='🟢 甜蜜區（'+sy.toFixed(2)+'%）';ydEl.style.color='var(--a2)';yaEl.textContent='殖利率>8.3%，全力加大買入！';}
-  else if(sy>=6){ydEl.textContent='🟡 正常水位（'+sy.toFixed(2)+'%）';ydEl.style.color='var(--a3)';yaEl.textContent='殖利率6-8.3%，按每月5,000元正常買入，不追高。';}
+  else if(sy>=6){ydEl.textContent='🟡 正常水位（'+sy.toFixed(2)+'%）';ydEl.style.color='var(--a3)';yaEl.textContent='殖利率6-8.3%，按每月計畫正常買入，不追高。';}
   else{ydEl.textContent='🔴 暫停加碼（'+sy.toFixed(2)+'%）';ydEl.style.color='var(--a4)';yaEl.textContent='殖利率<6%，暫停加碼，資金轉波段本金。';}
-  document.getElementById('spTbody').innerHTML=st.springTrades.map(t=>`
-    <tr>
-      <td class="mono">${t.date}</td>
-      <td class="green" style="font-weight:600">${t.qty}張</td>
-      <td class="mono">${t.price.toFixed(2)}</td>
-      <td class="mono">${(t.qty*t.price*1000).toLocaleString()}</td>
-      <td class="green">${(2.0/t.price*100).toFixed(2)}%</td>
-      <td>${t.src}</td>
-      <td style="color:var(--text2);font-size:11px">${t.note||'—'}</td>
-      <td><button class="btn-danger" onclick="delSpring(${t.id})">刪除</button></td>
-    </tr>`).join('')||`<tr><td colspan="8" style="text-align:center;color:var(--text2);padding:16px">尚無記錄</td></tr>`;
+
+  // Table
+  document.getElementById('spTbody').innerHTML=st.springTrades.map(t=>{
+    const sh=t.shares||(t.qty*1000)||0;
+    const zh=Math.floor(sh/1000), lg=sh%1000;
+    const displaySh=lg>0?(zh>0?zh+'張'+lg+'股':lg+'股（零股）'):zh+'張';
+    const invested=sh*t.price;
+    const yld=(2.0/t.price*100).toFixed(2);
+    return \`<tr>
+      <td class="mono">\${t.date}</td>
+      <td class="green" style="font-weight:600">\${displaySh}</td>
+      <td class="mono">\${t.price.toFixed(2)}</td>
+      <td class="mono">\${Math.round(invested).toLocaleString()}</td>
+      <td class="green">\${yld}%</td>
+      <td>\${t.src}</td>
+      <td style="color:var(--text2);font-size:12px">\${t.note||'—'}</td>
+      <td><button class="btn-danger" onclick="delSpring(\${t.id})">刪除</button></td>
+    </tr>\`;
+  }).join('')||\`<tr><td colspan="8" style="text-align:center;color:var(--text2);padding:16px">尚無記錄，請新增第一筆買入</td></tr>\`;
+
 }
 
 // ════════════════════════════════════════
@@ -1198,9 +1285,9 @@ function updateWaveStats(){
 // DECISION PANELS
 // ════════════════════════════════════════
 function renderDecisionPanels(sp,tm,sy){
-  const shares=calcShares(),avg=calcAvg();
+  const totalSh=calcShares(),avg=calcAvg();
   const spPnl=((sp-avg)/avg*100).toFixed(1);
-  const spPnlAmt=Math.round((sp-avg)*shares*1000/1000);
+  const spPnlAmt=Math.round((sp-avg)*totalSh/1000);
 
   // Spring decision panel
   let spDecision='',spColor='';
@@ -1209,12 +1296,13 @@ function renderDecisionPanels(sp,tm,sy){
   else{spDecision='🔴 暫停加碼';spColor='var(--a4)';}
   document.getElementById('springDecisionBadge').innerHTML=`<span style="color:${spColor};font-weight:700">${spDecision}</span>`;
 
+  const _zh2=Math.floor(totalSh/1000),_lg2=totalSh%1000;
   const spRows=[
-    ['持有張數',shares+'張','var(--a2)'],
+    ['持有股數（張數）',(_lg2>0?_zh2+'張'+_lg2+'股':_zh2+'張'),'var(--a2)'],
     ['加權均價',avg.toFixed(2)+' 元','var(--text)'],
     ['帳面損益',(spPnl>=0?'+':'')+spPnl+'%  ('+(spPnlAmt>=0?'+':'')+spPnlAmt+'K元)',spPnlAmt>=0?'var(--a2)':'var(--a4)'],
     ['年股利（估）',(shares*2000).toLocaleString()+' 元','var(--a3)'],
-    ['距100張目標',Math.max(0,100-shares)+'張','var(--a1)'],
+    ['距100張目標',(totalSh>=100000?'已達成！':Math.floor(Math.max(0,100000-totalSh)/1000)+'張'+Math.max(0,100000-totalSh)%1000+'股'),'var(--a1)'],
     ['操作建議',sy>=8.3?'全力加碼，難得甜蜜區':sy>=6?'按計畫每月5,000元定投':'暫停，資金轉波段本金','var(--text2)'],
   ];
   document.getElementById('springDecisionPanel').innerHTML=spRows.map(([l,v,c])=>`
@@ -1519,11 +1607,13 @@ function buildMonthlyData(){
   return [hdr,...st.monthly.map(r=>[r.ym,r.sp,r.shares,r.tm,r.wave,r.note||''])];
 }
 function buildSummaryData(){
-  const shares=calcShares(),avg=calcAvg();
+  const totalSh=calcShares(),avg=calcAvg();
+  const zh=Math.floor(totalSh/1000),lg=totalSh%1000;
+  const dispSh=lg>0?(zh+'張'+lg+'股'):zh+'張';
   return [
     ['項目','數值'],
     ['報告產出日期',new Date().toLocaleDateString('zh-TW')],
-    ['春源持有張數（含原始42張）',shares+'張'],
+    ['春源持有股數',dispSh],
     ['春源加權均價',avg.toFixed(2)+'元'],
     ['春源目前股價',st.sp+'元'],
     ['春源帳面損益率',((st.sp-avg)/avg*100).toFixed(2)+'%'],
@@ -1534,7 +1624,7 @@ function buildSummaryData(){
     ['波段本金',st.waveCapital.toLocaleString()+'元'],
     ['波段操作次數',st.waveTrades.length+'次'],
     ['波段已完成次數',st.waveTrades.filter(t=>t.exit).length+'次'],
-    ['年度春源股利（估）',(shares*2000).toLocaleString()+'元'],
+    ['年度春源股利（估）',(totalSh*2).toLocaleString()+'元'],
   ];
 }
 
