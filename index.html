@@ -1688,7 +1688,7 @@ function loadGHSettingsForm() {
   var o = document.getElementById('gh-owner');
   var r = document.getElementById('gh-repo');
   var p = document.getElementById('gh-path');
-  if (t) { t.value = GH.token ? '••••••••••••••••' : ''; }
+  if (t) { t.value = ''; t.placeholder = GH.token ? '已設定（輸入新 Token 可覆蓋）' : 'ghp_xxxxxxxxxxxxxxxxxxxx'; }
   if (o) { o.value = GH.owner; }
   if (r) { r.value = GH.repo; }
   if (p) { p.value = GH.path; }
@@ -1704,8 +1704,12 @@ function saveGHSettings() {
   var owner = document.getElementById('gh-owner').value.trim();
   var repo  = document.getElementById('gh-repo').value.trim();
   var path  = document.getElementById('gh-path').value.trim() || 'data.json';
-  if (!token || !owner || !repo) { showToast('❌ 請填寫所有欄位', 'red'); return; }
-  localStorage.setItem('ghToken', token);
+  if (!owner || !repo) { showToast('❌ 請填寫帳號和 Repository', 'red'); return; }
+  // Only update token if user typed a new one (not the masked placeholder)
+  if (token && token !== '••••••••••••••••') {
+    localStorage.setItem('ghToken', token);
+  }
+  if (!GH.token) { showToast('❌ 請填寫 Token', 'red'); return; }
   localStorage.setItem('ghOwner', owner);
   localStorage.setItem('ghRepo',  repo);
   localStorage.setItem('ghPath',  path);
@@ -1713,28 +1717,88 @@ function saveGHSettings() {
   updateGHStatus();
   // Test connection
   ghTestConnection(function(ok, msg) {
+    var syncEl = document.getElementById('ghSyncStatus');
+    var statusEl = document.getElementById('ghStatus');
     if (ok) {
       showToast('✅ 連線成功！', 'green');
-      document.getElementById('ghStatus').innerHTML = '<span class="green">✅ 已連線</span>';
-      document.getElementById('ghSyncStatus').textContent = msg;
+      if (statusEl) { statusEl.innerHTML = '<span class="green">✅ 已連線</span>'; }
+      var sb = document.getElementById('syncBtn'); if (sb) { sb.style.display = 'flex'; }
     } else {
-      showToast('❌ 連線失敗：' + msg, 'red');
-      document.getElementById('ghStatus').innerHTML = '<span class="red">❌ 連線失敗</span>';
+      showToast('❌ 連線失敗，請查看設定頁面的錯誤訊息', 'red');
+      if (statusEl) { statusEl.innerHTML = '<span class="red">❌ 連線失敗</span>'; }
+    }
+    if (syncEl) {
+      syncEl.style.whiteSpace = 'pre-line';
+      syncEl.style.lineHeight = '1.8';
+      syncEl.style.color = ok ? 'var(--green)' : 'var(--red)';
+      syncEl.textContent = msg;
     }
   });
 }
 
 function ghTestConnection(cb) {
-  var url = 'https://api.github.com/repos/' + GH.owner + '/' + GH.repo;
-  fetch(url, {
-    headers: { 'Authorization': 'token ' + GH.token, 'Accept': 'application/vnd.github.v3+json' }
-  }).then(function(r) {
-    if (r.ok) {
-      cb(true, '已連線到 ' + GH.owner + '/' + GH.repo);
-    } else {
-      cb(false, 'HTTP ' + r.status + '：請確認 token 和 repo 名稱');
+  var statusEl = document.getElementById('ghSyncStatus');
+  if (statusEl) { statusEl.textContent = '連線測試中...'; }
+
+  // Step 1: verify token is valid
+  fetch('https://api.github.com/user', {
+    headers: {
+      'Authorization': 'token ' + GH.token,
+      'Accept': 'application/vnd.github.v3+json'
     }
-  }).catch(function(e) { cb(false, e.message); });
+  }).then(function(r) {
+    if (!r.ok) {
+      if (r.status === 401) {
+        cb(false, '❌ Token 無效或已過期（401），請重新產生 Token');
+      } else {
+        cb(false, '❌ Token 驗證失敗（HTTP ' + r.status + '）');
+      }
+      return null;
+    }
+    return r.json();
+  }).then(function(user) {
+    if (!user) { return; }
+    var actualLogin = user.login;
+    if (statusEl) { statusEl.textContent = '✅ Token 有效，帳號：' + actualLogin + '　正在確認 repo...'; }
+
+    // Step 2: verify repo exists and is accessible
+    fetch('https://api.github.com/repos/' + GH.owner + '/' + GH.repo, {
+      headers: {
+        'Authorization': 'token ' + GH.token,
+        'Accept': 'application/vnd.github.v3+json'
+      }
+    }).then(function(r2) {
+      if (r2.status === 404) {
+        cb(false, '❌ 找不到 repo（404）
+可能原因：
+• repo 名稱「' + GH.repo + '」不正確（注意大小寫）
+• 帳號「' + GH.owner + '」不正確（您的實際帳號是：' + actualLogin + '）
+• Token 沒有 repo 讀取權限（請確認勾選了完整的 repo 權限，不只是 public_repo）');
+        return null;
+      }
+      if (r2.status === 403) {
+        cb(false, '❌ 權限不足（403）：Token 沒有存取此 repo 的權限，請重新產生並勾選 repo 完整權限');
+        return null;
+      }
+      if (!r2.ok) {
+        cb(false, '❌ repo 驗證失敗（HTTP ' + r2.status + '）');
+        return null;
+      }
+      return r2.json();
+    }).then(function(repo) {
+      if (!repo) { return; }
+      var isPrivate = repo.private ? '私有 🔒' : '公開 🌐';
+      cb(true, '✅ 連線成功！
+帳號：' + actualLogin + '
+Repo：' + repo.full_name + '（' + isPrivate + '）
+現在可以開啟自動同步了。');
+    }).catch(function(e) {
+      cb(false, '❌ 網路錯誤：' + e.message);
+    });
+  }).catch(function(e) {
+    cb(false, '❌ 網路錯誤：' + e.message + '
+請確認網路連線正常');
+  });
 }
 
 // Build data payload
