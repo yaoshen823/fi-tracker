@@ -1948,7 +1948,10 @@ function migrateData() {
   var now = new Date();
   var daysSinceBackup = lastBackup ? Math.floor((now - new Date(lastBackup)) / 86400000) : 999;
 
-  if (totalRecords > 0 && daysSinceBackup >= 7) {
+  // Only show reminder if GitHub auto-sync is NOT configured/enabled
+  var ghConfigured = !!(localStorage.getItem('ghToken') && localStorage.getItem('ghOwner') && localStorage.getItem('ghRepo'));
+  var ghAutoSyncOn = localStorage.getItem('ghAutoSync') === '1';
+  if (totalRecords > 0 && daysSinceBackup >= 7 && !(ghConfigured && ghAutoSyncOn)) {
     setTimeout(function() {
       showBackupReminder(totalRecords, daysSinceBackup);
     }, 1500);
@@ -1963,28 +1966,24 @@ function migrateData() {
 }
 
 function showBackupReminder(totalRecords, days) {
+  // Don't show if already visible
+  if (document.getElementById('backupReminderBar')) { return; }
   var msg = days >= 999
-    ? '您有 ' + totalRecords + ' 筆記錄尚未備份。建議立即備份，避免換裝置或清除快取時遺失資料。'
-    : '距離上次備份已有 ' + days + ' 天，共有 ' + totalRecords + ' 筆記錄。建議定期備份。';
-
+    ? '有 ' + totalRecords + ' 筆記錄尚未備份'
+    : '距上次備份已 ' + days + ' 天（共 ' + totalRecords + ' 筆記錄）';
   var bar = document.createElement('div');
   bar.id = 'backupReminderBar';
-  bar.style.cssText = 'position:fixed;top:60px;left:0;right:0;z-index:200;background:rgba(255,179,68,.15);border-bottom:2px solid rgba(255,179,68,.4);padding:10px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;';
-  bar.innerHTML = '<span style="font-size:13px;color:#ffe0a8;">⚠️ ' + msg + '</span>' +
-    '<div style="display:flex;gap:8px;">' +
-    '<button onclick="exportJSON();markBackupDone();" style="background:rgba(255,179,68,.3);border:1px solid rgba(255,179,68,.5);color:#ffe0a8;padding:6px 14px;border-radius:7px;cursor:pointer;font-size:12px;font-family:\'Noto Sans TC\',sans-serif;">💾 立即備份（JSON）</button>' +
-    '<button onclick="markBackupDone();" style="background:transparent;border:1px solid rgba(255,255,255,.2);color:var(--text2);padding:6px 14px;border-radius:7px;cursor:pointer;font-size:12px;font-family:\'Noto Sans TC\',sans-serif;">稍後提醒</button>' +
-    '</div>';
-  document.body.insertBefore(bar, document.body.firstChild);
-  // Adjust nav top to account for reminder bar
-  document.querySelector('nav').style.top = '100px';
+  bar.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:200;background:rgba(255,179,68,.18);border:1px solid rgba(255,179,68,.4);border-radius:12px;padding:10px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 4px 20px rgba(0,0,0,.4);max-width:520px;width:calc(100% - 40px);';
+  bar.innerHTML = '<span style="font-size:13px;color:#ffe0a8;flex:1;">⚠️ ' + msg + '</span>' +
+    '<button onclick="exportJSON();markBackupDone();" style="background:rgba(255,179,68,.3);border:1px solid rgba(255,179,68,.5);color:#ffe0a8;padding:6px 12px;border-radius:7px;cursor:pointer;font-size:12px;font-family:'Noto Sans TC',sans-serif;white-space:nowrap;">💾 備份</button>' +
+    '<button onclick="markBackupDone();" style="background:transparent;border:none;color:rgba(255,255,255,.4);padding:4px 8px;border-radius:4px;cursor:pointer;font-size:16px;line-height:1;" title="關閉">✕</button>';
+  document.body.appendChild(bar);
 }
 
 function markBackupDone() {
   localStorage.setItem('lastBackup', new Date().toISOString());
   var bar = document.getElementById('backupReminderBar');
   if (bar) { bar.remove(); }
-  document.querySelector('nav').style.top = '60px';
 }
 
 (function init() {
