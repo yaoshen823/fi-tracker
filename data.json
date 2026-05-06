@@ -1,0 +1,38 @@
+{
+  "version": "3",
+  "savedAt": "2026-05-06T09:41:28.439Z",
+  "sp": 24.85,
+  "tm": 25.05,
+  "springTrades": [
+    {
+      "id": 1778060488438,
+      "date": "2026-05-06",
+      "shares": 200,
+      "price": 24.8,
+      "src": "每月定投",
+      "note": ""
+    }
+  ],
+  "waveTrades": [],
+  "tmTrades": [],
+  "tmShares": 25,
+  "tmAvg": 35.08,
+  "events": [
+    {
+      "id": 1,
+      "date": "2026-05-04",
+      "text": "台泥宣布歐洲子公司赴歐IPO，三大投行協助評估",
+      "impact": "warning",
+      "action": "維持26元委託至6月底"
+    },
+    {
+      "id": 2,
+      "date": "2026-05-02",
+      "text": "辜仲諒持股達6.42%，成台泥單一最大股東",
+      "impact": "positive",
+      "action": "視為中期催化劑，維持計畫"
+    }
+  ],
+  "monthly": [],
+  "waveCapital": 121000
+}
