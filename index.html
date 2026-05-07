@@ -1703,15 +1703,15 @@ function loadGHSettingsForm() {
   var o = document.getElementById('gh-owner');
   var r = document.getElementById('gh-repo');
   var p = document.getElementById('gh-path');
-  if (t) { t.value = ''; t.placeholder = GH.token ? '已設定（輸入新 Token 可覆蓋）' : 'ghp_xxxxxxxxxxxxxxxxxxxx'; }
-  if (o) { o.value = GH.owner; }
-  if (r) { r.value = GH.repo; }
-  if (p) { p.value = GH.path; }
+  if (t) { t.value = ''; t.placeholder = ghGet('ghToken') ? '已設定（輸入新 Token 可覆蓋）' : 'ghp_xxxxxxxxxxxxxxxxxxxx'; }
+  if (o) { o.value = ghGet('ghOwner'); }
+  if (r) { r.value = ghGet('ghRepo'); }
+  if (p) { p.value = ghGet('ghPath'); }
   // Set checkbox states
   var asBox = document.getElementById('autoSyncBox');
   var apBox = document.getElementById('autoPullBox');
-  if (asBox) { GH.autoSync ? asBox.classList.add('ck') : asBox.classList.remove('ck'); }
-  if (apBox) { GH.autoPull ? apBox.classList.add('ck') : apBox.classList.remove('ck'); }
+  if (asBox) { ghAutoSyncOn() ? asBox.classList.add('ck') : asBox.classList.remove('ck'); }
+  if (apBox) { ghAutoPullOn() ? apBox.classList.add('ck') : apBox.classList.remove('ck'); }
 }
 
 function saveGHSettings() {
@@ -1719,102 +1719,48 @@ function saveGHSettings() {
   var owner = document.getElementById('gh-owner').value.trim();
   var repo  = document.getElementById('gh-repo').value.trim();
   var path  = document.getElementById('gh-path').value.trim() || 'data.json';
-  if (!owner || !repo) { showToast('❌ 請填寫帳號和 Repository', 'red'); return; }
-  // Only update token if user typed a new one (not the masked placeholder)
-  if (token && token !== '••••••••••••••••') {
-    localStorage.setItem('ghToken', token);
-  }
-  if (!GH.token) { showToast('❌ 請填寫 Token', 'red'); return; }
+  if (!owner || !repo) { showToast('請填寫帳號和 Repo 名稱', 'red'); return; }
+  if (token) { localStorage.setItem('ghToken', token); }
+  if (!ghGet('ghToken')) { showToast('請填寫 Token', 'red'); return; }
   localStorage.setItem('ghOwner', owner);
   localStorage.setItem('ghRepo',  repo);
   localStorage.setItem('ghPath',  path);
-  showToast('✅ 設定已儲存，測試連線中...', 'green');
-  updateGHStatus();
-  // Test connection
-  ghTestConnection(function(ok, msg) {
-    var syncEl = document.getElementById('ghSyncStatus');
-    var statusEl = document.getElementById('ghStatus');
-    if (ok) {
-      showToast('✅ 連線成功！', 'green');
-      if (statusEl) { statusEl.innerHTML = '<span class="green">✅ 已連線</span>'; }
-      var sb = document.getElementById('syncBtn'); if (sb) { sb.style.display = 'flex'; }
-    } else {
-      showToast('❌ 連線失敗，請查看設定頁面的錯誤訊息', 'red');
-      if (statusEl) { statusEl.innerHTML = '<span class="red">❌ 連線失敗</span>'; }
-    }
-    if (syncEl) {
-      syncEl.style.whiteSpace = 'pre-line';
-      syncEl.style.lineHeight = '1.8';
-      syncEl.style.color = ok ? 'var(--green)' : 'var(--red)';
-      syncEl.textContent = msg;
-    }
-  });
-}
-
-function ghTestConnection(cb) {
-  var statusEl = document.getElementById('ghSyncStatus');
-  if (statusEl) { statusEl.textContent = '連線測試中...'; }
-
-  // Step 1: verify token is valid
+  showToast('設定已儲存，測試連線中...', 'green');
+  var resultEl = document.getElementById('ghTestResult');
+  if (resultEl) { resultEl.textContent = '測試中...'; resultEl.style.color = 'var(--text2)'; }
+  var useToken = ghGet('ghToken');
   fetch('https://api.github.com/user', {
-    headers: {
-      'Authorization': 'token ' + GH.token,
-      'Accept': 'application/vnd.github.v3+json'
-    }
+    headers: { 'Authorization': 'token ' + useToken, 'Accept': 'application/vnd.github.v3+json' }
   }).then(function(r) {
     if (!r.ok) {
-      if (r.status === 401) {
-        cb(false, '❌ Token 無效或已過期（401），請重新產生 Token');
-      } else {
-        cb(false, '❌ Token 驗證失敗（HTTP ' + r.status + '）');
-      }
+      if (resultEl) { resultEl.textContent = 'Token 無效（HTTP ' + r.status + '）'; resultEl.style.color = 'var(--red)'; }
       return null;
     }
     return r.json();
   }).then(function(user) {
     if (!user) { return; }
-    var actualLogin = user.login;
-    if (statusEl) { statusEl.textContent = '✅ Token 有效，帳號：' + actualLogin + '　正在確認 repo...'; }
-
-    // Step 2: verify repo exists and is accessible
-    fetch('https://api.github.com/repos/' + GH.owner + '/' + GH.repo, {
-      headers: {
-        'Authorization': 'token ' + GH.token,
-        'Accept': 'application/vnd.github.v3+json'
-      }
+    fetch('https://api.github.com/repos/' + owner + '/' + repo, {
+      headers: { 'Authorization': 'token ' + useToken, 'Accept': 'application/vnd.github.v3+json' }
     }).then(function(r2) {
-      if (r2.status === 404) {
-        cb(false, '❌ 找不到 repo（404）
-可能原因：
-• repo 名稱「' + GH.repo + '」不正確（注意大小寫）
-• 帳號「' + GH.owner + '」不正確（您的實際帳號是：' + actualLogin + '）
-• Token 沒有 repo 讀取權限（請確認勾選了完整的 repo 權限，不只是 public_repo）');
-        return null;
+      if (r2.ok) {
+        if (resultEl) { resultEl.textContent = '連線成功！帳號：' + user.login + '　Repo：' + owner + '/' + repo; resultEl.style.color = 'var(--green)'; }
+        updateGHStatus();
+      } else if (r2.status === 404) {
+        if (resultEl) { resultEl.textContent = 'Repo 不存在（404）：帳號「' + owner + '」或 Repo「' + repo + '」不正確'; resultEl.style.color = 'var(--red)'; }
+      } else if (r2.status === 403) {
+        if (resultEl) { resultEl.textContent = 'Token 權限不足（403）：請確認勾選 repo 或 public_repo 權限'; resultEl.style.color = 'var(--red)'; }
+      } else {
+        if (resultEl) { resultEl.textContent = 'Repo 存取失敗（HTTP ' + r2.status + '）'; resultEl.style.color = 'var(--red)'; }
       }
-      if (r2.status === 403) {
-        cb(false, '❌ 權限不足（403）：Token 沒有存取此 repo 的權限，請重新產生並勾選 repo 完整權限');
-        return null;
-      }
-      if (!r2.ok) {
-        cb(false, '❌ repo 驗證失敗（HTTP ' + r2.status + '）');
-        return null;
-      }
-      return r2.json();
-    }).then(function(repo) {
-      if (!repo) { return; }
-      var isPrivate = repo.private ? '私有 🔒' : '公開 🌐';
-      cb(true, '✅ 連線成功！
-帳號：' + actualLogin + '
-Repo：' + repo.full_name + '（' + isPrivate + '）
-現在可以開啟自動同步了。');
     }).catch(function(e) {
-      cb(false, '❌ 網路錯誤：' + e.message);
+      if (resultEl) { resultEl.textContent = '網路錯誤：' + e.message; resultEl.style.color = 'var(--red)'; }
     });
   }).catch(function(e) {
-    cb(false, '❌ 網路錯誤：' + e.message + '
-請確認網路連線正常');
+    if (resultEl) { resultEl.textContent = '連線失敗：' + e.message; resultEl.style.color = 'var(--red)'; }
   });
 }
+
+
 
 // Build data payload
 function ghBuildData() {
@@ -1835,16 +1781,16 @@ function ghBuildData() {
 
 // Push data to GitHub
 function ghPush(showMsg) {
-  if (!GH.configured) {
+  if (!ghConfigured()) {
     if (showMsg) { showToast('⚠️ 請先在「設定」頁面填寫 GitHub 設定', 'amber'); }
     return;
   }
   var data = JSON.stringify(ghBuildData(), null, 2);
   var encoded = btoa(unescape(encodeURIComponent(data)));
   // First get current file SHA (needed for update)
-  var apiUrl = 'https://api.github.com/repos/' + GH.owner + '/' + GH.repo + '/contents/' + GH.path;
+  var apiUrl = 'https://api.github.com/repos/' + ghGet('ghOwner') + '/' + ghGet('ghRepo') + '/contents/' + ghGet('ghPath');
   fetch(apiUrl, {
-    headers: { 'Authorization': 'token ' + GH.token, 'Accept': 'application/vnd.github.v3+json' }
+    headers: { 'Authorization': 'token ' + ghGet('ghToken'), 'Accept': 'application/vnd.github.v3+json' }
   }).then(function(r) { return r.ok ? r.json() : null; })
   .then(function(existing) {
     var body = {
@@ -1855,7 +1801,7 @@ function ghPush(showMsg) {
     return fetch(apiUrl, {
       method: 'PUT',
       headers: {
-        'Authorization': 'token ' + GH.token,
+        'Authorization': 'token ' + ghGet('ghToken'),
         'Accept': 'application/vnd.github.v3+json',
         'Content-Type': 'application/json'
       },
@@ -1879,13 +1825,13 @@ function ghPush(showMsg) {
 
 // Pull data from GitHub
 function ghPull(showMsg) {
-  if (!GH.configured) {
+  if (!ghConfigured()) {
     if (showMsg) { showToast('⚠️ 請先在「設定」頁面填寫 GitHub 設定', 'amber'); }
     return;
   }
-  var apiUrl = 'https://api.github.com/repos/' + GH.owner + '/' + GH.repo + '/contents/' + GH.path;
+  var apiUrl = 'https://api.github.com/repos/' + ghGet('ghOwner') + '/' + ghGet('ghRepo') + '/contents/' + ghGet('ghPath');
   fetch(apiUrl, {
-    headers: { 'Authorization': 'token ' + GH.token, 'Accept': 'application/vnd.github.v3+json' }
+    headers: { 'Authorization': 'token ' + ghGet('ghToken'), 'Accept': 'application/vnd.github.v3+json' }
   }).then(function(r) {
     if (!r.ok) { throw new Error('HTTP ' + r.status); }
     return r.json();
@@ -1925,7 +1871,7 @@ function updateGHStatus() {
   var statusEl = document.getElementById('ghStatus');
   var syncEl   = document.getElementById('ghSyncStatus');
   if (!statusEl) { return; }
-  if (!GH.configured) {
+  if (!ghConfigured()) {
     statusEl.innerHTML = '<span style="color:var(--text2)">未設定</span>';
     return;
   }
@@ -1940,7 +1886,7 @@ function updateGHStatus() {
 }
 
 function toggleAutoSync() {
-  var val = GH.autoSync ? '0' : '1';
+  var val = ghAutoSyncOn() ? '0' : '1';
   localStorage.setItem('ghAutoSync', val);
   var box = document.getElementById('autoSyncBox');
   if (box) { val === '1' ? box.classList.add('ck') : box.classList.remove('ck'); }
@@ -1948,7 +1894,7 @@ function toggleAutoSync() {
 }
 
 function toggleAutoPull() {
-  var val = GH.autoPull ? '0' : '1';
+  var val = ghAutoPullOn() ? '0' : '1';
   localStorage.setItem('ghAutoPull', val);
   var box = document.getElementById('autoPullBox');
   if (box) { val === '1' ? box.classList.add('ck') : box.classList.remove('ck'); }
@@ -1957,7 +1903,7 @@ function toggleAutoPull() {
 
 // Auto-sync after any data change
 function ghAutoSync() {
-  if (GH.configured && GH.autoSync) { ghPush(false); }
+  if (ghConfigured() && ghAutoSyncOn()) { ghPush(false); }
 }
 
 // ════════════════════════════════════════════════════════
@@ -2039,7 +1985,7 @@ function migrateData() {
   console.log('[Init] Data loaded — spring:' + st.springTrades.length + ' wave:' + st.waveTrades.length + ' tm:' + st.tmTrades.length + ' monthly:' + st.monthly.length);
 
   // If autoPull is enabled, fetch from GitHub on load
-  if (GH.configured && GH.autoPull) {
+  if (ghConfigured() && ghAutoPullOn()) {
     ghPull(false);
   }
 }
@@ -2054,7 +2000,7 @@ function showBackupReminder(totalRecords, days) {
   bar.id = 'backupReminderBar';
   bar.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:200;background:rgba(255,179,68,.18);border:1px solid rgba(255,179,68,.4);border-radius:12px;padding:10px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 4px 20px rgba(0,0,0,.4);max-width:520px;width:calc(100% - 40px);';
   bar.innerHTML = '<span style="font-size:13px;color:#ffe0a8;flex:1;">⚠️ ' + msg + '</span>' +
-    '<button onclick="exportJSON();markBackupDone();" style="background:rgba(255,179,68,.3);border:1px solid rgba(255,179,68,.5);color:#ffe0a8;padding:6px 12px;border-radius:7px;cursor:pointer;font-size:12px;font-family:'Noto Sans TC',sans-serif;white-space:nowrap;">💾 備份</button>' +
+    '<button onclick="exportJSON();markBackupDone();" style="background:rgba(255,179,68,.3);border:1px solid rgba(255,179,68,.5);color:#ffe0a8;padding:6px 12px;border-radius:7px;cursor:pointer;font-size:12px;font-family:sans-serif;white-space:nowrap;">💾 備份</button>' +
     '<button onclick="markBackupDone();" style="background:transparent;border:none;color:rgba(255,255,255,.4);padding:4px 8px;border-radius:4px;cursor:pointer;font-size:16px;line-height:1;" title="關閉">✕</button>';
   document.body.appendChild(bar);
 }
@@ -2065,27 +2011,177 @@ function markBackupDone() {
   if (bar) { bar.remove(); }
 }
 
-(function init() {
-  // ── Data Migration: ensure all keys exist and formats are compatible ──
-  migrateData();
 
+
+// ── from tracker_js: checkBackupReminder ──
+function checkBackupReminder() {
+  if (ghConfigured() && ghAutoSyncOn()) { return; }
+  var total = st.springTrades.length + st.waveTrades.length + st.tmTrades.length + st.monthly.length;
+  if (total === 0) { return; }
+  var last = localStorage.getItem('lastBackup');
+  var days = last ? Math.floor((new Date() - new Date(last)) / 86400000) : 999;
+  if (days < 7) { return; }
+  var bar = document.getElementById('backupBar');
+  var msg = document.getElementById('backupMsg');
+  if (bar && msg) {
+    msg.textContent = days >= 999 ? ('有 '+total+' 筆記錄尚未備份') : ('距上次備份已 '+days+' 天（共 '+total+' 筆）');
+    bar.style.display = 'flex';
+  }
+}
+
+// ── from tracker_js: dismissBackup ──
+function dismissBackup() {
+  localStorage.setItem('lastBackup', new Date().toISOString());
+  var bar = document.getElementById('backupBar');
+  if (bar) { bar.style.display = 'none'; }
+}
+
+// ── from tracker_js: doBackup ──
+function doBackup() { exportJSON(); }
+
+// ── from tracker_js: finish ──
+function finish() {
+    done++;
+    if (done < 2) { return; }
+    spin.classList.remove('spinning');
+    if (newSp || newTm) {
+      if (newSp) { st.spPrev = st.sp; st.sp = newSp; S.set('spPrev', st.spPrev); S.set('sp', st.sp); }
+      if (newTm) { st.tmPrev = st.tm; st.tm = newTm; S.set('tmPrev', st.tmPrev); S.set('tm', st.tm); }
+      setPriceStatus('s-live', '即時報價');
+      refreshDash();
+      showToast('股價已更新', 'green');
+    } else {
+      setPriceStatus('s-error', 'API失敗，請手動輸入');
+      showToast('無法自動取得股價，請點擊股價數字手動輸入', 'amber');
+    }
+    setLastUpdate();
+  }
+
+// ── from tracker_js: fmtShares ──
+function fmtShares(sh) {
+  var zhang = Math.floor(sh / 1000);
+  var linggu = sh % 1000;
+  if (linggu === 0) { return zhang + '張'; }
+  return zhang + '張' + linggu + '股';
+}
+
+// ── from tracker_js: ghAutoPullOn ──
+function ghAutoPullOn() { return localStorage.getItem('ghAutoPull') === '1'; }
+
+// ── from tracker_js: ghAutoSyncOn ──
+function ghAutoSyncOn() { return localStorage.getItem('ghAutoSync') === '1'; }
+
+// ── from tracker_js: ghBuildPayload ──
+function ghBuildPayload() {
+  return {version:'4', savedAt:new Date().toISOString(), sp:st.sp, tm:st.tm, springTrades:st.springTrades, waveTrades:st.waveTrades, tmTrades:st.tmTrades, tmShares:st.tmShares, tmAvg:st.tmAvg, events:st.events, monthly:st.monthly, waveCapital:st.waveCapital};
+}
+
+// ── from tracker_js: ghConfigured ──
+function ghConfigured() { return !!(ghGet('ghToken') && ghGet('ghOwner') && ghGet('ghRepo')); }
+
+// ── from tracker_js: ghGet ──
+function ghGet(key) { return localStorage.getItem(key) || ''; }
+
+// ── from tracker_js: loadGHForm ──
+function loadGHForm() {
+  var el;
+  el = document.getElementById('gh-token'); if (el) { el.value = ''; el.placeholder = ghGet('ghToken') ? '已設定（輸入新 Token 可覆蓋）' : 'ghp_xxxxxxxxxxxxxxxxxxxx'; }
+  el = document.getElementById('gh-owner'); if (el) { el.value = ghGet('ghOwner'); }
+  el = document.getElementById('gh-repo');  if (el) { el.value = ghGet('ghRepo'); }
+  el = document.getElementById('gh-path');  if (el) { el.value = ghGet('ghPath') || 'data.json'; }
+  el = document.getElementById('autoSyncBox'); if (el) { ghAutoSyncOn() ? el.classList.add('ck') : el.classList.remove('ck'); }
+  el = document.getElementById('autoPullBox'); if (el) { ghAutoPullOn() ? el.classList.add('ck') : el.classList.remove('ck'); }
+}
+
+// ── from tracker_js: loadState ──
+function loadState() {
+  st.sp           = S.get('sp')           !== null ? S.get('sp')           : 24.80;
+  st.tm           = S.get('tm')           !== null ? S.get('tm')           : 24.15;
+  st.spPrev       = S.get('spPrev');
+  st.tmPrev       = S.get('tmPrev');
+  st.waveCapital  = S.get('waveCapital')  !== null ? S.get('waveCapital')  : 121000;
+  st.tmShares     = S.get('tmShares')     !== null ? S.get('tmShares')     : 25;
+  st.tmAvg        = S.get('tmAvg')        !== null ? S.get('tmAvg')        : 35.08;
+  st.springTrades = S.get('springTrades') || [];
+  st.waveTrades   = S.get('waveTrades')   || [];
+  st.tmTrades     = S.get('tmTrades')     || [];
+  st.events       = S.get('events')       || [
+    {id:1, date:'2026-05-04', text:'台泥宣布歐洲子公司赴歐IPO，三大投行協助評估', impact:'warning', action:'維持26元委託至6月底'},
+    {id:2, date:'2026-05-02', text:'辜仲諒持股達6.42%，成台泥單一最大股東', impact:'positive', action:'視為中期催化劑，維持計畫'}
+  ];
+  st.monthly      = S.get('monthly')      || [];
+  // migrate: old springTrades used qty (張), convert to shares (股)
+  var migrated = false;
+  for (var i = 0; i < st.springTrades.length; i++) {
+    var t = st.springTrades[i];
+    if (t.qty !== undefined && t.shares === undefined) {
+      t.shares = t.qty * 1000;
+      delete t.qty;
+      migrated = true;
+    }
+  }
+  if (migrated) { S.set('springTrades', st.springTrades); }
+}
+
+// ── from tracker_js: setLastUpdate ──
+function setLastUpdate() {
+  var now = new Date();
+  var el = document.getElementById('lastUpdate');
+  if (el) { el.textContent = '更新：' + now.toLocaleTimeString('zh-TW', {hour:'2-digit',minute:'2-digit'}); }
+}
+
+// ── from tracker_js: setPriceStatus ──
+function setPriceStatus(cls, text) {
+  var el = document.getElementById('priceStatus');
+  if (el) { el.className = 'price-status ' + cls; el.textContent = text; }
+}
+
+// ── from tracker_js: tryTWSE ──
+function tryTWSE(no, cb) {
+    var today = new Date();
+    var ds = today.getFullYear() + String(today.getMonth()+1).padStart(2,'0') + String(today.getDate()).padStart(2,'0');
+    var url = 'https://www.twse.com.tw/exchangeReport/STOCK_DAY?response=json&date=' + ds + '&stockNo=' + no;
+    fetch(url).then(function(r) { return r.json(); }).then(function(d) {
+      if (d.stat === 'OK' && d.data && d.data.length > 0) {
+        var p = parseFloat(d.data[d.data.length-1][6].replace(/,/g,''));
+        cb(!isNaN(p) && p > 0 ? p : null);
+      } else { cb(null); }
+    }).catch(function() { cb(null); });
+  }
+
+// ── from tracker_js: tryYahoo ──
+function tryYahoo(sym, cb) {
+    var yUrl = 'https://query1.finance.yahoo.com/v8/finance/chart/' + sym + '?interval=1d&range=1d';
+    var pUrl = 'https://api.allorigins.win/get?url=' + encodeURIComponent(yUrl);
+    fetch(pUrl).then(function(r) { return r.json(); }).then(function(d) {
+      var parsed = JSON.parse(d.contents);
+      var p = parsed.chart.result[0].meta.regularMarketPrice;
+      cb(p && p > 0 ? p : null);
+    }).catch(function() { cb(null); });
+  }
+
+// ── Init ──
+window.onload = function() {
+  loadState();
   var today = new Date().toISOString().split('T')[0];
-  var dateFields = ['sp-date', 'tm-date', 'wv-date', 'ev-date'];
+  var dateFields = ['sp-date','tm-date','wv-date','ev-date'];
   for (var i = 0; i < dateFields.length; i++) {
     var el = document.getElementById(dateFields[i]);
     if (el) { el.value = today; }
   }
-  refreshDash();
-  updateLastTime();
-  // Auto-fetch on load (weekdays; outside hours shows last cached price)
-  var now = new Date(), day = now.getDay();
-  if (day >= 1 && day <= 5) {
-    fetchPrices();
-  } else {
-    updatePriceStatus('s-manual', '週末休市（顯示上次收盤）');
-    updateLastTime();
+  var wvEntry = document.getElementById('wv-entry');
+  if (wvEntry) {
+    wvEntry.addEventListener('input', wvAutoCalc);
   }
-})();
-</script>
+  if (ghConfigured() && ghAutoPullOn()) {
+    ghPull(false);
+  }
+  refreshDash();
+  setLastUpdate();
+  setTimeout(checkBackupReminder, 2000);
+  var day = new Date().getDay();
+  if (day >= 1 && day <= 5) { fetchPrices(); }
+  else { updatePriceStatus('s-manual', '週末休市（顯示上次收盤）'); setLastUpdate(); }
+};</script>
 </body>
 </html>
